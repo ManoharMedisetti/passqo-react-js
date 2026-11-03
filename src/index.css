@@ -1,0 +1,349 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Figma v1: warm 60% surface + neutral text. The design has no dark theme. */
+:root {
+  --background: #F5F0EB;
+  --foreground: #1B1B23;
+  --font-manrope: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --navbar-height: 96px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --navbar-height: 68px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --navbar-height: 72px;
+  }
+}
+
+html {
+  overflow-x: clip;
+}
+
+body {
+  overflow-x: clip;
+  max-width: 100%;
+  width: 100%;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-manrope);
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  max-width: 100%;
+  width: 100%;
+  min-height: 100vh;
+}
+
+body.auth-modal-open {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+body.auth-modal-open #bottom-nav-bar,
+body.auth-modal-open .bottom-nav-bar {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Translucent Glassy Distortion & Specular Optics */
+.glass-navbar {
+  background: rgba(245, 240, 235, 0.65);
+  backdrop-filter: blur(24px) saturate(190%) contrast(92%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%) contrast(92%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 4px 24px -1px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.glass-navbar-scrolled {
+  background: rgba(245, 240, 235, 0.78);
+  backdrop-filter: blur(28px) saturate(200%) contrast(95%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%) contrast(95%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.07),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+}
+
+/* Figma v1 type: headings use the display face (Cabinet Grotesk). */
+@layer base {
+  h1, h2, h3 {
+    font-family: theme("fontFamily.display");
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Accessibility preferences — toggled from /settings, applied on <html> */
+@keyframes hoverWiggle {
+  0%, 100% {
+    transform: scale(1.18) rotate(-3deg) translateY(-1px);
+  }
+  50% {
+    transform: scale(1.22) rotate(3deg) translateY(-3px);
+  }
+}
+
+.group:hover .animate-hover-live {
+  animation: hoverWiggle 4.5s ease-in-out infinite;
+}
+html.a11y-high-contrast {
+  filter: contrast(1.25) saturate(1.15);
+}
+html.a11y-large-text {
+  font-size: 112.5%;
+}
+/* Figma design-system motion spec: with reduced motion, replace animation with
+   opacity-only crossfades. Honours both the OS setting and the in-app toggle. */
+html.a11y-reduced-motion *,
+html.a11y-reduced-motion *::before,
+html.a11y-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-property: opacity !important;
+  transition-duration: 150ms !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: opacity !important;
+    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print */
+@media print {
+  body.print-guest-table {
+    background: #fff;
+  }
+  body.print-guest-table * {
+    visibility: hidden;
+  }
+  body.print-guest-table [data-print-root],
+  body.print-guest-table [data-print-root] * {
+    visibility: visible;
+  }
+  body.print-guest-table [data-print-root] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0 12mm;
+  }
+  body.print-guest-table [data-print-root] table {
+    font-size: 10px;
+  }
+  body.print-guest-table [data-print-root] thead {
+    display: table-header-group;
+  }
+  @page {
+    size: landscape;
+    margin: 12mm;
+  }
+}
+
+/* Horizontal rows (home carousels, filter chips) scroll by swipe/arrows */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── Fluid / Liquid Modal & Sheet Animations ── */
+@keyframes liquidModalIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.93) translateY(24px);
+    filter: blur(8px);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.006) translateY(-1px);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+}
+
+@keyframes liquidBackdropIn {
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(14px);
+  }
+}
+
+@keyframes liquidModalOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.94) translateY(18px);
+    filter: blur(8px);
+  }
+}
+
+@keyframes liquidBackdropOut {
+  0% {
+    opacity: 1;
+    backdrop-filter: blur(14px);
+  }
+  100% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+}
+
+@keyframes liquidItemFade {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes liquidPopCard {
+  0% {
+    opacity: 0;
+    transform: scale(0.88) translateY(10px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.02) translateY(-1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes slideViewToLeft {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-40px) scale(0.97);
+    filter: blur(4px);
+  }
+}
+
+@keyframes slideViewFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(40px) scale(0.97);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+@keyframes slideViewToRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(40px) scale(0.97);
+    filter: blur(4px);
+  }
+}
+
+@keyframes slideViewFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-40px) scale(0.97);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+.animate-liquid-modal {
+  animation: liquidModalIn 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-liquid-modal-out {
+  animation: liquidModalOut 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-liquid-backdrop {
+  animation: liquidBackdropIn 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-liquid-backdrop-out {
+  animation: liquidBackdropOut 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-liquid-item-1 {
+  animation: liquidItemFade 360ms cubic-bezier(0.16, 1, 0.3, 1) 40ms forwards both;
+}
+
+.animate-liquid-item-2 {
+  animation: liquidItemFade 360ms cubic-bezier(0.16, 1, 0.3, 1) 80ms forwards both;
+}
+
+.animate-liquid-item-3 {
+  animation: liquidItemFade 360ms cubic-bezier(0.16, 1, 0.3, 1) 120ms forwards both;
+}
+
+.animate-liquid-item-4 {
+  animation: liquidItemFade 360ms cubic-bezier(0.16, 1, 0.3, 1) 160ms forwards both;
+}
+
+.animate-pop-card {
+  animation: liquidPopCard 380ms cubic-bezier(0.16, 1, 0.3, 1) forwards both;
+}
+
+
+

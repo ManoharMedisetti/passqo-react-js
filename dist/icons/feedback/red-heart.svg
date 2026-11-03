@@ -1,0 +1,8 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="emojione:red-heart">
+<mask id="stroke0_0_23" fill="white">
+<path d="M19.0937 5.6875C17.0937 0.375 10.5938 2.75 10 5.40625C9.1875 2.59375 2.84375 0.5 0.90625 5.6875C-1.25 11.4688 9.25 16.6563 10 17.5C10.75 16.8125 21.25 11.375 19.0937 5.6875Z"/>
+</mask>
+<path id="Vector" d="M19.0937 5.6875C17.0937 0.375 10.5938 2.75 10 5.40625C9.1875 2.59375 2.84375 0.5 0.90625 5.6875C-1.25 11.4688 9.25 16.6563 10 17.5C10.75 16.8125 21.25 11.375 19.0937 5.6875Z" stroke-width="2" stroke="black" mask="url(#stroke0_0_23)"/>
+</g>
+</svg>
