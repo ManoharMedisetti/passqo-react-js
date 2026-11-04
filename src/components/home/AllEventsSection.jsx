@@ -508,11 +508,11 @@ export function AllEventsSection({ initialEvents = MOCK_EVENTS }) {
         </div>
       </div>
 
-      {/* ── 4. Quick Date Filter Chips ── */}
+      {/* ── 4. Quick Date Filter Chips (Matching Reference Image) ── */}
       {[
         ["today", "Today"],
-        ["week", "This week"],
-        ["month", "This month"],
+        ["tomorrow", "Tomorrow"],
+        ["week", "This Weekend"],
       ].map(([val, label]) => {
         const active = dateFilter === val;
         return (
@@ -527,11 +527,11 @@ export function AllEventsSection({ initialEvents = MOCK_EVENTS }) {
             className={`
               flex-shrink-0 inline-flex items-center text-xs lg:text-sm font-semibold
               px-3 sm:px-3.5 lg:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl
-              backdrop-blur-md transition-all duration-200 active:scale-95
+              backdrop-blur-md transition-all duration-200 active:scale-95 border
               ${
                 active
-                  ? "bg-[#FF4E7A] text-white shadow-xs"
-                  : "bg-white/85 hover:bg-white text-[#1B1B23] border border-black/8 hover:border-black/15 shadow-xs hover:text-[#FF4E7A]"
+                  ? "bg-[#FF4E7A] text-white border-[#FF4E7A] shadow-xs"
+                  : "bg-white hover:bg-neutral-50 text-[#1B1B23] border border-black/10 hover:border-black/20 shadow-xs hover:text-[#FF4E7A]"
               }
             `}
           >
@@ -795,6 +795,11 @@ export function AllEventsSection({ initialEvents = MOCK_EVENTS }) {
     displayTitle = `Results for : ${cleanQ}`;
   } else if (selectedCategoryLabel) {
     displayTitle = `Results for : ${selectedCategoryLabel}`;
+  } else if (dateFilter && dateFilter !== "any") {
+    const dateLabel = dateFilter === "today" ? "Today" : dateFilter === "tomorrow" ? "Tomorrow" : "This Weekend";
+    displayTitle = `Results for : ${dateLabel}`;
+  } else if (nearMe) {
+    displayTitle = "Results for : Events Near You";
   }
 
   return (
@@ -811,87 +816,132 @@ export function AllEventsSection({ initialEvents = MOCK_EVENTS }) {
         )}
       </div>
 
-      {/* ── Sticky Filters Toolbar: Only Filters Fixed, No Shadows ── */}
+      {/* ── Sticky Filters Toolbar: Fixed directly beneath navbar on all screens ── */}
       <div
-        className="sticky z-40 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-2 bg-[#F5F0EB]/95 backdrop-blur-md border-b border-black/5 transition-all shadow-none"
-        style={{ top: "var(--navbar-height, 64px)" }}
+        className="sticky z-40 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-2.5 bg-[#F5F0EB]/95 backdrop-blur-md border-b border-black/8 transition-all shadow-[0_4px_16px_rgba(0,0,0,0.04)]"
+        style={{ top: "var(--navbar-height, 72px)" }}
       >
-        {/* Mobile & Tablet Toolbar (< lg): Quick Clickable Filters (Today, Tomorrow, Under 10km, More filters) */}
-        <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1 touch-pan-x select-none">
-          {/* Today */}
+        {/* Mobile & Tablet Toolbar (< lg): Matching Reference Image (Filters ▾, Today, Tomorrow, This Weekend, Under 10km, Categories) */}
+        <div className="lg:hidden flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide py-1 touch-pan-x select-none">
+          {/* 1. Filters Trigger (at the start, matching reference image) */}
+          <button
+            type="button"
+            onClick={() => setIsMobileFilterSheetOpen(true)}
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex-shrink-0 flex items-center gap-1.5 transition-all active:scale-95 border ${
+              totalActiveFiltersCount > 0
+                ? "bg-[#1B1B23] text-white border-[#1B1B23] shadow-xs"
+                : "bg-white text-[#1B1B23] border-black/10 shadow-2xs hover:border-[#FF4E7A]/40"
+            }`}
+          >
+            <SlidersHorizontal className={`w-3.5 h-3.5 ${totalActiveFiltersCount > 0 ? "text-[#FF4E7A]" : "text-[#1B1B23]"}`} />
+            <span>Filters</span>
+            {totalActiveFiltersCount > 0 && (
+              <span className="w-4 h-4 rounded-full bg-[#FF4E7A] text-white text-[10px] font-bold flex items-center justify-center">
+                {totalActiveFiltersCount}
+              </span>
+            )}
+            <ChevronDown className="w-3 h-3 text-neutral-400" />
+          </button>
+
+          {/* 2. Today */}
           <button
             type="button"
             onClick={() => {
               setDateFilter(dateFilter === "today" ? "any" : "today");
               setVisibleCount(8);
             }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex-shrink-0 transition-all active:scale-95 ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex-shrink-0 transition-all active:scale-95 border ${
               dateFilter === "today"
-                ? "bg-[#FF4E7A] text-white shadow-xs"
-                : "bg-white text-[#1B1B23] border border-black/8 shadow-2xs hover:border-[#FF4E7A]/30"
+                ? "bg-[#FF4E7A] text-white border-[#FF4E7A] shadow-xs"
+                : "bg-white text-[#1B1B23] border-black/10 shadow-2xs hover:border-[#FF4E7A]/40"
             }`}
           >
             Today
           </button>
 
-          {/* Tomorrow */}
+          {/* 3. Tomorrow */}
           <button
             type="button"
             onClick={() => {
               setDateFilter(dateFilter === "tomorrow" ? "any" : "tomorrow");
               setVisibleCount(8);
             }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex-shrink-0 transition-all active:scale-95 ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex-shrink-0 transition-all active:scale-95 border ${
               dateFilter === "tomorrow"
-                ? "bg-[#FF4E7A] text-white shadow-xs"
-                : "bg-white text-[#1B1B23] border border-black/8 shadow-2xs hover:border-[#FF4E7A]/30"
+                ? "bg-[#FF4E7A] text-white border-[#FF4E7A] shadow-xs"
+                : "bg-white text-[#1B1B23] border-black/10 shadow-2xs hover:border-[#FF4E7A]/40"
             }`}
           >
             Tomorrow
           </button>
 
-          {/* Under 10 Km */}
+          {/* 4. This Weekend */}
+          <button
+            type="button"
+            onClick={() => {
+              setDateFilter(dateFilter === "week" ? "any" : "week");
+              setVisibleCount(8);
+            }}
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex-shrink-0 transition-all active:scale-95 border ${
+              dateFilter === "week"
+                ? "bg-[#FF4E7A] text-white border-[#FF4E7A] shadow-xs"
+                : "bg-white text-[#1B1B23] border-black/10 shadow-2xs hover:border-[#FF4E7A]/40"
+            }`}
+          >
+            This Weekend
+          </button>
+
+          {/* 5. Under 10 Km */}
           <button
             type="button"
             onClick={() => {
               setNearMe(!nearMe);
               setVisibleCount(8);
             }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex-shrink-0 flex items-center gap-1 transition-all active:scale-95 ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex-shrink-0 flex items-center gap-1 transition-all active:scale-95 border ${
               nearMe
-                ? "bg-[#FF4E7A] text-white shadow-xs"
-                : "bg-white text-[#1B1B23] border border-black/8 shadow-2xs hover:border-[#FF4E7A]/30"
+                ? "bg-[#FF4E7A] text-white border-[#FF4E7A] shadow-xs"
+                : "bg-white text-[#1B1B23] border-black/10 shadow-2xs hover:border-[#FF4E7A]/40"
             }`}
           >
             <MapPin className={`w-3.5 h-3.5 ${nearMe ? "text-white" : "text-[#8C8C9E]"}`} />
-            <span>Under 10 Km</span>
+            <span>Under 10 km</span>
           </button>
 
-          {/* More filters (Opens 70% Bottom Sheet) */}
-          <button
-            type="button"
-            onClick={() => setIsMobileFilterSheetOpen(true)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex-shrink-0 flex items-center gap-1.5 transition-all active:scale-95 ${
-              totalActiveFiltersCount > 0
-                ? "bg-[#1B1B23] text-white shadow-xs"
-                : "bg-white text-[#1B1B23] border border-black/8 shadow-2xs hover:border-[#FF4E7A]/30"
-            }`}
-          >
-            <SlidersHorizontal className={`w-3.5 h-3.5 ${totalActiveFiltersCount > 0 ? "text-[#FF4E7A]" : "text-[#8C8C9E]"}`} />
-            <span>More filters</span>
-            {totalActiveFiltersCount > 0 && (
-              <span className="w-4 h-4 rounded-full bg-[#FF4E7A] text-white text-[10px] font-bold flex items-center justify-center">
-                {totalActiveFiltersCount}
-              </span>
-            )}
-          </button>
+          {/* 6. Quick Categories (Music, Business, Food, Sports, Community) */}
+          {[
+            { value: "MUSIC_ENTERTAINMENT", label: "Music" },
+            { value: "BUSINESS", label: "Business" },
+            { value: "FOOD_DRINK", label: "Food & Drink" },
+            { value: "SPORTS", label: "Sports" },
+            { value: "COMMUNITY", label: "Community" },
+          ].map((cat) => {
+            const isSelected = category === cat.value;
+            return (
+              <button
+                key={cat.value}
+                type="button"
+                onClick={() => {
+                  setCategory(isSelected ? "" : cat.value);
+                  setVisibleCount(8);
+                }}
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex-shrink-0 transition-all active:scale-95 border ${
+                  isSelected
+                    ? "bg-[#FF4E7A] text-white border-[#FF4E7A] shadow-xs"
+                    : "bg-white text-[#1B1B23] border-black/10 shadow-2xs hover:border-[#FF4E7A]/40"
+                }`}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
 
           {/* Reset (if active) */}
           {filtered && (
             <button
               type="button"
               onClick={clear}
-              className="px-2.5 py-1.5 rounded-full text-xs font-bold text-[#8C8C9E] hover:text-[#FF4E7A] bg-black/5 flex-shrink-0 active:scale-95 transition-colors"
+              className="px-2.5 py-2 rounded-xl text-xs font-bold text-[#8C8C9E] hover:text-[#FF4E7A] bg-black/5 flex-shrink-0 active:scale-95 transition-colors"
             >
               Reset
             </button>

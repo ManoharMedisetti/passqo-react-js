@@ -479,7 +479,7 @@ export function SearchModal() {
       if (viewMode === "location") {
         setTimeout(() => {
           locationInputRef.current?.focus();
-          locationInputRef.current?.select();
+          locationInputRef.current?.setSelectionRange(0, 0);
         }, 120);
       } else if (viewMode === "search") {
         setTimeout(() => {
@@ -501,18 +501,20 @@ export function SearchModal() {
     const handleScroll = () => {
       const letters = ALPHABET_LIST.filter((l) => (ALPHABET_CITIES_MAP[l] || []).length > 0);
       const containerRect = container.getBoundingClientRect();
-      const triggerY = containerRect.top + 90;
+      const triggerY = containerRect.top + 95;
 
+      let found = null;
       for (let i = letters.length - 1; i >= 0; i--) {
         const el = document.getElementById(`mobile-city-letter-${letters[i]}`);
         if (el) {
           const rect = el.getBoundingClientRect();
           if (rect.top <= triggerY) {
-            setSelectedLetter(letters[i]);
+            found = letters[i];
             break;
           }
         }
       }
+      setSelectedLetter(found || "A");
     };
 
     container.addEventListener("scroll", handleScroll, { passive: true });
@@ -556,7 +558,7 @@ export function SearchModal() {
       if (activeDropdown && !e.target.closest("[data-dropdown]")) {
         setActiveDropdown(null);
       }
-      if (isMoreFiltersOpen && !e.target.closest('[data-dropdown="more"]')) {
+      if (isMoreFiltersOpen && window.innerWidth >= 1024 && !e.target.closest('[data-dropdown="more"]')) {
         setIsMoreFiltersOpen(false);
       }
     };
@@ -746,9 +748,6 @@ export function SearchModal() {
   // Category click toggles category filter independently from the search text input
   const handleCategoryClick = (categoryValue) => {
     setSelectedCategory((prev) => (prev === categoryValue ? null : categoryValue));
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 60);
   };
 
   // Navigates to dedicated EventsPage maintaining ALL active filters with smooth fade/expand close
@@ -823,8 +822,8 @@ export function SearchModal() {
     if (target && container) {
       const containerTop = container.getBoundingClientRect().top;
       const targetTop = target.getBoundingClientRect().top;
-      const offset = targetTop - containerTop + container.scrollTop - 44;
-      container.scrollTo({ top: offset, behavior: "smooth" });
+      const offset = targetTop - containerTop + container.scrollTop - 40;
+      container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
     }
   };
 
@@ -848,11 +847,12 @@ export function SearchModal() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="fixed inset-0 z-[200] flex lg:items-start lg:justify-center lg:pt-8 lg:px-8 lg:pb-4 overflow-y-auto overscroll-contain bg-[#F8F5F0] lg:bg-transparent"
-          style={{
-            height: visualHeight ? `${visualHeight}px` : "100%",
-            overscrollBehavior: "contain",
-          }}
+          className="fixed inset-0 z-[200] flex items-center justify-center lg:p-6 xl:p-8 overflow-y-auto overscroll-contain bg-[#F8F5F0] lg:bg-transparent"
+          style={
+            typeof window !== "undefined" && window.innerWidth < 1024 && visualHeight
+              ? { height: `${visualHeight}px`, overscrollBehavior: "contain" }
+              : { overscrollBehavior: "contain" }
+          }
         >
           {/* Frosted Glass Backdrop (Desktop >= lg) */}
           <motion.div
@@ -865,13 +865,13 @@ export function SearchModal() {
             aria-hidden="true"
           />
 
-          {/* Main Search Modal Card (Full-screen on mobile & tablet < lg, Floating card on desktop >= lg) */}
+          {/* Main Search Modal Card (Full-screen on mobile < lg, Centered Floating Popup on desktop >= lg) */}
           <motion.div
             ref={modalRef}
             initial={{
               opacity: 0,
-              scale: 0.98,
-              y: -12,
+              scale: 0.96,
+              y: -16,
             }}
             animate={{
               opacity: 1,
@@ -886,75 +886,72 @@ export function SearchModal() {
             }}
             exit={{
               opacity: 0,
-              scale: 0.98,
-              y: -12,
+              scale: 0.96,
+              y: -16,
               transition: {
                 duration: 0.18,
                 ease: [0.16, 1, 0.3, 1],
               },
             }}
-            style={{
-              height: visualHeight ? `${visualHeight}px` : "100dvh",
-              maxHeight: visualHeight && typeof window !== "undefined" && window.innerWidth >= 1024
-                ? `${Math.min(visualHeight - 16, 720)}px`
-                : visualHeight ? `${visualHeight}px` : "100dvh",
-            }}
+            style={
+              typeof window !== "undefined" && window.innerWidth < 1024 && visualHeight
+                ? { height: `${visualHeight}px` }
+                : undefined
+            }
             className="
               relative w-full lg:max-w-2xl bg-[#F8F5F0] rounded-none lg:rounded-[32px]
               border-0 lg:border lg:border-white/80 shadow-none lg:shadow-[0_24px_64px_rgba(0,0,0,0.22),0_8px_24px_rgba(0,0,0,0.08)]
               h-[100dvh] lg:h-[88vh] lg:max-h-[720px] min-h-0
-              flex flex-col overflow-hidden z-10 transition-all
+              flex flex-col overflow-hidden z-10 transition-all my-auto
             "
           >
-            {/* ── TOP BAR (Clean, Aesthetic & Modern Flex Row) ── */}
+            {/* ── TOP BAR (Fixed at top - Never scrolls away) ── */}
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05, duration: 0.2, ease: "easeOut" }}
-              className="flex-shrink-0 px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3 border-b border-black/[0.06] bg-[#F8F5F0]/95 backdrop-blur-md z-30"
+              className={`flex-shrink-0 px-3.5 sm:px-5 lg:px-6 ${viewMode === "location" ? "pt-2 pb-1.5 sm:pt-2.5 sm:pb-2" : "py-2.5 sm:py-3"} border-b border-black/[0.06] bg-[#F8F5F0]/98 backdrop-blur-md z-30`}
             >
+              {/* UNIFIED ROW 1: SAME ACROSS BOTH SEARCH AND LOCATION MODES */}
               <div className="flex items-center gap-2 sm:gap-2.5 w-full">
                 {/* Location Selector Pill */}
                 <button
                   type="button"
                   onClick={() => {
-                    const nextMode = viewMode === "location" ? "search" : "location";
-                    setViewMode(nextMode);
-                    if (nextMode === "location") {
+                    if (viewMode === "location") {
+                      setViewMode("search");
+                    } else {
+                      setViewMode("location");
                       setTimeout(() => {
                         locationInputRef.current?.focus();
-                        locationInputRef.current?.select();
+                        locationInputRef.current?.setSelectionRange(0, 0);
                       }, 50);
                     }
                   }}
-                  title="Click to select location"
+                  title={viewMode === "location" ? "Close location view" : "Select location"}
                   className={`
-                    group h-11 sm:h-12 rounded-full px-3.5 sm:px-4
+                    group h-10 sm:h-11 rounded-full px-3 sm:px-3.5
                     flex items-center gap-1.5 sm:gap-2 border transition-all duration-200 cursor-pointer flex-shrink-0
-                    active:scale-95 select-none
-                    ${
-                      viewMode === "location"
-                        ? "bg-white border-[#FF4E7A] ring-2 ring-[#FF4E7A]/20 shadow-[0_2px_12px_rgba(255,78,122,0.14)]"
-                        : "bg-white border-black/[0.08] shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:border-black/20 hover:bg-neutral-50/80"
-                    }
+                    active:scale-95 select-none bg-white border-black/[0.08] shadow-[0_2px_8px_rgba(0,0,0,0.03)]
+                    ${viewMode === "location" ? "border-[#FF4E7A]/60 ring-2 ring-[#FF4E7A]/20 bg-[#FFF5F7]" : "hover:border-black/20 hover:bg-neutral-50/80"}
                   `}
                 >
-                  <MapPin className="w-4 h-4 text-[#FF4E7A] flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
+                  <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FF4E7A] flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
                   <span className="text-xs sm:text-sm font-bold text-[#1B1B23] truncate max-w-[70px] sm:max-w-[105px]">{city}</span>
-                  <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform duration-200 ${viewMode === "location" ? "rotate-180 text-[#FF4E7A]" : "group-hover:text-neutral-700"}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform duration-200 group-hover:text-neutral-700 ${viewMode === "location" ? "rotate-180 text-[#FF4E7A]" : ""}`} />
                 </button>
 
-                {/* Search Input Bar (Clean, Modern & Aesthetic with Animated Single-Line Placeholder) */}
+                {/* Event Search Input Bar (Row 1 Center) */}
                 <div
                   onClick={() => {
-                    if (viewMode === "location") setViewMode("search");
+                    if (viewMode !== "search") setViewMode("search");
                     inputRef.current?.focus();
                     if (!searchQuery) {
                       inputRef.current?.setSelectionRange(0, 0);
                     }
                   }}
                   className="
-                    group relative flex-1 min-w-0 h-11 sm:h-12 bg-white rounded-full px-3.5 sm:px-4
+                    group relative flex-1 min-w-0 h-10 sm:h-11 bg-white rounded-full px-3.5 sm:px-4
                     flex items-center gap-2 sm:gap-2.5 border border-black/[0.08] shadow-[0_2px_8px_rgba(0,0,0,0.03)]
                     transition-all duration-200 cursor-text
                     focus-within:border-black/25 focus-within:ring-2 focus-within:ring-black/5
@@ -985,30 +982,46 @@ export function SearchModal() {
                     </span>
                   )}
 
-                  {/* Text Input with Single-line Faded Animated Placeholder */}
+                  {/* Text Input with Single-line Animated Placeholder positioned directly at cursor start */}
                   <div className="relative flex-1 min-w-0 h-full flex items-center">
                     {!searchQuery && !selectedCategory && (
-                      <AnimatedSearchPlaceholder className="absolute inset-y-0 left-0 w-full pointer-events-none" />
+                      <div className="absolute inset-y-0 left-0 pl-0.5 flex items-center pointer-events-none w-full">
+                        <AnimatedSearchPlaceholder className="w-full" />
+                      </div>
                     )}
                     <input
                       ref={inputRef}
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleViewMore();
+                        }
+                      }}
                       onFocus={(e) => {
-                        requestAnimationFrame(() => {
+                        if (!searchQuery) {
                           e.target.setSelectionRange(0, 0);
-                        });
+                          requestAnimationFrame(() => e.target.setSelectionRange(0, 0));
+                          setTimeout(() => e.target.setSelectionRange(0, 0), 50);
+                        }
                       }}
                       onClick={(e) => {
                         if (!searchQuery) {
                           e.target.setSelectionRange(0, 0);
+                          requestAnimationFrame(() => e.target.setSelectionRange(0, 0));
+                        }
+                      }}
+                      onTouchEnd={(e) => {
+                        if (!searchQuery) {
+                          setTimeout(() => e.target.setSelectionRange(0, 0), 50);
                         }
                       }}
                       placeholder=""
                       className="
                         w-full min-w-0 bg-transparent border-none outline-none text-xs sm:text-sm
-                        font-medium text-[#1B1B23] relative z-10
+                        font-medium text-[#1B1B23] relative z-10 caret-[#FF4E7A] pl-0
                       "
                     />
                   </div>
@@ -1034,12 +1047,12 @@ export function SearchModal() {
                   )}
                 </div>
 
-                {/* Integrated Close Modal Button */}
+                {/* Close Modal Button */}
                 <button
                   type="button"
                   onClick={handleCloseModal}
                   className="
-                    w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white border border-black/[0.08] shadow-[0_2px_8px_rgba(0,0,0,0.03)]
+                    w-10 h-10 sm:h-11 sm:w-11 rounded-full bg-white border border-black/[0.08] shadow-[0_2px_8px_rgba(0,0,0,0.03)]
                     flex items-center justify-center text-[#6B6B80] hover:text-[#1B1B23] hover:bg-neutral-50
                     active:scale-95 transition-all flex-shrink-0 cursor-pointer
                   "
@@ -1048,19 +1061,96 @@ export function SearchModal() {
                   <X className="w-4 h-4 transition-transform duration-200 group-hover:rotate-90" />
                 </button>
               </div>
+
+              {/* LOCATION MODE ROWS: Row 2 (Search city) & Row 3 (Use Current Location) */}
+              {viewMode === "location" && (
+                <div className="pt-2 sm:pt-2.5 space-y-1.5 sm:space-y-2 w-full animate-in fade-in slide-in-from-top-1 duration-200">
+                  {/* Row 2: Search city, area or locality (Fixed full width searchbar) */}
+                  <div className="
+                    w-full bg-white rounded-full px-3.5 sm:px-4 py-2 sm:py-2.5
+                    flex items-center justify-between gap-2 shadow-[0_2px_8px_rgba(0,0,0,0.03)]
+                    border border-black/[0.08] focus-within:border-black/25 focus-within:ring-2 focus-within:ring-black/5
+                    transition-all duration-200
+                  ">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <Search className="w-4 h-4 text-[#8C8C9E] flex-shrink-0" />
+                      <input
+                        ref={locationInputRef}
+                        type="text"
+                        value={locationSearchQuery}
+                        onChange={(e) => setLocationSearchQuery(e.target.value)}
+                        onFocus={(e) => {
+                          if (!locationSearchQuery) {
+                            e.target.setSelectionRange(0, 0);
+                            requestAnimationFrame(() => e.target.setSelectionRange(0, 0));
+                            setTimeout(() => e.target.setSelectionRange(0, 0), 50);
+                          }
+                        }}
+                        onClick={(e) => {
+                          if (!locationSearchQuery) {
+                            e.target.setSelectionRange(0, 0);
+                            requestAnimationFrame(() => e.target.setSelectionRange(0, 0));
+                          }
+                        }}
+                        onTouchEnd={(e) => {
+                          if (!locationSearchQuery) {
+                            setTimeout(() => e.target.setSelectionRange(0, 0), 50);
+                          }
+                        }}
+                        placeholder="Search city, area or locality"
+                        className="
+                          w-full bg-transparent border-none outline-none text-xs sm:text-sm
+                          font-medium text-[#1B1B23] placeholder:text-[#9A9AA8] caret-[#FF4E7A] pl-0
+                        "
+                      />
+                    </div>
+                    {locationSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setLocationSearchQuery("")}
+                        className="text-[#8C8C9E] hover:text-[#1B1B23] p-0.5 active:scale-90 transition-transform cursor-pointer"
+                        aria-label="Clear city query"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Row 3: Use Current Location (Directly below location search bar with pink symbol, snug spacing) */}
+                  <div className="flex items-center px-1.5 pt-1.5 pb-0.5">
+                    <button
+                      type="button"
+                      onClick={handleUseCurrentLocation}
+                      disabled={locatingCurrent}
+                      className="
+                        inline-flex items-center gap-2 py-0.5 px-0.5 text-xs sm:text-sm font-bold text-[#1B1B23]
+                        hover:text-[#FF4E7A] active:scale-95 transition-colors cursor-pointer group select-none
+                      "
+                    >
+                      <LocateFixed className={`w-4 h-4 text-[#FF4E7A] ${locatingCurrent ? "animate-spin" : "group-hover:scale-110"} transition-transform flex-shrink-0`} />
+                      <span className="group-hover:text-[#FF4E7A] transition-colors">
+                        {locatingCurrent ? "Locating…" : "Use Current Location"}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </motion.div>
 
-        {/* ── SCROLLABLE BODY IN BETWEEN (Fixed height container, smooth vertical scroll, zero horizontal shift) ── */}
-        <div
-          ref={scrollContainerRef}
-          onScroll={(e) => {
-            if (e.currentTarget.scrollLeft !== 0) e.currentTarget.scrollLeft = 0;
-          }}
-          style={{ overflowX: "clip" }}
-          className="flex-1 min-h-0 overflow-y-auto overflow-x-clip [touch-action:pan-y] overscroll-contain px-3.5 sm:px-5 lg:px-6 py-2.5 sm:py-3.5 lg:py-4 space-y-3 sm:space-y-4 scrollbar-hide"
-        >
+        {/* ── SCROLLABLE BODY WRAPPER WITH FIXED RIGHT ALPHABET SCRUBBER ── */}
+        <div className="relative flex-1 min-h-0 flex flex-col overflow-hidden">
+          <div
+            ref={scrollContainerRef}
+            onScroll={(e) => {
+              if (e.currentTarget.scrollLeft !== 0) e.currentTarget.scrollLeft = 0;
+            }}
+            className={`
+              flex-1 min-h-0 overflow-y-auto overflow-x-hidden [touch-action:pan-y] overscroll-contain
+              px-3.5 sm:px-5 lg:px-6 ${viewMode === "location" ? "pt-1.5 pb-3 sm:pt-2 sm:pb-4 space-y-2 sm:space-y-2.5" : "py-2.5 sm:py-3.5 lg:py-4 space-y-3 sm:space-y-4"} scrollbar-hide
+            `}
+          >
           {/* ── VIEW CONTAINER ── */}
-          <div className="relative w-full max-w-full overflow-hidden">
+          <div className="relative w-full max-w-full overflow-visible">
             {/* PANEL 0: SEARCH & DISCOVERY VIEW */}
             <div
               className={`
@@ -1068,11 +1158,12 @@ export function SearchModal() {
                 ${viewMode === "search" ? "block" : "hidden pointer-events-none"}
               `}
             >
-            {/* ── DESKTOP CATEGORIES: Home-Screen Style (First 2 Rows with More Button at Top) (>= lg) ── */}
-            <div className="hidden lg:block space-y-1.5 animate-liquid-item-2">
+            {/* ── BROWSE BY CATEGORY (Top of Search View) ── */}
+            {/* DESKTOP CATEGORIES (>= lg) */}
+            <div className="hidden lg:block space-y-1.5 pb-1">
               <div className="flex items-center justify-between pb-0.5">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#6B6B80] font-label">
-                  Categories
+                  Browse by Category
                 </span>
                 <button
                   type="button"
@@ -1148,9 +1239,12 @@ export function SearchModal() {
               </div>
             </div>
 
-            {/* ── MOBILE & TABLET CATEGORIES: 2 Independent Free-Width Flex Rows (< lg) ── */}
-            <div className="lg:hidden space-y-1 animate-liquid-item-2">
-              <div className="w-full max-w-full overflow-x-auto scrollbar-hide py-1 overscroll-x-contain select-none cursor-grab active:cursor-grabbing space-y-2 touch-pan-x">
+            {/* MOBILE & TABLET CATEGORIES (< lg) */}
+            <div className="lg:hidden space-y-1.5 pb-1">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#6B6B80] font-label">
+                Browse by Category
+              </span>
+              <div className="w-full max-w-full overflow-x-auto scrollbar-hide py-1 [touch-action:pan-y_pan-x] select-none cursor-grab active:cursor-grabbing space-y-2">
                 {/* Row 1 */}
                 <div className="flex items-center gap-2 w-max">
                   {BROWSE_CATEGORIES.filter((_, i) => i % 2 === 0).map((cat) => {
@@ -1627,9 +1721,9 @@ export function SearchModal() {
                         <button
                           type="button"
                           onClick={() => setIsMoreFiltersOpen(false)}
-                          className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#FF4E7A] hover:bg-[#e03d67] shadow-sm transition-all active:scale-95"
+                          className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#FF4E7A] hover:bg-[#e03d67] shadow-sm transition-all active:scale-95 flex items-center gap-1.5"
                         >
-                          Done
+                          <span>Done</span>
                         </button>
                       </div>
                     </div>
@@ -1660,11 +1754,26 @@ export function SearchModal() {
               transition={{ delay: 0.22, type: "spring", stiffness: 320, damping: 26 }}
               className="space-y-1.5 pt-0.5"
             >
+              <div className="flex items-center justify-between px-0.5 pb-0.5">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#6B6B80] font-label">
+                  {hasUserFiltered ? "Results" : "Recommended"} ({filteredEvents.length})
+                </span>
+                {totalSearchFiltersCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleResetFilters}
+                    className="text-xs font-bold text-[#FF4E7A] hover:underline"
+                  >
+                    Reset Filters
+                  </button>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 items-start">
-                {/* Dynamically Filtered Events List (Matching Image 2) */}
-                <div className="lg:col-span-2 space-y-2">
+                {/* Dynamically Filtered Events List: 2 in a row on Mobile, single column on Desktop */}
+                <div className="lg:col-span-2 grid grid-cols-2 gap-2 sm:gap-2.5 lg:grid-cols-1 lg:gap-2">
                   {filteredEvents.length > 0 ? (
-                    filteredEvents.slice(0, 4).map((event) => {
+                    filteredEvents.slice(0, 4).map((event, idx) => {
                       const isHovered = hoveredEventId === event.id;
                       const catName =
                         EVENT_CATEGORIES.find((c) => c.value === event.category)?.label || "Event";
@@ -1676,7 +1785,9 @@ export function SearchModal() {
                           onMouseEnter={() => setHoveredEventId(event.id)}
                           onMouseLeave={() => setHoveredEventId(null)}
                           className={`
-                            p-2 sm:p-2.5 rounded-2xl bg-white border transition-all duration-200 cursor-pointer flex items-center gap-3 sm:gap-3.5 group
+                            p-2 sm:p-2.5 rounded-2xl bg-white border transition-all duration-200 cursor-pointer
+                            flex flex-col lg:flex-row lg:items-center gap-2 sm:gap-2.5 lg:gap-3.5 group
+                            ${idx >= 3 ? "lg:hidden" : ""}
                             ${
                               isHovered
                                 ? "border-[#FF4E7A] ring-2 ring-[#FF4E7A]/25 shadow-sm -translate-y-0.5"
@@ -1684,8 +1795,8 @@ export function SearchModal() {
                             }
                           `}
                         >
-                          {/* Left Thumbnail (Rounded Square like Image 2) */}
-                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-100 shadow-2xs">
+                          {/* Thumbnail */}
+                          <div className="w-full lg:w-16 h-24 sm:h-28 lg:h-16 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-100 shadow-2xs">
                             <img
                               src={event.image || "/images/figma-sample/goa/goa-hero.png"}
                               alt={event.name}
@@ -1693,8 +1804,8 @@ export function SearchModal() {
                             />
                           </div>
 
-                          {/* Right Information */}
-                          <div className="flex-1 min-w-0 space-y-0.5">
+                          {/* Information */}
+                          <div className="flex-1 min-w-0 space-y-0.5 w-full">
                             <h4
                               className={`font-bold text-xs sm:text-sm text-[#1B1B23] truncate transition-colors ${
                                 isHovered ? "text-[#FF4E7A]" : "group-hover:text-[#FF4E7A]"
@@ -1702,14 +1813,14 @@ export function SearchModal() {
                             >
                               {event.name}
                             </h4>
-                            <p className="text-[11px] sm:text-xs text-[#8C8C9E] font-medium truncate">
+                            <p className="text-[10px] sm:text-xs text-[#8C8C9E] font-medium truncate">
                               {catName}
                               {event.venue ? ` • ${event.venue}` : ""}
                             </p>
-                            <div className="flex items-center gap-2 text-[11px] sm:text-xs text-neutral-600 font-medium">
-                              <span>{event.timeLabel || "Fri, 20 Nov, 7:00 PM"}</span>
+                            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-neutral-600 font-medium pt-0.5">
+                              <span className="truncate">{event.timeLabel || "Fri, 20 Nov, 7:00 PM"}</span>
                               <span className="text-[#FF4E7A] font-bold">
-                                {event.priceLabel || (event.minPrice > 0 ? `• From € ${event.minPrice}` : "• Free")}
+                                {event.priceLabel || (event.minPrice > 0 ? `• € ${event.minPrice}` : "• Free")}
                               </span>
                             </div>
                           </div>
@@ -1717,7 +1828,7 @@ export function SearchModal() {
                       );
                     })
                   ) : (
-                    <div className="bg-white rounded-2xl p-5 sm:p-6 text-center space-y-2 border border-black/5 flex flex-col items-center justify-center">
+                    <div className="col-span-2 bg-white rounded-2xl p-5 sm:p-6 text-center space-y-2 border border-black/5 flex flex-col items-center justify-center">
                       <p className="text-sm font-bold text-[#1B1B23]">No events match your current filters</p>
                       <p className="text-xs text-[#8C8C9E]">Try clearing some filters or changing your search terms.</p>
                       <button
@@ -1730,6 +1841,22 @@ export function SearchModal() {
                     </div>
                   )}
                 </div>
+
+                {/* Mobile View More Button: Below Cards, Above Map (Mobile Only) */}
+                {filteredEvents.length > 0 && (
+                  <div className="lg:hidden w-full pt-1 pb-1">
+                    <button
+                      type="button"
+                      onClick={handleViewMore}
+                      className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#FF4E7A] hover:bg-[#e03d67] shadow-sm active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <span>View More Events ({filteredEvents.length})</span>
+                      <span className="text-sm">→</span>
+                    </button>
+                  </div>
+                )}
+
+                
 
                 {/* ── CARD 3: Synchronized Vector Map Card with Live Radar & Event Pins ── */}
                 <div className="
@@ -1887,92 +2014,37 @@ export function SearchModal() {
               </div>
 
               {filteredEvents.length > 0 && (
-                <div className="pt-2.5 pb-0.5">
+                <div className="hidden lg:flex pt-2.5 sm:pt-3 pb-0.5 items-center justify-between">
                   <button
                     type="button"
                     onClick={handleViewMore}
-                    className="text-[#FF4E7A] text-xs sm:text-sm font-bold hover:underline inline-flex items-center gap-1.5 transition-colors group"
+                    className="text-[#FF4E7A] text-xs sm:text-sm font-bold hover:underline inline-flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
-                    <span>View More Events</span>
+                    <span>View More Events ({filteredEvents.length})</span>
                     <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
                   </button>
                 </div>
               )}
             </motion.div>
-          </div>
+
+            </div>
 
           {/* ══════════════════════════════════════════════════════════════ */}
-          {/* PANEL 1: SELECT LOCATION VIEW (Matching Reference Mockup)      */}
+          {/* PANEL 1: SELECT LOCATION VIEW                                  */}
           {/* ══════════════════════════════════════════════════════════════ */}
           <div
             className={`
-              w-full space-y-3.5 sm:space-y-4
+              w-full space-y-2.5 sm:space-y-3
               ${viewMode === "location" ? "block" : "hidden"}
             `}
           >
-            {/* Header Title (Clean and bold matching mockup) */}
-            <div>
-              <h3 className="font-display font-bold text-base sm:text-lg text-[#1B1B23]">
-                Select Location
-              </h3>
-            </div>
-
-            {/* Location Search Input (Clean, modern aesthetic) */}
-            <div className="
-              w-full max-w-[280px] sm:max-w-[340px] bg-white rounded-full px-4 sm:px-5 py-2 sm:py-2.5
-              flex items-center justify-between gap-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.03)]
-              border border-black/[0.08] focus-within:border-black/25 focus-within:ring-2 focus-within:ring-black/5
-              transition-all duration-200
-            ">
-              <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                <Search className="w-4 h-4 text-[#8C8C9E] flex-shrink-0" />
-                <input
-                  ref={locationInputRef}
-                  type="text"
-                  value={locationSearchQuery}
-                  onChange={(e) => setLocationSearchQuery(e.target.value)}
-                  placeholder="Search City, area or locality"
-                  className="
-                    w-full bg-transparent border-none outline-none text-xs sm:text-sm
-                    font-medium text-[#1B1B23] placeholder:text-[#9A9AA8]
-                  "
-                />
-              </div>
-              {locationSearchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setLocationSearchQuery("")}
-                  className="text-[#8C8C9E] hover:text-[#1B1B23] p-0.5 active:scale-90 transition-transform"
-                  aria-label="Clear city query"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-
-            {/* Use Current Location Action */}
-            <div>
-              <button
-                type="button"
-                onClick={handleUseCurrentLocation}
-                disabled={locatingCurrent}
-                className="
-                  inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#1B1B23]
-                  hover:text-[#FF4E7A] active:scale-98 transition-colors group
-                "
-              >
-                <LocateFixed className={`w-4 h-4 text-[#FF4E7A] ${locatingCurrent ? "animate-spin" : "group-hover:rotate-45 transition-transform duration-300"}`} />
-                <span>{locatingCurrent ? "Detecting location…" : "Use Current Location"}</span>
-              </button>
-            </div>
-
-            {/* ── Popular Cities: 1:1 Aspect Ratio on PC/Desktop & No Redundant Text Labels ── */}
-            <div className="space-y-2">
+            {/* ── Popular Cities: 2 Rows Draggable Left-to-Right + Vertical Touch Scroll ── */}
+            <div className="space-y-1.5">
               <h4 className="text-xs sm:text-sm font-bold text-[#1B1B23]">
                 Popular Cities
               </h4>
 
-              {/* Desktop Popular Cities: 1:1 Aspect Ratio 5-Col Grid for Big/Tab/Laptop/Desktop Screens */}
+              {/* Desktop Popular Cities: 1:1 Aspect Ratio 5-Col Grid for Big Screens */}
               <div className="hidden lg:grid lg:grid-cols-5 lg:grid-rows-2 gap-2.5 lg:gap-3 w-full">
                 {filteredPopularCities.map((c) => {
                   const isCurrent = city.toLowerCase() === c.name.toLowerCase();
@@ -2006,44 +2078,46 @@ export function SearchModal() {
                 })}
               </div>
 
-              {/* Mobile & Tablet Popular Cities: Exactly 4 Cards Visible in 1:1 Aspect Ratio */}
-              <div className="lg:hidden grid grid-cols-4 gap-2 w-full">
-                {filteredPopularCities.slice(0, 4).map((c) => {
-                  const isCurrent = city.toLowerCase() === c.name.toLowerCase();
-                  return (
-                    <button
-                      key={c.name}
-                      type="button"
-                      onClick={() => handleCitySelect(c.name)}
-                      title={c.name}
-                      className={`
-                        group relative bg-white rounded-2xl p-0 aspect-square w-full
-                        flex items-center justify-center border shadow-2xs transition-all duration-200 cursor-pointer overflow-hidden
-                        active:scale-95
-                        ${
-                          isCurrent
-                            ? "border-[#FF4E7A] ring-2 ring-[#FF4E7A]/25 bg-gradient-to-b from-[#FFF5F7] to-white"
-                            : "border-black/6 hover:border-[#FF4E7A]/40"
-                        }
-                      `}
-                    >
-                      <img
-                        src={c.image}
-                        alt={c.name}
-                        className="w-full h-full object-contain p-0 scale-105 pointer-events-none transition-transform duration-300 group-hover:scale-115"
-                      />
-                      {isCurrent && (
-                        <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#FF4E7A] ring-2 ring-white animate-pulse" />
-                      )}
-                    </button>
-                  );
-                })}
+              {/* Mobile & Tablet Popular Cities: 2 Rows Draggable (All Cities with 4th Column Peeking on Side) */}
+              <div className="lg:hidden w-full overflow-x-auto scrollbar-hide py-1 [touch-action:pan-y_pan-x] select-none cursor-grab active:cursor-grabbing">
+                <div className="grid grid-rows-2 grid-flow-col auto-cols-[calc((100vw-54px)/3.35)] sm:auto-cols-[108px] gap-2 sm:gap-2.5 w-max pr-3">
+                  {filteredPopularCities.map((c) => {
+                    const isCurrent = city.toLowerCase() === c.name.toLowerCase();
+                    return (
+                      <button
+                        key={c.name}
+                        type="button"
+                        onClick={() => handleCitySelect(c.name)}
+                        title={c.name}
+                        className={`
+                          group relative bg-white rounded-2xl p-0 aspect-square w-full
+                          flex items-center justify-center border shadow-2xs transition-all duration-200 cursor-pointer overflow-hidden
+                          active:scale-95
+                          ${
+                            isCurrent
+                              ? "border-[#FF4E7A] ring-2 ring-[#FF4E7A]/25 bg-gradient-to-b from-[#FFF5F7] to-white"
+                              : "border-black/6 hover:border-[#FF4E7A]/40"
+                          }
+                        `}
+                      >
+                        <img
+                          src={c.image}
+                          alt={c.name}
+                          className="w-full h-full object-contain p-1.5 pointer-events-none transition-transform duration-300 group-hover:scale-108"
+                        />
+                        {isCurrent && (
+                          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#FF4E7A] ring-2 ring-white animate-pulse" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* ── All Cities: Desktop Original Layout vs Mobile Full A-Z Scroll with Scrubber ── */}
-            <div className="space-y-2 pt-2 border-t border-black/6">
-              {/* DESKTOP ALL CITIES (Kept Original Style for PC, Show All Letters removed) */}
+            {/* ── All Cities: Desktop Grid vs Mobile Continuous List ── */}
+            <div className="pt-1 lg:pt-2 lg:border-t lg:border-black/6">
+              {/* DESKTOP ALL CITIES */}
               <div className="hidden lg:block space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B6B80] font-label">
@@ -2051,7 +2125,7 @@ export function SearchModal() {
                   </h4>
                 </div>
 
-                {/* Horizontal Alphabet Filter Bar (Matching Reference Layout) */}
+                {/* Horizontal Alphabet Filter Bar */}
                 <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1 scrollbar-hide text-xs font-semibold select-none">
                   {ALPHABET_LIST.map((letter) => {
                     const hasCities = (ALPHABET_CITIES_MAP[letter] || []).length > 0;
@@ -2083,8 +2157,8 @@ export function SearchModal() {
                   })}
                 </div>
 
-                {/* Desktop 4-Column City Grid (Matching Reference Mockup) */}
-                <div className="grid grid-cols-4 gap-y-2.5 gap-x-6 pt-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-hide text-xs sm:text-sm font-medium text-[#1B1B23]">
+                {/* Desktop 4-Column City Grid */}
+                <div className="grid grid-cols-4 gap-y-2.5 gap-x-6 pt-2 max-h-[260px] overflow-y-auto pr-1 scrollbar-hide text-xs sm:text-sm font-medium text-[#1B1B23]">
                   {desktopCitiesList.length > 0 ? (
                     desktopCitiesList.map((cityName) => {
                       const isSelected = city.toLowerCase() === cityName.toLowerCase();
@@ -2111,23 +2185,19 @@ export function SearchModal() {
                 </div>
               </div>
 
-              {/* MOBILE ALL CITIES: Full A to Z List with Right Scrubber & Smooth Scroll */}
-              <div className="lg:hidden space-y-2">
-                {/* Sticky "All Cities" header that stays fixed at top when scrolled */}
-                <div className="sticky -top-4 bg-[#F8F5F0]/95 backdrop-blur-md py-2.5 z-20 border-b border-black/5 -mx-3 px-3 sm:-mx-5 sm:px-5 flex items-center justify-between">
+              {/* MOBILE ALL CITIES: Smooth Scrolling Continuous A to Z List with Right-Side Alphabet Scrubber Starting Beside Cities */}
+              <div className="lg:hidden">
+                {/* Sticky "All Cities" header (Remains fixed at top on mobile while scrolling) */}
+                <div className="sticky top-0 bg-[#F8F5F0] py-1.5 z-20 border-b border-black/5 -mx-3.5 sm:-mx-5 px-3.5 sm:px-5 flex items-center justify-between">
                   <h4 className="text-xs sm:text-sm font-bold text-[#1B1B23]">
                     All Cities
                   </h4>
-                  {selectedLetter && !locationSearchQuery && (
-                    <span className="text-[11px] font-black text-[#FF4E7A] bg-[#FF4E7A]/10 px-2.5 py-0.5 rounded-full">
-                      Letter: {selectedLetter}
-                    </span>
-                  )}
                 </div>
 
-                <div className="relative flex gap-2.5 items-start">
-                  {/* Left: Scrollable Full A-to-Z City List flowing in the main modal body */}
-                  <div className="flex-1 min-w-0 pr-1 space-y-3 pb-8">
+                {/* Cities List + Vertical Alphabet Scrubber Container */}
+                <div className="relative flex items-start">
+                  {/* Left Column: Cities Content (Cities and ABC section letters scroll together) */}
+                  <div className="flex-1 min-w-0 pr-5 space-y-3 pb-8">
                     {locationSearchQuery.trim() ? (
                       /* Live search query results across all letters */
                       <div className="divide-y divide-black/5">
@@ -2156,15 +2226,15 @@ export function SearchModal() {
                         )}
                       </div>
                     ) : (
-                      /* Full continuous A to Z list grouped by letter */
+                      /* Full continuous A to Z list grouped by letter: ABC headers scroll naturally with cities */
                       ALPHABET_LIST.map((letter) => {
                         const citiesForLetter = ALPHABET_CITIES_MAP[letter] || [];
                         if (citiesForLetter.length === 0) return null;
                         return (
-                          <div key={letter} id={`mobile-city-letter-${letter}`} className="scroll-mt-14">
-                            {/* Sticky letter badge header */}
-                            <div className="sticky top-[28px] bg-[#F8F5F0]/95 backdrop-blur-xs py-1 z-10">
-                              <span className="text-[11px] font-bold text-[#FF4E7A] bg-pink-50 px-2 py-0.5 rounded-md">
+                          <div key={letter} id={`mobile-city-letter-${letter}`} className="scroll-mt-14 pt-1">
+                            {/* Section letter header (scrolls with cities) */}
+                            <div className="py-1">
+                              <span className="text-xs font-black text-[#FF4E7A] px-1 py-0.5">
                                 {letter}
                               </span>
                             </div>
@@ -2193,40 +2263,59 @@ export function SearchModal() {
                     )}
                   </div>
 
-                  {/* Right: Vertical Alphabet Index A to Z Scrubber (Sticky as cities scroll, dynamically animated) */}
-                  <div className="sticky top-[28px] flex flex-col items-center py-0.5 select-none flex-shrink-0 z-20">
-                    {ALPHABET_LIST.map((letter) => {
-                      const hasCities = (ALPHABET_CITIES_MAP[letter] || []).length > 0;
-                      const isActive = selectedLetter === letter && !locationSearchQuery;
-                      return (
-                        <button
-                          key={letter}
-                          type="button"
-                          disabled={!hasCities}
-                          onClick={() => handleMobileLetterClick(letter)}
-                          className={`
-                            w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center transition-all duration-200
-                            ${
-                              isActive
-                                ? "bg-[#FF4E7A] text-white shadow-md scale-125 font-black ring-2 ring-[#FF4E7A]/30 z-10"
-                                : hasCities
-                                ? "text-[#8C8C9E] hover:text-[#1B1B23] active:scale-95"
-                                : "text-neutral-300 pointer-events-none"
-                            }
-                          `}
-                        >
-                          {letter}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  {/* Right Column: Fixed/Sticky Vertical Alphabet Scrubber (Letters animate big & small on scroll and change color) */}
+                  {!locationSearchQuery.trim() && (
+                    <div
+                      className="
+                        sticky top-11 -mr-1.5 sm:mr-0 z-30 w-6 flex-shrink-0
+                        flex flex-col justify-between items-center py-0 select-none pointer-events-auto
+                        h-[calc(100vh-210px)] max-h-[460px]
+                      "
+                      aria-label="Alphabet Scrubber"
+                    >
+                      {ALPHABET_LIST.map((letter, idx) => {
+                        const hasCities = (ALPHABET_CITIES_MAP[letter] || []).length > 0;
+                        const activeLetter = selectedLetter || "A";
+                        const activeIdx = ALPHABET_LIST.indexOf(activeLetter);
+                        const distance = Math.abs(idx - activeIdx);
+                        const isSelected = distance === 0;
+
+                        return (
+                          <button
+                            key={letter}
+                            type="button"
+                            disabled={!hasCities}
+                            onClick={() => handleMobileLetterClick(letter)}
+                            className={`
+                              w-6 h-[calc((100%-4px)/26)] min-h-[14px] max-h-[18px] flex items-center justify-center
+                              transition-all duration-200 ease-out transform origin-center cursor-pointer select-none
+                              ${
+                                !hasCities
+                                  ? "text-neutral-300/40 pointer-events-none scale-75"
+                                  : isSelected
+                                  ? "text-[#FF4E7A] font-black scale-140 z-10"
+                                  : distance === 1
+                                  ? "text-[#6B6B80] font-bold scale-115"
+                                  : distance === 2
+                                  ? "text-[#8C8C9E] font-medium scale-100"
+                                  : "text-[#A8A8B8] font-normal scale-90"
+                              }
+                            `}
+                          >
+                            <span className="text-[10px] leading-none select-none">{letter}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
         </div>
-        </motion.div>
+      </div>
+      </motion.div>
 
         {/* ── 85% HEIGHT FILTERS BOTTOM SHEET ON MOBILE & TABLET (< lg) ── */}
         {isMoreFiltersOpen && (
@@ -2509,9 +2598,9 @@ export function SearchModal() {
                 <button
                   type="button"
                   onClick={() => setIsMoreFiltersOpen(false)}
-                  className="flex-1 py-3 px-6 rounded-full text-xs sm:text-sm font-bold text-white bg-[#FF4E7A] hover:bg-[#e03d67] shadow-md transition-all active:scale-95 text-center"
+                  className="flex-1 py-3 px-6 rounded-full text-xs sm:text-sm font-bold text-white bg-[#FF4E7A] hover:bg-[#e03d67] shadow-md transition-all active:scale-95 text-center flex items-center justify-center gap-2"
                 >
-                  Show {filteredEvents.length} Events
+                  <span>Done ({filteredEvents.length})</span>
                 </button>
               </div>
             </motion.div>

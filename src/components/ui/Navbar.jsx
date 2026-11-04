@@ -85,14 +85,14 @@ export function Navbar({ wide = false }) {
   return (
     <div
       id="main-navbar"
-      className={`fixed top-0 left-0 right-0 z-[100] px-3.5 sm:px-4 lg:px-8 transition-colors duration-200 ${
+      className={`fixed top-0 left-0 right-0 z-[100] px-3.5 sm:px-4 lg:px-8 transition-all duration-300 ${
         isHeroTransparent
           ? "bg-transparent md:bg-white/75 md:backdrop-blur-2xl md:backdrop-saturate-180 border-b border-transparent md:border-white/60 md:shadow-[0_4px_20px_rgba(0,0,0,0.04)] py-2.5 sm:py-3 lg:py-3.5"
-          : "bg-white/75 backdrop-blur-2xl backdrop-saturate-180 border-b border-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.06),inset_0_-1px_1px_rgba(255,255,255,0.6)] py-2 lg:py-3.5"
+          : "bg-white/65 backdrop-blur-xl backdrop-saturate-180 border-b border-white/60 shadow-[0_4px_20px_rgba(0,0,0,0.04)] md:bg-white/80 md:backdrop-blur-2xl md:border-white/60 md:shadow-[0_4px_24px_rgba(0,0,0,0.06),inset_0_-1px_1px_rgba(255,255,255,0.6)] py-1.5 sm:py-2 lg:py-2"
       }`}
     >
-      {/* ── 1. DESKTOP & TABLET NAVBAR (>= md): Translucent BG, Clean White Matching-Height Pills ── */}
-      <div className={`hidden md:flex items-center justify-between gap-3 lg:gap-6 ${container} mx-auto`}>
+      {/* ── 1. DESKTOP & TABLET NAVBAR (>= md): Translucent BG, Lower Height When Scrolled ── */}
+      <div className={`hidden md:flex items-center justify-between gap-3 lg:gap-6 ${container} mx-auto transition-all duration-300`}>
         {/* Logo */}
         <Link
           to="/"
@@ -101,14 +101,16 @@ export function Navbar({ wide = false }) {
           <img
             src="/images/Logos/navbar%20logo.png"
             alt="Passqo"
-            className="h-8 lg:h-9 xl:h-10 w-auto object-contain transition-transform duration-200 hover:scale-105 active:scale-95"
+            className={`${
+              scrolled ? "h-6.5 sm:h-7 lg:h-8" : "h-8 lg:h-9 xl:h-10"
+            } w-auto object-contain transition-all duration-300 hover:scale-105 active:scale-95`}
           />
         </Link>
 
-        {/* Center: Location + Search pill (Both exact same height h-11 / h-12) */}
+        {/* Center: Location + Search pill (Lower height h-9 / h-10 when scrolled, original h-11 / h-12 when top) */}
         <div className="flex items-center gap-2.5 lg:gap-3 flex-1 max-w-[540px] justify-center min-w-0">
           <div className="flex-shrink-0">
-            <LocationPill />
+            <LocationPill compact={scrolled} />
           </div>
 
           <motion.button
@@ -120,7 +122,9 @@ export function Navbar({ wide = false }) {
             aria-label="Open search popup"
             className="w-full max-w-[280px] lg:max-w-[360px] min-w-0 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4E7A] rounded-full group"
           >
-            <div className="flex items-center justify-between gap-2.5 rounded-full h-11 lg:h-12 pl-4 pr-3.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-black/[0.08] group-hover:border-black/20 text-[#1B1B23] transition-all duration-200">
+            <div className={`flex items-center justify-between gap-2.5 rounded-full ${
+              scrolled ? "h-9 lg:h-10" : "h-11 lg:h-12"
+            } pl-3.5 sm:pl-4 pr-3.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-black/[0.08] group-hover:border-black/20 text-[#1B1B23] transition-all duration-300`}>
               <div className="flex items-center gap-2.5 flex-1 min-w-0">
                 <Search className="w-4 h-4 flex-shrink-0 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
                 <AnimatedSearchPlaceholder
@@ -128,56 +132,55 @@ export function Navbar({ wide = false }) {
                   textColor="text-neutral-500 font-normal"
                 />
               </div>
-              <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-black/4 text-neutral-400 border border-black/5 flex-shrink-0 select-none">
-                ⌘K
-              </kbd>
             </div>
           </motion.button>
         </div>
 
         {/* Right side — NavUser */}
-        <div className="flex items-center flex-shrink-0">
-          <NavUser />
+        <div className="flex items-center flex-shrink-0 relative z-20">
+          <NavUser scrolled={scrolled} />
         </div>
       </div>
 
-      {/* ── 2. MOBILE NAVBAR (< md) — Always present, transparent on hero, smoothly translucent on scroll ── */}
-      <div className="flex flex-col md:hidden w-full max-w-full gap-2">
+      {/* ── 2. MOBILE NAVBAR (< md) — Lower Height When Scrolled ── */}
+      <div className={`flex flex-col md:hidden w-full max-w-full ${scrolled ? "gap-1.5" : "gap-2"} transition-all duration-300`}>
         {/* Row 1: Logo (left), Location (center), Sign In (right) */}
         <div className="flex items-center justify-between gap-2 w-full">
           <Link to="/" className="flex-shrink-0 flex items-center px-0.5">
             <img
               src="/images/Logos/navbar%20logo.png"
               alt="Passqo"
-              className={`h-7 w-auto object-contain transition-all duration-200 ${
+              className={`${
+                scrolled ? "h-6" : "h-7"
+              } w-auto object-contain transition-all duration-300 ${
                 isHeroTransparent ? "brightness-0 invert drop-shadow-sm" : ""
               }`}
             />
           </Link>
 
           <div className="flex-1 flex justify-center min-w-0">
-            <LocationPill glass={isHeroTransparent} />
+            <LocationPill glass={isHeroTransparent} compact={scrolled} />
           </div>
 
-          <div className="flex-shrink-0">
-            <NavUser compact glass={isHeroTransparent} />
+          <div className="flex-shrink-0 relative z-20">
+            <NavUser compact glass={isHeroTransparent} scrolled={scrolled} />
           </div>
         </div>
 
-        {/* Row 2: Search bar — Glassy on hero, clean white when scrolled */}
+        {/* Row 2: Search bar — Lower height h-9 / h-9.5 when scrolled */}
         <motion.button
           type="button"
           whileTap={{ scale: 0.98 }}
           onClick={() => openSearch()}
           aria-label="Open search popup"
           className={`
-            w-full h-11 px-4 rounded-full
+            w-full ${scrolled ? "h-9 sm:h-9.5 px-3.5" : "h-11 px-4"} rounded-full
             flex items-center gap-2.5 text-left
-            transition-all duration-200
+            transition-all duration-300
             ${
               isHeroTransparent
                 ? "bg-white/20 hover:bg-white/30 active:bg-white/35 backdrop-blur-xl border border-white/35 shadow-[0_4px_20px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.45)] text-white"
-                : "bg-white hover:bg-neutral-50 active:bg-neutral-100 border border-black/8 shadow-2xs text-[#1B1B23]"
+                : "bg-white/95 hover:bg-white active:bg-neutral-100 border border-black/8 shadow-2xs text-[#1B1B23]"
             }
           `}
         >
