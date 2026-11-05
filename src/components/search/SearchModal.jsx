@@ -1756,7 +1756,7 @@ export function SearchModal() {
             >
               <div className="flex items-center justify-between px-0.5 pb-0.5">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#6B6B80] font-label">
-                  {hasUserFiltered ? "Results" : "Recommended"} ({filteredEvents.length})
+                  Results ({filteredEvents.length})
                 </span>
                 {totalSearchFiltersCount > 0 && (
                   <button

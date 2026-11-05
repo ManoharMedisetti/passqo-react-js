@@ -3,6 +3,7 @@ import { A11yInit } from "@/components/ui/A11yInit";
 import { HomePage } from "@/pages/HomePage";
 import { EventsPage } from "@/pages/EventsPage";
 import { EventDetailPage } from "@/pages/EventDetailPage";
+import { BookingPage } from "@/pages/BookingPage";
 import { SearchProvider } from "@/context/SearchContext";
 import { SearchModal } from "@/components/search/SearchModal";
 import { AuthProvider } from "@/context/AuthContext";
@@ -19,6 +20,8 @@ export function App() {
           <Route path="/category/:category" element={<EventsPage />} />
           <Route path="/search" element={<EventsPage />} />
           <Route path="/events/:id" element={<EventDetailPage />} />
+          <Route path="/events/:id/book" element={<BookingPage />} />
+          <Route path="/checkout" element={<BookingPage />} />
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

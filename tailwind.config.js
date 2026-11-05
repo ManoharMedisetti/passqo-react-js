@@ -68,7 +68,16 @@ export default {
         card: "20px",
         "3xl": "24px",
       },
+      spacing: {
+        "4.5": "1.125rem",
+        "6.5": "1.625rem",
+        "7.5": "1.875rem",
+        "9.5": "2.375rem",
+        "10.5": "2.625rem",
+        "26": "6.5rem",
+      },
       boxShadow: {
+        "2xs": "0 1px 2px 0 rgb(0 0 0 / 0.04)",
         xs: "0 1px 2px 0 rgb(0 0 0 / 0.06)",
         sm: "0 2px 8px 0 rgb(0 0 0 / 0.08)",
         md: "0 4px 16px 0 rgb(0 0 0 / 0.10)",

@@ -8,7 +8,7 @@ import { isAuthenticated, getUser } from "@/lib/auth/storage";
 import { useAuthModal } from "@/context/AuthContext";
 import { RichTextDisplay } from "@/components/ui/RichTextDisplay";
 import { FEATURES } from "@/lib/features";
-import { CalendarPlus, Heart, Share2, UserPlus } from "lucide-react";
+import { CalendarPlus, Heart, Share2, UserPlus, MapPin, Calendar, Clock, ChevronRight, ChevronDown, ChevronUp, Check, Sparkles, ShieldCheck, X, HelpCircle, FileText, ExternalLink, Navigation } from "lucide-react";
 import { getWishlist, toggleWishlist } from "@/components/events/EventCard";
 import { eventDetailsOf } from "@/lib/eventDetails";
 import {
@@ -44,6 +44,22 @@ function BlockchainBadge() {
       <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
       ⛓ On-chain verified
     </span>
+  );
+}
+
+function UberLogo({ className = "w-4 h-4" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 17.5c-4.14 0-7.5-3.36-7.5-7.5S7.86 4.5 12 4.5s7.5 3.36 7.5 7.5-3.36 7.5-7.5 7.5zm-2.5-4h5c.83 0 1.5-.67 1.5-1.5V8h-2.5v5h-3V8H7v6c0 .83.67 1.5 1.5 1.5z" />
+    </svg>
+  );
+}
+
+function BoltLogo({ className = "w-4 h-4" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M13.2 2.2a1 1 0 00-1.6.4l-7 11a1 1 0 00.8 1.4h4.7l-1.3 6.8a1 1 0 001.7.8l9-12a1 1 0 00-.8-1.6h-5l.5-6.8z" />
+    </svg>
   );
 }
 
@@ -223,7 +239,7 @@ function SocialHubSection({ eventId, isOrganiser }) {
     api.events
       .posts(eventId)
       .then(setPosts)
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
 
   useEffect(() => {
@@ -249,11 +265,10 @@ function SocialHubSection({ eventId, isOrganiser }) {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`text-sm font-semibold px-4 py-2.5 border-b-2 transition-colors ${
-              tab === t
+            className={`text-sm font-semibold px-4 py-2.5 border-b-2 transition-colors ${tab === t
                 ? "border-[#FF4E7A] text-[#FF4E7A]"
                 : "border-transparent text-gray-400 hover:text-[#1B1B23]"
-            }`}
+              }`}
           >
             {t === "updates" ? "Organiser Updates" : "Discussion"}
           </button>
@@ -386,6 +401,30 @@ function EventDetailPageInner() {
   const [interested, setInterested] = useState(false);
   const [discover, setDiscover] = useState([]);
   const [copied, setCopied] = useState("");
+  const [showAllAbout, setShowAllAbout] = useState(false);
+  const [showAllThingsToKnow, setShowAllThingsToKnow] = useState(false);
+  const [showFaqs, setShowFaqs] = useState(false);
+  const [showTicketDrawer, setShowTicketDrawer] = useState(false);
+  const [activeTab, setActiveTab] = useState("tickets");
+  const [showMoreBio, setShowMoreBio] = useState(false);
+  const [activeModal, setActiveModal] = useState(null); // 'schedule' | 'faqs' | 'terms'
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
+  const [openTermsIndex, setOpenTermsIndex] = useState(null);
+  const [isScheduleDayOpen, setIsScheduleDayOpen] = useState(true);
+
+  useEffect(() => {
+    if (!activeModal) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setActiveModal(null);
+    };
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [activeModal]);
 
   useEffect(() => {
     if (!inviteToken) {
@@ -444,14 +483,14 @@ function EventDetailPageInner() {
             const source =
               utmSource ||
               (referrerHost && referrerHost !== window.location.hostname ? referrerHost : "Direct");
-            api.events.trackView(realId, source).catch(() => {});
-          } catch {}
+            api.events.trackView(realId, source).catch(() => { });
+          } catch { }
         }
         if (data.publicGuestList) {
           try {
             const gl = await api.events.publicGuestList(realId);
             if (!cancelled && gl && gl.names?.length) setGuestList(gl);
-          } catch {}
+          } catch { }
         }
         if (data.addressHidden && isAuthenticated()) {
           try {
@@ -461,17 +500,17 @@ function EventDetailPageInner() {
                 prev && prev.id === realId ? { ...prev, ...revealed, addressHidden: false } : prev
               );
             }
-          } catch {}
+          } catch { }
         }
         try {
           const wl = await api.waitlist.position(realId);
           if (!cancelled && wl) setWaitlistInfo(wl);
-        } catch {}
+        } catch { }
         if (data.organiser?.id) {
           try {
             const f = await api.organisers.isFollowing(data.organiser.id);
             if (!cancelled && f) setOrganiserFollowing(f.following);
-          } catch {}
+          } catch { }
         }
 
         const similar = MOCK_EVENTS.filter((e) => e.id !== realId);
@@ -529,9 +568,9 @@ function EventDetailPageInner() {
   const totalItems = Object.values(selectedTiers).reduce((s, q) => s + q, 0);
   const totalPrice = event
     ? (event.ticketTiers || []).reduce(
-        (s, t) => s + (selectedTiers[t.id] ?? 0) * t.price,
-        0
-      )
+      (s, t) => s + (selectedTiers[t.id] ?? 0) * t.price,
+      0
+    )
     : 0;
 
   const handleCheckout = () => {
@@ -550,7 +589,7 @@ function EventDetailPageInner() {
 
   const handleShare = async () => {
     if (navigator.share) {
-      navigator.share({ title: event?.name, url: window.location.href }).catch(() => {});
+      navigator.share({ title: event?.name, url: window.location.href }).catch(() => { });
       return;
     }
     await navigator.clipboard.writeText(window.location.href);
@@ -560,7 +599,7 @@ function EventDetailPageInner() {
   const handleInvite = async () => {
     const text = `Join me at ${event?.name} — ${window.location.href}`;
     if (navigator.share) {
-      navigator.share({ title: event?.name, text, url: window.location.href }).catch(() => {});
+      navigator.share({ title: event?.name, text, url: window.location.href }).catch(() => { });
       return;
     }
     await navigator.clipboard.writeText(text);
@@ -642,16 +681,16 @@ function EventDetailPageInner() {
   const isMultiDay =
     !!endDateObj &&
     date.toLocaleDateString("en-CA", { timeZone: eventTimeZone }) !==
-      endDateObj.toLocaleDateString("en-CA", { timeZone: eventTimeZone });
+    endDateObj.toLocaleDateString("en-CA", { timeZone: eventTimeZone });
   const dateLabel =
     details.dateLabel ??
     (isMultiDay
       ? `${shortDate} – ${endDateObj.toLocaleDateString("en-IE", {
-          weekday: "short",
-          day: "numeric",
-          month: "short",
-          timeZone: eventTimeZone,
-        })}`
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        timeZone: eventTimeZone,
+      })}`
       : `${shortDate}, ${startTime}`);
   const timeLabel =
     endDateObj && !isMultiDay
@@ -685,549 +724,881 @@ function EventDetailPageInner() {
   const contactOrganiser = () =>
     document.getElementById("community-hub")?.scrollIntoView({ behavior: "smooth" });
 
+  const defaultFaqs = [
+    {
+      q: "Is there an age restriction for the event?",
+      a: event.ageRestriction === "EIGHTEEN_PLUS"
+        ? "Yes, entry is strictly restricted to attendees aged 18 and above. A valid government photo ID is mandatory at the gate."
+        : "Entry is open for all ages. Children aged 4 and above require a separate ticket for entry.",
+    },
+    {
+      q: "Is parking available?",
+      a: "Venue parking is limited and available on a first-come, first-served basis. We strongly recommend taking public transit or carpooling.",
+    },
+    {
+      q: "Can I get a refund if I can't attend the event?",
+      a: "Tickets are non-refundable. However, you can transfer or resell your ticket securely through the verified Passqo Resale Marketplace.",
+    },
+    {
+      q: "Is there a designated smoking area?",
+      a: "Smoking and vaping are strictly prohibited inside the main performance zones. Designated outdoor smoking areas are available near the exit concourse.",
+    },
+    {
+      q: "Are group bookings available?",
+      a: "Yes! Group bookings of 5 or more attendees are eligible for exclusive discounts. Select the group tier or reach out to support for corporate inquiries.",
+    },
+    ...(details.faqs || []).filter(
+      (f) =>
+        ![
+          "Is there an age restriction for the event?",
+          "Is there parking available?",
+          "Can I get a refund if I can't attend the event?",
+          "Is there a designated smoking area?",
+          "Are group bookings available?",
+        ].includes(f.q)
+    ),
+  ];
+
+  const defaultTerms = [
+    {
+      title: "1. Age & Identification",
+      desc: "All attendees must present a valid physical government-issued photo ID (Aadhaar, Passport, Driving License, or Voter ID). Digital photos, photocopies, or student IDs will not be accepted at entry.",
+    },
+    {
+      title: "2. Ticket Validity & Transfer",
+      desc: "Each ticket grants one-time entry for a single individual. Tickets purchased through unauthorized third-party platforms are invalid. Official resales must occur exclusively through Passqo.",
+    },
+    {
+      title: "3. Cancellation & Refunds",
+      desc: "All ticket sales are final and non-refundable. If the event is officially cancelled by the organizers, refunds will be processed automatically to the original payment source within 7-10 working days.",
+    },
+    {
+      title: "4. Security & Prohibited Items",
+      desc: "Mandatory security frisking and bag checks will take place at all entry gates. Strictly prohibited: outside food, alcohol, glassware, knives, weapons, illicit substances, lasers, and professional cameras with detachable lenses.",
+    },
+    {
+      title: "5. Right of Admission & Code of Conduct",
+      desc: "Organizers and venue security reserve the absolute right of admission. Any attendee engaging in disorderly, unruly, abusive, or dangerous behavior will be immediately evicted without refund.",
+    },
+    {
+      title: "6. Photography & Recording Consent",
+      desc: "By attending the event, attendees grant the organizers irrevocable consent to photograph, film, and record their image and voice for marketing, television broadcasts, and promotional materials worldwide.",
+    },
+  ];
+
+  const timelineItems =
+    details.schedule && details.schedule.length > 0
+      ? details.schedule.map((s) => ({
+        title: s.title || s.label || s.name,
+        time: s.time || s.startTime || "TBD",
+      }))
+      : [
+        {
+          title: "Gates open",
+          time: doorsLabel.includes("at") ? doorsLabel.split("at")[1].trim() : "4:30 PM",
+        },
+        { title: "Event starts", time: startTime || "6:00 PM" },
+        {
+          title: "Event ends",
+          time: endDateObj ? endDateObj.toLocaleTimeString("en-IE", timeFmtOpts) : "10:00 PM",
+        },
+      ];
+
+  const fullAddress = [event.venue, event.address, event.city].filter(Boolean).join(", ") || "Event Location";
+  const uberUrl = `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${encodeURIComponent(fullAddress)}`;
+  const boltUrl = `https://bolt.onelink.me/iaKi/?af_dp=bolt%3A%2F%2Fdestination%3Faddress%3D${encodeURIComponent(fullAddress)}&af_web_dp=https%3A%2F%2Fbolt.eu`;
+  const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+  const appleMapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(fullAddress)}`;
+
   return (
-    <div className="min-h-screen bg-[#F5F0EB] pb-32 lg:pb-8 pt-16 sm:pt-20 lg:pt-24">
+    <div className="min-h-screen bg-[#F8F5F0] pb-24 lg:pb-16 pt-16 sm:pt-20">
       <Navbar />
 
-      <div className="max-w-[1120px] mx-auto px-4 lg:px-0 divide-y divide-[#E7DEDA]/60">
-        {/* ── Event introduction ───────────────────── */}
-        <div className="flex flex-col gap-[26px] pt-6 lg:pt-9 pb-8">
-          {event.isPrivate && isOwner && (
-            <div className="bg-[#1B1B23] text-white rounded-xl px-4 py-3 flex items-center gap-2 text-sm">
-              <span>This event is private. Only people with the link can see it.</span>
-            </div>
-          )}
-          <p className="text-xs leading-relaxed text-[#6E6969]">
-            <Link to="/" className="hover:text-[#EF4B7E]">
-              Home
-            </Link>{" "}
-            /{" "}
-            <Link to={`/search?category=${event.category}`} className="hover:text-[#EF4B7E]">
-              {categoryLabel(event.category)}
-            </Link>{" "}
-            /{" "}
-            <Link
-              to={`/search?city=${encodeURIComponent(event.city)}`}
-              className="hover:text-[#EF4B7E]"
-            >
-              {event.city}
-            </Link>{" "}
-            / {event.name}
+      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-2 sm:pt-3 space-y-3.5 sm:space-y-4">
+        {/* ── Private Notice (if applicable) ── */}
+        {event.isPrivate && isOwner && (
+          <div className="bg-[#1B1B23] text-white rounded-xl px-4 py-2.5 flex items-center gap-2 text-xs sm:text-sm shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span>This event is private. Only people with the link can see it.</span>
+          </div>
+        )}
+
+        {/* ── TOP EVENT TITLE & DATE (Matching District Screenshot - NO breadcrumb line) ── */}
+        <div className="space-y-1">
+          <p className="text-xs sm:text-sm font-semibold text-[#FF4E7A] tracking-wide">
+            {dateLabel}
           </p>
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex flex-col gap-2.5 max-w-[820px]">
-              <h1 className="text-[28px] lg:text-[38px] leading-[1.25] text-[#18181C]">
-                {event.name}
-              </h1>
-              <p className="text-base font-bold text-[#EF4B7E]">{dateLabel}</p>
-            </div>
-            <div className="hidden sm:flex flex-col items-end gap-2 flex-shrink-0">
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-[36px] font-medium text-[#18181C] tracking-tight leading-tight">
+              {event.name}
+            </h1>
+            <div className="hidden sm:flex items-center gap-1.5 flex-shrink-0">
               <Badge>
                 {event.format === "VIRTUAL" ? "ONLINE" : categoryLabel(event.category).toUpperCase()}
               </Badge>
               {event.isSoldOut && <Badge>SOLD OUT</Badge>}
-              {event.isSellingFast && !event.isSoldOut && <Badge>SELLING FAST</Badge>}
-              {AGE_RESTRICTION_LABELS[event.ageRestriction] && (
-                <Badge>{AGE_RESTRICTION_LABELS[event.ageRestriction]}</Badge>
-              )}
             </div>
           </div>
-
-          {/* Hero artwork */}
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="relative h-[260px] sm:h-[400px] lg:h-[520px] lg:w-[848px] rounded-[30px] overflow-hidden bg-[#1B1B23] flex-shrink-0">
-              {event.image ? (
-                <img
-                  src={event.image}
-                  alt={event.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#FF4E7A]/40 via-[#1B1B23] to-[#00C896]/30" />
-              )}
-              {FEATURES.blockchain && event.isBlockchain && (
-                <div className="absolute top-4 left-4">
-                  <BlockchainBadge />
-                </div>
-              )}
-            </div>
-            {(sideTop || sideBottom) && (
-              <div className="flex lg:flex-col gap-4 flex-1 min-w-0">
-                {sideTop && (
-                  <div className="relative flex-1 h-[160px] lg:h-[304px] rounded-[20px] overflow-hidden bg-[#EDE8E2]">
-                    <img src={sideTop} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                  </div>
-                )}
-                {sideBottom && (
-                  <a
-                    href="#gallery"
-                    className="relative flex-1 h-[160px] lg:h-[200px] rounded-[20px] overflow-hidden bg-[#EDE8E2] flex items-center justify-center"
-                  >
-                    <img src={sideBottom} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                    <span className="absolute inset-0 bg-black/40" />
-                    <span className="relative text-lg text-white">View gallery ↗</span>
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Information and actions */}
-          <div className="bg-white rounded-[20px] p-5 lg:p-6 flex flex-col md:flex-row md:items-center gap-5 lg:gap-6">
-            <div className="flex-1 min-w-0 flex flex-col gap-1">
-              <p className="text-xs font-semibold text-[#6E6969]">Location</p>
-              <p className="text-[15px] font-bold leading-relaxed text-[#18181C]">
-                {eventLocationLine(event)}
-              </p>
-            </div>
-            <div className="flex-1 min-w-0 flex flex-col gap-1">
-              <p className="text-xs font-semibold text-[#6E6969]">Doors / event start</p>
-              <p className="text-[15px] font-bold leading-relaxed text-[#18181C]">{doorsLabel}</p>
-            </div>
-            <div className="md:w-[230px] flex flex-col gap-2">
-              <p className="text-[22px] leading-[1.25] text-[#18181C]">
-                {isPastEvent ? "Event ended" : priceLabel}
-              </p>
-              {isInviteActionable ? (
-                <ActionChip primary onClick={handleAcceptInvite} disabled={acceptingInvite}>
-                  {acceptingInvite ? "…" : "Accept invite →"}
-                </ActionChip>
-              ) : isPastEvent ? (
-                <ActionChip disabled>Tickets closed</ActionChip>
-              ) : event.isSoldOut ? (
-                event.waitlistEnabled ? (
-                  <ActionChip primary href={`/waitlist/${event.id}`}>
-                    Join waitlist →
-                  </ActionChip>
-                ) : (
-                  <ActionChip disabled>Sold out</ActionChip>
-                )
-              ) : (
-                <ActionChip primary onClick={scrollToTickets}>
-                  Book Tickets →
-                </ActionChip>
-              )}
-            </div>
-          </div>
-
-          {/* Event tools */}
-          <div className="flex flex-wrap gap-3 items-center">
-            <ActionChip onClick={handleInterested} icon={Heart} ariaPressed={interested}>
-              {interested ? "Interested ✓" : "Interested"}
-            </ActionChip>
-            <ActionChip onClick={handleShare} icon={Share2}>
-              Share event
-            </ActionChip>
-            <ActionChip onClick={handleInvite} icon={UserPlus}>
-              Invite friends
-            </ActionChip>
-            <ActionChip href={calendarUrl} external icon={CalendarPlus}>
-              Add to calendar
-            </ActionChip>
-            {copied && <span className="text-xs font-semibold text-[#00A889]">{copied}</span>}
-          </div>
-
-          {/* About */}
-          {(event.description || details.aboutExtra) && (
-            <div className="flex flex-col gap-4 pt-3">
-              <h2 className="text-[30px] leading-[1.25] text-[#18181C]">About</h2>
-              {event.description && (
-                <RichTextDisplay
-                  html={event.description}
-                  className="text-[15px] leading-relaxed text-[#18181C]"
-                />
-              )}
-              {details.aboutExtra && (
-                <p className="text-[15px] leading-relaxed text-[#6E6969]">{details.aboutExtra}</p>
-              )}
-              {event.totalSold > 0 || event.waitlistCount > 0 ? (
-                <p className="text-xs text-[#6E6969]">
-                  {event.totalSold > 0 && `${event.totalSold.toLocaleString()} going`}
-                  {event.totalSold > 0 && event.waitlistCount > 0 && " · "}
-                  {event.waitlistCount > 0 &&
-                    `${event.waitlistCount.toLocaleString()} on the waitlist`}
-                </p>
-              ) : null}
-            </div>
-          )}
         </div>
 
-        <LineupSection event={event} details={details} />
-        <ScheduleSection details={details} calendarUrl={calendarUrl} />
-        <StagesSection details={details} />
-        <HighlightsSection details={details} />
-        <VenueSection
-          event={event}
-          details={details}
-          dateLabel={details.dateLabel ?? longDate}
-          timeLabel={
-            details.doors
-              ? `${details.doors}${timeLabel !== startTime ? ` · ${timeLabel}` : ""}`
-              : timeLabel
-          }
-          onContact={contactOrganiser}
-        />
+        {/* ── HERO ARTWORK SECTION: MAIN BANNER + MEDIA BESIDE (MATCHING IMAGE 1) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 items-stretch">
+          {/* Main Artwork Banner */}
+          <div className="lg:col-span-8 relative min-h-[260px] sm:h-[340px] lg:h-[400px] xl:h-[430px] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#121218] shadow-sm group">
+            {/* Ambient Blurred Background Glow */}
+            {event.image ? (
+              <img
+                src={event.image}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-cover filter blur-2xl opacity-40 scale-125 select-none pointer-events-none"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-900/40 via-purple-900/30 to-black/60 filter blur-xl opacity-50" />
+            )}
+            <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
-        {/* ── 06 Tickets ── */}
-        <Section id="tickets">
-          <SectionHeading eyebrow="Tickets" title="Choose your ticket" />
-          {details.tickets?.notice && <Notice>{details.tickets.notice}</Notice>}
-          {isInviteActionable ? (
-            <div className="max-w-md">
-              <AcceptInviteCard
-                organiserName={invite.organiserName}
-                responding={acceptingInvite}
-                error={inviteError}
-                onAccept={handleAcceptInvite}
-                token={inviteToken}
+            {/* Centered Crisp Event Poster Artwork */}
+            <img
+              src={event.image || "/images/figma-sample/goa/goa-hero.png"}
+              alt={event.name}
+              className="relative w-full h-full object-contain sm:object-cover mx-auto"
+            />
+
+            {/* Quick Action Pills Overlaid on Top Right of Image */}
+            <div className="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 flex items-center gap-1.5 sm:gap-2 z-10">
+              <button
+                type="button"
+                onClick={handleInterested}
+                className={`
+                  text-xs font-semibold py-1.5 px-3 rounded-full border transition-all flex items-center gap-1.5 backdrop-blur-md cursor-pointer shadow-sm active:scale-95
+                  ${interested
+                    ? "bg-[#FF4E7A] border-[#FF4E7A] text-white"
+                    : "bg-black/50 hover:bg-black/70 border-white/20 text-white"
+                  }
+                `}
+              >
+                <Heart className={`w-3.5 h-3.5 ${interested ? "fill-white text-white" : "text-white"}`} />
+                <span className="hidden sm:inline">Interested</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShare}
+                className="bg-black/50 hover:bg-black/70 border border-white/20 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-md shadow-sm cursor-pointer active:scale-95"
+                title="Share event"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Share</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleInvite}
+                className="bg-black/50 hover:bg-black/70 border border-white/20 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-md shadow-sm cursor-pointer active:scale-95"
+                title="Invite friends"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Invite</span>
+              </button>
+
+              <a
+                href={calendarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-black/50 hover:bg-black/70 border border-white/20 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-md shadow-sm cursor-pointer active:scale-95"
+                title="Add to calendar"
+              >
+                <CalendarPlus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Calendar</span>
+              </a>
+
+              {copied && (
+                <span className="text-[11px] font-semibold text-white bg-emerald-600 px-2.5 py-1 rounded-full shadow-sm animate-fade-in">
+                  {copied}
+                </span>
+              )}
+            </div>
+
+            {/* Badges Overlaid on Bottom Left of Image */}
+            <div className="absolute bottom-3 left-3 flex items-center gap-2 z-10">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/15">
+                {categoryLabel(event.category).toUpperCase()}
+              </span>
+              {FEATURES.blockchain && event.isBlockchain && (
+                <span className="text-[10px] font-semibold text-[#00C896] bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/15">
+                  ⛓ On-Chain
+                </span>
+              )}
+              {event.isSellingFast && !event.isSoldOut && (
+                <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-[#FF4E7A] px-2.5 py-0.5 rounded-full shadow-2xs">
+                  SELLING FAST
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Right Side Media Cards (Desktop >= lg, matching Image 1) */}
+          <div className="hidden lg:flex lg:col-span-4 lg:h-[400px] xl:h-[430px] flex-col gap-3.5">
+            <div className="relative flex-1 min-h-0 rounded-2xl overflow-hidden bg-neutral-200 shadow-2xs group">
+              <img
+                src={sideTop || "/images/figma-sample/goa/headliner.png"}
+                alt=""
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-          ) : isPastEvent ? (
-            <div className={`${CARD} text-center`}>
-              <p className="font-bold text-[#18181C]">This event has ended</p>
-              <p className="text-sm text-[#6E6969]">Tickets are no longer available.</p>
+
+            <a
+              href="#gallery"
+              className="relative flex-1 min-h-0 rounded-2xl overflow-hidden bg-neutral-900 shadow-2xs flex items-center justify-center group"
+            >
+              <img
+                src={sideBottom || "/images/figma-sample/goa/gallery-1.png"}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-45 transition-opacity duration-300 group-hover:scale-105"
+              />
+              <span className="relative text-white font-semibold text-base flex items-center gap-1.5 z-10 drop-shadow-md">
+                <span>View gallery</span>
+                <span className="text-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200">↗</span>
+              </span>
+            </a>
+          </div>
+        </div>
+
+        {/* ── TWO-COLUMN FIRST-FOLD LAYOUT (VISIBLE ON LOAD WITHOUT SCROLLING) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start pt-1 sm:pt-2">
+
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* LEFT COLUMN: ABOUT, DETAILS, AND SECTIONS                       */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          <div className="lg:col-span-7 xl:col-span-8 space-y-6 sm:space-y-7">
+
+            {/* 1. ABOUT SECTION (Matching District Screenshot) */}
+            <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-2.5">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">About</h2>
+              <div className={`text-xs sm:text-sm text-[#4A4A58] leading-relaxed ${showAllAbout ? "" : "line-clamp-3 sm:line-clamp-4"}`}>
+                {event.description ? (
+                  <RichTextDisplay html={event.description} />
+                ) : (
+                  <p>Join us for an unforgettable experience featuring world-class talent, vibrant community energy, and memories that last a lifetime.</p>
+                )}
+                {details.aboutExtra && <p className="mt-1.5 text-[#6E6969]">{details.aboutExtra}</p>}
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAllAbout((prev) => !prev)}
+                className="text-xs font-bold text-[#FF4E7A] hover:underline inline-flex items-center gap-1 cursor-pointer pt-0.5"
+              >
+                <span>{showAllAbout ? "Read less" : "Read more"}</span>
+                <span className="text-[10px]">{showAllAbout ? "▲" : "▼"}</span>
+              </button>
             </div>
-          ) : event.isSoldOut ? (
-            <div className="bg-[#1B1B23] rounded-[20px] p-6 text-center flex flex-col items-center gap-3">
-              <p className="text-gray-300 font-bold text-lg">Sold Out</p>
-              <p className="text-sm text-gray-400">
-                {event.waitlistCount > 0
-                  ? `${event.waitlistCount} on the waitlist`
-                  : "Be the first on the waitlist"}
-              </p>
-              {event.waitlistEnabled && (
-                <ActionChip primary href={`/waitlist/${event.id}`}>
-                  Join waitlist
-                </ActionChip>
-              )}
-              {FEATURES.resale && (
-                <ActionChip href={`/resale/${event.id}`}>Browse resale tickets</ActionChip>
-              )}
+
+            {/* 2. THINGS TO KNOW (Matching District Screenshot) */}
+            <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Things to know</h2>
+              <ul className="space-y-2 text-xs sm:text-sm text-[#4A4A58]">
+                <li className="flex items-start gap-2.5">
+                  <span className="text-[#FF4E7A] text-base leading-none">•</span>
+                  <span>{event.ageRestriction && event.ageRestriction !== "NONE" ? `Entry restricted: ${AGE_RESTRICTION_LABELS[event.ageRestriction] || event.ageRestriction}` : "Entry allowed for all ages"}</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-[#FF4E7A] text-base leading-none">•</span>
+                  <span>Tickets required for ages 4 and above</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-[#FF4E7A] text-base leading-none">•</span>
+                  <span>Pets are not allowed</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-[#FF4E7A] text-base leading-none">•</span>
+                  <span>ID (Aadhaar/PAN/DL/Passport) is required for entry</span>
+                </li>
+                {showAllThingsToKnow && (
+                  <>
+                    <li className="flex items-start gap-2.5">
+                      <span className="text-[#FF4E7A] text-base leading-none">•</span>
+                      <span>Outside commercial food, alcohol, and glassware are prohibited</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <span className="text-[#FF4E7A] text-base leading-none">•</span>
+                      <span>Security checks and contactless ticket scanning in operation at all entry gates</span>
+                    </li>
+                  </>
+                )}
+              </ul>
+              <button
+                type="button"
+                onClick={() => setShowAllThingsToKnow((prev) => !prev)}
+                className="text-xs sm:text-sm font-bold text-[#1B1B23] hover:text-[#FF4E7A] inline-flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                <span>{showAllThingsToKnow ? "View less" : "View more"}</span>
+                <ChevronRight className={`w-3.5 h-3.5 transition-transform ${showAllThingsToKnow ? "-rotate-90" : "rotate-90"}`} />
+              </button>
             </div>
-          ) : (
-            <>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {(event.ticketTiers || []).map((tier, idx) => {
-                  const avail = tier.quantity - tier.sold;
-                  const qty = selectedTiers[tier.id] ?? 0;
-                  const soldOut = avail <= 0;
-                  const effectiveMax = event.allowGroupRegistration ? tier.maxPerOrder : 1;
-                  const tierPerks = perks[tier.name] ?? [];
-                  return (
-                    <div
-                      key={tier.id}
-                      className={`${CARD} flex flex-col gap-4 ${
-                        qty > 0 ? "ring-1 ring-[#EF4B7E]" : ""
-                      } ${soldOut ? "opacity-60" : ""}`}
-                    >
-                      <Badge>
-                        {idx === 0
-                          ? minTierPrice === 0
-                            ? "FREE ENTRY"
-                            : "PUBLISHED STARTING PRICE"
-                          : soldOut
-                          ? "SOLD OUT"
-                          : "TICKET CATEGORY"}
-                      </Badge>
-                      <p className="text-[22px] leading-[1.25] text-[#18181C] capitalize">
-                        {tier.name}
-                        {FEATURES.blockchain && tier.isBlockchain && (
-                          <span className="text-[#00C896] text-sm ml-2">⛓</span>
-                        )}
-                      </p>
-                      <p className="text-[28px] leading-[1.25] text-[#18181C]">
-                        {tier.price === 0 ? "Free" : `€${tier.price}`}
-                      </p>
-                      {(blurbs[tier.name] || tier.description) && (
-                        <p className="text-[13px] leading-relaxed text-[#6E6969]">
-                          {blurbs[tier.name] ?? tier.description}
-                        </p>
-                      )}
-                      {tierPerks.length > 0 && (
-                        <ul className="flex flex-col gap-2.5 text-[13px] text-[#18181C]">
-                          {tierPerks.map((p) => (
-                            <li key={p}>✓ {p}</li>
-                          ))}
-                        </ul>
-                      )}
-                      <p className="text-xs text-[#6E6969]">
-                        {soldOut
-                          ? "Availability: Sold out"
-                          : avail >= 999999
-                          ? `Max ${effectiveMax} per order`
-                          : `Availability: ${avail.toLocaleString()} left · max ${effectiveMax} per order`}
-                      </p>
-                      <div className="mt-auto">
-                        {soldOut ? (
-                          <ActionChip disabled>Sold out</ActionChip>
-                        ) : qty === 0 ? (
-                          <ActionChip
-                            primary
-                            onClick={() => handleQtyChange(tier.id, 1, effectiveMax, avail)}
-                          >
-                            Add ticket →
-                          </ActionChip>
-                        ) : (
-                          <div className="inline-flex items-center gap-4 bg-[#EF4B7E] text-white rounded-xl px-4 py-2.5">
-                            <button
-                              type="button"
-                              onClick={() => handleQtyChange(tier.id, -1, effectiveMax, avail)}
-                              aria-label={`Remove one ${tier.name}`}
-                              className="w-6 h-6 rounded-full border-[1.5px] border-white flex items-center justify-center text-sm leading-none"
-                            >
-                              −
-                            </button>
-                            <span className="text-sm font-bold min-w-[1ch] text-center">{qty}</span>
-                            <button
-                              type="button"
-                              onClick={() => handleQtyChange(tier.id, 1, effectiveMax, avail)}
-                              disabled={qty >= effectiveMax || qty >= avail}
-                              aria-label={`Add one ${tier.name}`}
-                              className="w-6 h-6 rounded-full border-[1.5px] border-white flex items-center justify-center text-sm leading-none disabled:opacity-40"
-                            >
-                              +
-                            </button>
-                          </div>
-                        )}
+
+            {/* 3. DYNAMIC CATEGORY HIGHLIGHT */}
+            {event.category === "MUSIC_ENTERTAINMENT" && (details.lineup || event.lineup) && (
+              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Artist Lineup</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {(details.lineup?.headliner ? [details.lineup.headliner, ...(details.lineup.supporting || [])] : (event.lineup || [])).map((artist, idx) => (
+                    <div key={idx} className="p-3 rounded-xl border border-black/6 bg-neutral-50/50 flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-neutral-200 flex-shrink-0">
+                        <img src={artist.image || "/images/figma-sample/goa/headliner.png"} alt={artist.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-xs sm:text-sm text-[#1B1B23] truncate">{artist.name}</p>
+                        <p className="text-[11px] text-[#FF4E7A] font-semibold truncate">{artist.role || artist.tag || "Performer"}</p>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Order summary */}
-              <div className={`${CARD} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
-                <div>
-                  <p className="text-[22px] leading-[1.25] text-[#18181C]">
-                    {totalItems > 0
-                      ? totalPrice === 0
-                        ? "Free"
-                        : `€${totalPrice.toFixed(2)}`
-                      : priceLabel}
-                  </p>
-                  <p className="text-sm text-[#6E6969]">
-                    {totalItems > 0
-                      ? `${totalItems} ticket${totalItems > 1 ? "s" : ""} selected`
-                      : "Select a ticket above"}
-                    {waitlistInfo?.onWaitlist &&
-                      ` · You're #${waitlistInfo.position} on the waitlist`}
-                  </p>
-                  <p className="text-xs text-[#6E6969] pt-1">
-                    {FEATURES.blockchain && event.isBlockchain
-                      ? "NFT tickets · on-chain verified"
-                      : "Secure checkout"}
-                  </p>
+                  ))}
                 </div>
-                <div className="flex items-center gap-3">
-                  {FEATURES.resale && (
-                    <ActionChip href={`/resale/${event.id}`}>Resale tickets</ActionChip>
+              </div>
+            )}
+
+            {event.category === "BUSINESS" && details.speakers && (
+              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Featured Speakers</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {details.speakers.map((spk, idx) => (
+                    <div key={idx} className="p-3.5 rounded-xl border border-black/6 bg-neutral-50/50 flex items-start gap-3">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-neutral-200 flex-shrink-0 shadow-2xs">
+                        <img src={spk.image || "/images/figma-sample/goa/headliner.png"} alt={spk.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-xs sm:text-sm text-[#1B1B23] truncate">{spk.name}</p>
+                        <p className="text-[11px] text-[#FF4E7A] font-semibold truncate">{spk.role}</p>
+                        <p className="text-[10px] text-[#8C8C9E] font-medium truncate">{spk.company}</p>
+                        {spk.topic && <p className="text-[11px] text-[#4A4A58] mt-1 line-clamp-1 italic font-medium">"{spk.topic}"</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {event.category === "EDUCATION" && details.curriculum && (
+              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Curriculum & Syllabus</h2>
+                <div className="space-y-2">
+                  {details.curriculum.map((c, idx) => (
+                    <div key={idx} className="p-3.5 rounded-xl border border-black/6 bg-neutral-50/50 flex items-center justify-between gap-3">
+                      <div>
+                        <span className="text-[10px] font-bold text-[#FF4E7A] bg-pink-50 px-2 py-0.5 rounded-md">{c.week}</span>
+                        <p className="font-bold text-xs sm:text-sm text-[#1B1B23] mt-1">{c.title}</p>
+                      </div>
+                      <span className="text-xs text-[#8C8C9E] font-medium flex-shrink-0">{c.duration}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {event.category === "FOOD_DRINK" && details.tastingMenu && (
+              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Tasting Menu & Pairings</h2>
+                <div className="space-y-2">
+                  {details.tastingMenu.map((m, idx) => (
+                    <div key={idx} className="p-3.5 rounded-xl border border-black/6 bg-neutral-50/50 flex items-center justify-between gap-3">
+                      <div>
+                        <span className="text-[10px] font-bold text-[#FF4E7A] bg-pink-50 px-2 py-0.5 rounded-md">{m.course}</span>
+                        <p className="font-bold text-xs sm:text-sm text-[#1B1B23] mt-1">{m.dish}</p>
+                      </div>
+                      {m.pairing && (
+                        <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md flex-shrink-0">
+                          🍷 {m.pairing}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {event.category === "EXHIBITIONS" && details.timedEntrySlots && (
+              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Timed Entry Arrival Windows</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {details.timedEntrySlots.map((slot, idx) => (
+                    <div key={idx} className="p-3 rounded-xl border border-black/6 bg-neutral-50/50 flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#1B1B23]">{slot.slot}</span>
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">{slot.availability}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 4. ORGANIZED BY SECTION (Matching District Screenshot) */}
+            <div className="space-y-2.5">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Organized by</h2>
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border border-black/6 shadow-2xs flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-[#1B1B23] flex items-center justify-center text-white flex-shrink-0 shadow-sm p-1 overflow-hidden">
+                  {event.organiser?.image && event.organiser.image !== "/icons/organiser.svg" ? (
+                    <img src={event.organiser.image} alt="" className="w-full h-full object-cover rounded-full" />
+                  ) : (
+                    <span className="font-black text-xs text-center leading-tight tracking-wider text-white">
+                      {(event.organiser?.businessName || "HOST").slice(0, 10).toUpperCase()}
+                    </span>
                   )}
-                  <ActionChip primary onClick={handleCheckout} disabled={totalItems === 0}>
-                    Checkout →
-                  </ActionChip>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-sm sm:text-base text-[#1B1B23] truncate">
+                      {event.organiser?.businessName || "SHOWKRAFT STUDIOS LLP"}
+                    </h3>
+                    {event.organiser?.verified && (
+                      <span className="w-4 h-4 rounded-full bg-[#00C896] text-white flex items-center justify-center text-[10px] flex-shrink-0" title="Verified">
+                        ✓
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-[#8C8C9E] font-medium mt-1">
+                    <span>{event.totalSold ? `${event.totalSold}+ attendees` : "3 events"}</span>
+                    <span>•</span>
+                    <span>1+ year hosting</span>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              {details.tickets?.comparison && (
-                <div className={`${CARD} flex flex-col gap-4 overflow-x-auto`}>
-                  <p className="text-xl leading-[1.25] text-[#18181C]">Compare benefits</p>
-                  <table className="w-full min-w-[560px] text-[13px]">
-                    <thead>
-                      <tr className="border-b border-[#E7DEDA] text-[11px] font-bold uppercase text-[#18181C]">
-                        <th className="text-left py-2.5 pr-4 font-bold">Benefit</th>
-                        {details.tickets.comparison.columns.map((c) => (
-                          <th key={c} className="text-left py-2.5 pr-4 font-bold">
-                            {c}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {details.tickets.comparison.rows.map((r) => (
-                        <tr key={r.benefit} className="border-b border-[#E7DEDA]">
-                          <td className="py-2.5 pr-4 font-bold text-[#18181C]">{r.benefit}</td>
-                          {r.values.map((v, i) => (
-                            <td key={i} className="py-2.5 pr-4 text-[#18181C]">
-                              {v}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              {(() => {
-                const dealNote =
-                  details.tickets?.earlyBird ??
-                  (event.hasCoupons ? "Promo codes are accepted at checkout." : null);
-                const groupNote =
-                  details.tickets?.groupBooking ??
-                  (event.allowGroupRegistration
-                    ? `Up to ${Math.max(
-                        ...event.ticketTiers.map((t) => t.maxPerOrder ?? 1)
-                      )} tickets per order, with a named guest for each.`
-                    : null);
-                const knowLines = details.tickets?.knowBefore ?? [
-                  `Entry: ${doorsLabel}${event.timedEntryEnabled ? " · timed entry slots apply" : ""}.`,
-                  ...(event.refundPolicyText ? [`Refund policy: ${event.refundPolicyText}`] : []),
-                  event.requireApproval
-                    ? "Registrations are reviewed by the organiser before tickets are issued."
-                    : "Tickets are issued instantly after checkout.",
-                ];
-                const showGroup = !!(dealNote || groupNote);
-                return (
-                  <div className={`grid gap-5 ${showGroup ? "md:grid-cols-2" : ""}`}>
-                    {showGroup && (
-                      <div className={`${CARD} flex flex-col gap-4`}>
-                        <p className="text-lg leading-[1.25] text-[#18181C]">Going in a group?</p>
-                        {dealNote && (
-                          <p className="text-[13px] leading-relaxed text-[#18181C]">{dealNote}</p>
-                        )}
-                        {groupNote && (
-                          <p className="text-[13px] leading-relaxed text-[#18181C]">{groupNote}</p>
-                        )}
-                        {groupNote && (
-                          <div>
-                            <ActionChip onClick={contactOrganiser}>Contact organiser</ActionChip>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    <div className={`${CARD} flex flex-col gap-4`}>
-                      <p className="text-lg leading-[1.25] text-[#18181C]">Before you book</p>
-                      {knowLines.map((line, i) => (
-                        <p key={i} className="text-[13px] leading-relaxed text-[#18181C]">
-                          {line}
-                        </p>
-                      ))}
-                      {event.refundPolicyUrl && (
-                        <a
-                          href={event.refundPolicyUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[13px] font-bold text-[#EF4B7E]"
-                        >
-                          Read the full refund policy →
-                        </a>
-                      )}
-                    </div>
+            {/* 5. MORE / FAQS & TERMS SECTION (Matching District Screenshot) */}
+            <div className="space-y-2.5">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">More</h2>
+              <div className="bg-white rounded-2xl border border-black/6 shadow-2xs divide-y divide-black/6 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenFaqIndex(null);
+                    setActiveModal("faqs");
+                  }}
+                  className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-neutral-50/80 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-[#8C8C9E] group-hover:text-[#1B1B23] transition-colors" />
+                    <span className="font-bold text-xs sm:text-sm text-[#1B1B23]">
+                      Frequently asked questions
+                    </span>
                   </div>
-                );
-              })()}
-            </>
-          )}
-        </Section>
+                  <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:translate-x-0.5 group-hover:text-[#1B1B23] transition-all" />
+                </button>
 
-        <GallerySection details={details} />
-        <CommunitySection
-          event={event}
-          details={details}
-          guestNames={guestList?.names ?? []}
-          onShare={handleShare}
-          onInvite={handleInvite}
-        />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenTermsIndex(null);
+                    setActiveModal("terms");
+                  }}
+                  className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-neutral-50/80 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-[#8C8C9E] group-hover:text-[#1B1B23] transition-colors" />
+                    <span className="font-bold text-xs sm:text-sm text-[#1B1B23]">
+                      Terms and Conditions
+                    </span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:translate-x-0.5 group-hover:text-[#1B1B23] transition-all" />
+                </button>
+              </div>
+            </div>
 
-        <SocialHubSection eventId={event.id} isOrganiser={!!isOwner} />
+            {/* Community Social Hub */}
+            <SocialHubSection eventId={event.id} isOrganiser={!!isOwner} />
 
-        <FaqSection event={event} details={details} />
-        <OrganiserSection
-          event={event}
-          following={organiserFollowing}
-          onFollow={handleToggleOrganiserFollow}
-          followError={organiserFollowError}
-        />
-        <DiscoverSection groups={discover} />
+
+          </div>
+
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* RIGHT COLUMN: STICKY BOOK TICKETS & LOCATION CARDS              */}
+          {/* (VISIBLE DIRECTLY ON LOAD IN FIRST FOLD WITHOUT SCROLLING)       */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 self-start space-y-3 z-20">
+
+            {/* 1. BOOK TICKETS CARD (Matching District Screenshot: Price onwards & Direct Book tickets button) */}
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-black/8 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-extrabold text-xl sm:text-2xl text-[#1B1B23] tracking-tight">
+                    {minTierPrice === 0 ? "Free" : `€${minTierPrice}`}
+                    <span className="text-xs font-semibold text-[#8C8C9E] ml-1.5 tracking-normal">
+                      onwards
+                    </span>
+                  </p>
+                  {event.isSellingFast && !event.isSoldOut && (
+                    <span className="text-[11px] font-bold text-[#FF4E7A] flex items-center gap-1 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#FF4E7A] animate-pulse" />
+                      Selling fast
+                    </span>
+                  )}
+                </div>
+
+                {isPastEvent ? (
+                  <span className="bg-neutral-100 text-neutral-400 font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm">
+                    Event ended
+                  </span>
+                ) : event.isSoldOut ? (
+                  event.waitlistEnabled ? (
+                    <Link
+                      to={`/waitlist/${event.id}`}
+                      className="bg-[#1B1B23] hover:bg-[#2D2D3A] text-white font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-98"
+                    >
+                      Join waitlist
+                    </Link>
+                  ) : (
+                    <span className="bg-neutral-100 text-neutral-400 font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm">
+                      Sold out
+                    </span>
+                  )
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/events/${event.id}/book`)}
+                    className="bg-[#1B1B23] hover:bg-[#2D2D3A] text-white font-bold text-xs sm:text-sm px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-all shadow-sm active:scale-98 cursor-pointer"
+                  >
+                    Book tickets
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* 2. MERGED LOCATION & TAXIS CARD */}
+            <div className="bg-white rounded-2xl border border-black/8 shadow-2xs overflow-hidden">
+              {/* Clickable Location Row */}
+              <div
+                onClick={() => setActiveModal("location")}
+                className="p-3.5 sm:p-4 hover:bg-neutral-50/80 transition-colors flex items-center gap-3 cursor-pointer group"
+              >
+                <div className="w-9 h-9 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0 text-[#1B1B23] group-hover:bg-pink-50 group-hover:text-[#FF4E7A] transition-colors">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-xs sm:text-sm text-[#1B1B23] truncate group-hover:text-[#FF4E7A] transition-colors">
+                    {event.venue || event.city}
+                  </p>
+                  <p className="text-[11px] text-[#8C8C9E] font-medium truncate">
+                    {event.address ? event.address : `${event.city || "Venue"} · 5.6 km away`}
+                  </p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:translate-x-0.5 group-hover:text-[#FF4E7A] transition-all flex-shrink-0" />
+              </div>
+
+              {/* Taxis / Ride-hailing Section (Merged seamlessly inside) */}
+              <div className="border-t border-black/6 bg-neutral-50/40 p-3.5 sm:p-4 space-y-2.5">
+                <p className="text-[11px] sm:text-xs text-[#555] leading-relaxed">
+                  Taxis and ride-hailing drop-off at the main entrance. Pre-book your return journey to avoid surge pricing.
+                </p>
+                <div className="grid grid-cols-2 gap-2.5 pt-0.5">
+                  <a
+                    href={uberUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="h-10 rounded-full bg-black hover:bg-neutral-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-98 shadow-xs cursor-pointer px-4"
+                  >
+                    <UberLogo className="w-3.5 h-3.5" />
+                    <span>Uber</span>
+                  </a>
+                  <a
+                    href={boltUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="h-10 rounded-full bg-[#34D186] hover:bg-[#2ebd78] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-98 shadow-xs cursor-pointer px-4"
+                  >
+                    <BoltLogo className="w-3.5 h-3.5" />
+                    <span>Bolt</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. TIME / SCHEDULE PILL CARD (Matching District Screenshot: Gates open at 4:30 PM / View full schedule & timeline >) */}
+            <div
+              onClick={() => setActiveModal("schedule")}
+              className="bg-white rounded-2xl p-3.5 sm:p-4 border border-black/8 shadow-2xs hover:shadow-xs hover:border-black/20 transition-all flex items-center gap-3 cursor-pointer group"
+            >
+              <div className="w-9 h-9 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0 text-[#1B1B23] group-hover:bg-neutral-200 transition-colors">
+                <Clock className="w-4 h-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-xs sm:text-sm text-[#1B1B23] truncate">
+                  {doorsLabel || "Starts at 6:00 PM"}
+                </p>
+                <p className="text-[11px] text-[#8C8C9E] font-medium truncate">
+                  View full schedule & timeline
+                </p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:translate-x-0.5 group-hover:text-[#1B1B23] transition-all flex-shrink-0" />
+            </div>
+
+          </div>
+        </div>
       </div>
 
-      {/* ── Sticky mobile buy bar ──────────────────────────────── */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white shadow-[0_0_16px_rgba(17,17,26,0.1)] px-4 py-3 z-40 lg:hidden">
-        {isInviteActionable ? (
-          <div className="flex items-center justify-between max-w-lg mx-auto gap-3">
-            <div className="min-w-0">
-              <p className="text-[10px] text-[#FF4E7A] font-bold uppercase tracking-wide">
-                You&apos;re invited
-              </p>
-              <p className="font-black text-sm text-[#1B1B23] truncate">{event.name}</p>
-            </div>
-            {inviteError && (
-              <p className="text-red-500 text-[10px] flex-shrink-0 max-w-[100px]">{inviteError}</p>
-            )}
-            <button
-              onClick={handleAcceptInvite}
-              disabled={acceptingInvite}
-              className="flex-shrink-0 bg-[#FF4E7A] hover:bg-[#D4537E] disabled:opacity-60 text-white font-label font-semibold px-5 py-3.5 rounded-[30px] transition-colors text-sm"
-            >
-              {acceptingInvite ? "…" : "Accept Invite"}
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between max-w-lg mx-auto">
-            <div>
-              <p className="font-bold text-2xl leading-[1.3] text-black">
-                {totalItems > 0
-                  ? totalPrice === 0
-                    ? "Free"
-                    : `€${totalPrice.toFixed(2)}`
-                  : minTierPrice === 0
+      {/* ── STICKY MOBILE BUY BAR (Fixed at bottom on mobile screens) ── */}
+      <div className="fixed bottom-16 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-black/8 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 py-3 z-40 lg:hidden">
+        <div className="flex items-center justify-between max-w-lg mx-auto gap-3">
+          <div>
+            <p className="font-extrabold text-xl leading-tight text-[#1B1B23]">
+              {totalItems > 0
+                ? totalPrice === 0
+                  ? "Free"
+                  : `€${totalPrice.toFixed(2)}`
+                : minTierPrice === 0
                   ? "Free"
                   : `€${minTierPrice}`}
-              </p>
-              <p className="text-sm font-medium text-black">
-                {totalItems > 0
-                  ? `${totalItems} Ticket${totalItems > 1 ? "s" : ""}`
-                  : minTierPrice === 0
+            </p>
+            <p className="text-xs font-medium text-[#8C8C9E]">
+              {totalItems > 0
+                ? `${totalItems} Ticket${totalItems > 1 ? "s" : ""} selected`
+                : minTierPrice === 0
                   ? ""
                   : "onwards"}
-              </p>
-            </div>
-            {isPastEvent ? (
-              <span className="bg-gray-100 text-gray-400 font-label font-semibold px-5 py-3.5 rounded-[30px] text-sm">
-                Event Ended
-              </span>
-            ) : event.isSoldOut ? (
-              event.waitlistEnabled ? (
-                <Link
-                  to={`/waitlist/${event.id}`}
-                  className="bg-[#FF4E7A] hover:bg-[#D4537E] text-white font-label font-semibold px-5 py-3.5 rounded-[30px] transition-colors text-sm"
-                >
-                  Join Waitlist
-                </Link>
-              ) : FEATURES.resale ? (
-                <Link
-                  to={`/resale/${event.id}`}
-                  className="bg-[#FF4E7A] hover:bg-[#D4537E] text-white font-label font-semibold px-5 py-3.5 rounded-[30px] transition-colors text-sm"
-                >
-                  Browse Resale
-                </Link>
-              ) : (
-                <span className="bg-gray-100 text-gray-400 font-label font-semibold px-5 py-3.5 rounded-[30px] text-sm">
-                  Sold Out
-                </span>
-              )
-            ) : (
-              <button
-                onClick={totalItems > 0 ? handleCheckout : scrollToTickets}
-                className="bg-[#FF4E7A] hover:bg-[#D4537E] text-white font-label font-semibold px-5 py-3.5 rounded-[30px] transition-colors text-sm"
-              >
-                {totalItems > 0
-                  ? totalPrice === 0
-                    ? "Checkout · Free"
-                    : `Checkout · €${totalPrice.toFixed(2)}`
-                  : "Get Tickets"}
-              </button>
-            )}
+            </p>
           </div>
-        )}
+
+          {isPastEvent ? (
+            <span className="bg-neutral-100 text-neutral-400 font-bold px-5 py-3 rounded-xl text-xs">
+              Event Ended
+            </span>
+          ) : event.isSoldOut ? (
+            event.waitlistEnabled ? (
+              <Link
+                to={`/waitlist/${event.id}`}
+                className="bg-[#1B1B23] hover:bg-[#2D2D3A] text-white font-bold px-5 py-3 rounded-xl text-xs transition-colors shadow-sm"
+              >
+                Join Waitlist
+              </Link>
+            ) : (
+              <span className="bg-neutral-100 text-neutral-400 font-bold px-5 py-3 rounded-xl text-xs">
+                Sold Out
+              </span>
+            )
+          ) : (
+            <button
+              type="button"
+              onClick={() => navigate(`/events/${event.id}/book`)}
+              className="bg-[#1B1B23] hover:bg-[#2D2D3A] text-white font-bold px-6 py-3 rounded-xl transition-all shadow-sm text-xs active:scale-98 cursor-pointer"
+            >
+              Book tickets
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* ── MODAL POPUPS (Schedule, FAQs, Terms) Matching District Screenshots ── */}
+      {activeModal && (
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setActiveModal(null);
+          }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in duration-150"
+        >
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative max-h-[88vh] flex flex-col border border-black/5 animate-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-black/6 flex-shrink-0">
+              <h3 className="font-extrabold text-lg sm:text-xl text-[#1B1B23]">
+                {activeModal === "schedule" && "Schedule and timeline"}
+                {activeModal === "faqs" && "Frequently asked questions"}
+                {activeModal === "terms" && "Terms and Conditions"}
+                {activeModal === "location" && "Venue & Directions"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-[#1B1B23] flex items-center justify-center transition-colors cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="overflow-y-auto pt-4 space-y-4 pr-1 text-[#1B1B23]">
+              {/* SCHEDULE MODAL (Matching District Image 1) */}
+              {activeModal === "schedule" && (
+                <div className="space-y-4">
+                  {/* Calendar Date Subheader */}
+                  <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1B23]">
+                    <Calendar className="w-4 h-4 text-[#8C8C9E]" />
+                    <span>{longDate}</span>
+                  </div>
+
+                  {/* Day Accordion Item */}
+                  <div className="border border-black/6 rounded-2xl p-4 bg-neutral-50/50">
+                    <button
+                      type="button"
+                      onClick={() => setIsScheduleDayOpen((prev) => !prev)}
+                      className="w-full flex items-center justify-between text-left cursor-pointer group"
+                    >
+                      <span className="font-bold text-sm text-[#1B1B23]">
+                        {shortDate} - {doorsLabel.includes("at") ? doorsLabel.split("at")[1].trim() : startTime}
+                      </span>
+                      <ChevronUp
+                        className={`w-4 h-4 text-neutral-400 group-hover:text-[#1B1B23] transition-transform duration-200 ${isScheduleDayOpen ? "" : "rotate-180"
+                          }`}
+                      />
+                    </button>
+
+                    {isScheduleDayOpen && (
+                      <div className="relative pl-7 space-y-6 pt-5 pb-2">
+                        {/* Vertical line connecting nodes */}
+                        <div className="absolute left-[7px] top-6 bottom-5 w-0.5 bg-neutral-200" />
+
+                        {timelineItems.map((item, idx) => (
+                          <div key={idx} className="relative flex items-center justify-between text-xs sm:text-sm">
+                            {/* Hollow bullet circle matching screenshot */}
+                            <div className="absolute -left-7 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-2 border-neutral-300 bg-white" />
+                            <span className="font-medium text-[#1B1B23]">{item.title}</span>
+                            <span className="font-bold text-[#1B1B23] tabular-nums">{item.time}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* FAQS MODAL (Matching District Image 2) */}
+              {activeModal === "faqs" && (
+                <div className="divide-y divide-black/6">
+                  {defaultFaqs.map((faq, idx) => {
+                    const isOpen = openFaqIndex === idx;
+                    return (
+                      <div key={idx} className="py-3.5 sm:py-4 first:pt-0 last:pb-0">
+                        <button
+                          type="button"
+                          onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                          className="w-full flex items-center justify-between text-left gap-4 cursor-pointer group"
+                        >
+                          <span className="font-semibold text-xs sm:text-sm text-[#1B1B23] group-hover:text-[#FF4E7A] transition-colors">
+                            {faq.q}
+                          </span>
+                          <ChevronDown
+                            className={`w-4 h-4 text-neutral-400 group-hover:text-[#1B1B23] transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180" : ""
+                              }`}
+                          />
+                        </button>
+                        {isOpen && (
+                          <p className="mt-2.5 text-xs sm:text-sm text-[#6E6969] leading-relaxed">
+                            {faq.a}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* TERMS AND CONDITIONS MODAL */}
+              {activeModal === "terms" && (
+                <div className="divide-y divide-black/6">
+                  {defaultTerms.map((term, idx) => {
+                    const isOpen = openTermsIndex === idx;
+                    return (
+                      <div key={idx} className="py-3.5 sm:py-4 first:pt-0 last:pb-0">
+                        <button
+                          type="button"
+                          onClick={() => setOpenTermsIndex(isOpen ? null : idx)}
+                          className="w-full flex items-center justify-between text-left gap-4 cursor-pointer group"
+                        >
+                          <span className="font-semibold text-xs sm:text-sm text-[#1B1B23] group-hover:text-[#FF4E7A] transition-colors">
+                            {term.title}
+                          </span>
+                          <ChevronDown
+                            className={`w-4 h-4 text-neutral-400 group-hover:text-[#1B1B23] transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180" : ""
+                              }`}
+                          />
+                        </button>
+                        {isOpen && (
+                          <p className="mt-2.5 text-xs sm:text-sm text-[#6E6969] leading-relaxed">
+                            {term.desc}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* LOCATION & GETTING THERE MODAL */}
+              {activeModal === "location" && (
+                <div className="space-y-4">
+                  {/* Venue Card */}
+                  <div className="bg-neutral-50 rounded-2xl p-4 border border-black/6 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-full bg-pink-50 text-[#FF4E7A] flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-base text-[#1B1B23]">
+                          {event.venue || event.city}
+                        </h4>
+                        <p className="text-xs text-[#8C8C9E] mt-0.5">
+                          {event.address ? event.address : `${event.city || "Venue"} · 5.6 km away`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-black/6">
+                      <a
+                        href={gmapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white border border-black/8 text-xs font-bold text-[#1B1B23] hover:bg-neutral-100 transition-colors cursor-pointer"
+                      >
+                        <span>Google Maps</span>
+                        <ExternalLink className="w-3.5 h-3.5 text-neutral-400" />
+                      </a>
+                      <a
+                        href={appleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white border border-black/8 text-xs font-bold text-[#1B1B23] hover:bg-neutral-100 transition-colors cursor-pointer"
+                      >
+                        <span>Apple Maps</span>
+                        <ExternalLink className="w-3.5 h-3.5 text-neutral-400" />
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Ride-hailing box matching screenshot */}
+                  <div className="border border-black/6 rounded-2xl p-4 bg-white space-y-3">
+                    <h5 className="font-bold text-xs uppercase tracking-wider text-[#8C8C9E]">Ride-hailing & Taxis</h5>
+                    <p className="text-xs text-[#555] leading-relaxed">
+                      Taxis and ride-hailing drop-off at the main entrance. Pre-book your return journey to avoid surge pricing.
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 pt-1">
+                      <a
+                        href={uberUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="h-11 rounded-full bg-black hover:bg-neutral-800 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-98 shadow-xs cursor-pointer px-4"
+                      >
+                        <UberLogo className="w-4 h-4" />
+                        <span>Uber</span>
+                      </a>
+                      <a
+                        href={boltUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="h-11 rounded-full bg-[#34D186] hover:bg-[#2ebd78] text-white font-bold text-sm flex items-center justify-center gap-1.5 transition-all active:scale-98 shadow-xs cursor-pointer px-4"
+                      >
+                        <BoltLogo className="w-4 h-4" />
+                        <span>Bolt</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
       <BottomNav />
     </div>
   );
 }
-
 export function EventDetailPage() {
   return (
     <Suspense
