@@ -32,6 +32,7 @@ import {
 import { categoryLabel } from "@/lib/eventCategories";
 import { eventLocationLine } from "@/lib/eventLocation";
 import { MOCK_EVENTS } from "@/lib/mockData";
+import { EventFeatureTabs } from "@/components/events/features/EventFeatureTabs";
 
 const AGE_RESTRICTION_LABELS = {
   EIGHTEEN_PLUS: "🔞 18+",
@@ -266,8 +267,8 @@ function SocialHubSection({ eventId, isOrganiser }) {
             key={t}
             onClick={() => setTab(t)}
             className={`text-sm font-semibold px-4 py-2.5 border-b-2 transition-colors ${tab === t
-                ? "border-[#FF4E7A] text-[#FF4E7A]"
-                : "border-transparent text-gray-400 hover:text-[#1B1B23]"
+              ? "border-[#FF4E7A] text-[#FF4E7A]"
+              : "border-transparent text-gray-400 hover:text-[#1B1B23]"
               }`}
           >
             {t === "updates" ? "Organiser Updates" : "Discussion"}
@@ -994,143 +995,10 @@ function EventDetailPageInner() {
               </button>
             </div>
 
-            {/* 2. THINGS TO KNOW (Matching District Screenshot) */}
-            <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3">
-              <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Things to know</h2>
-              <ul className="space-y-2 text-xs sm:text-sm text-[#4A4A58]">
-                <li className="flex items-start gap-2.5">
-                  <span className="text-[#FF4E7A] text-base leading-none">•</span>
-                  <span>{event.ageRestriction && event.ageRestriction !== "NONE" ? `Entry restricted: ${AGE_RESTRICTION_LABELS[event.ageRestriction] || event.ageRestriction}` : "Entry allowed for all ages"}</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="text-[#FF4E7A] text-base leading-none">•</span>
-                  <span>Tickets required for ages 4 and above</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="text-[#FF4E7A] text-base leading-none">•</span>
-                  <span>Pets are not allowed</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="text-[#FF4E7A] text-base leading-none">•</span>
-                  <span>ID (Aadhaar/PAN/DL/Passport) is required for entry</span>
-                </li>
-                {showAllThingsToKnow && (
-                  <>
-                    <li className="flex items-start gap-2.5">
-                      <span className="text-[#FF4E7A] text-base leading-none">•</span>
-                      <span>Outside commercial food, alcohol, and glassware are prohibited</span>
-                    </li>
-                    <li className="flex items-start gap-2.5">
-                      <span className="text-[#FF4E7A] text-base leading-none">•</span>
-                      <span>Security checks and contactless ticket scanning in operation at all entry gates</span>
-                    </li>
-                  </>
-                )}
-              </ul>
-              <button
-                type="button"
-                onClick={() => setShowAllThingsToKnow((prev) => !prev)}
-                className="text-xs sm:text-sm font-bold text-[#1B1B23] hover:text-[#FF4E7A] inline-flex items-center gap-1 cursor-pointer transition-colors"
-              >
-                <span>{showAllThingsToKnow ? "View less" : "View more"}</span>
-                <ChevronRight className={`w-3.5 h-3.5 transition-transform ${showAllThingsToKnow ? "-rotate-90" : "rotate-90"}`} />
-              </button>
-            </div>
+            {/* 2. DYNAMIC HORIZONTAL NAVBAR WITH CATEGORY FEATURE TABS */}
+            <EventFeatureTabs event={event} details={details} />
 
-            {/* 3. DYNAMIC CATEGORY HIGHLIGHT */}
-            {event.category === "MUSIC_ENTERTAINMENT" && (details.lineup || event.lineup) && (
-              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
-                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Artist Lineup</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {(details.lineup?.headliner ? [details.lineup.headliner, ...(details.lineup.supporting || [])] : (event.lineup || [])).map((artist, idx) => (
-                    <div key={idx} className="p-3 rounded-xl border border-black/6 bg-neutral-50/50 flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-neutral-200 flex-shrink-0">
-                        <img src={artist.image || "/images/figma-sample/goa/headliner.png"} alt={artist.name} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-xs sm:text-sm text-[#1B1B23] truncate">{artist.name}</p>
-                        <p className="text-[11px] text-[#FF4E7A] font-semibold truncate">{artist.role || artist.tag || "Performer"}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {event.category === "BUSINESS" && details.speakers && (
-              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
-                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Featured Speakers</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {details.speakers.map((spk, idx) => (
-                    <div key={idx} className="p-3.5 rounded-xl border border-black/6 bg-neutral-50/50 flex items-start gap-3">
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-neutral-200 flex-shrink-0 shadow-2xs">
-                        <img src={spk.image || "/images/figma-sample/goa/headliner.png"} alt={spk.name} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-xs sm:text-sm text-[#1B1B23] truncate">{spk.name}</p>
-                        <p className="text-[11px] text-[#FF4E7A] font-semibold truncate">{spk.role}</p>
-                        <p className="text-[10px] text-[#8C8C9E] font-medium truncate">{spk.company}</p>
-                        {spk.topic && <p className="text-[11px] text-[#4A4A58] mt-1 line-clamp-1 italic font-medium">"{spk.topic}"</p>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {event.category === "EDUCATION" && details.curriculum && (
-              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
-                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Curriculum & Syllabus</h2>
-                <div className="space-y-2">
-                  {details.curriculum.map((c, idx) => (
-                    <div key={idx} className="p-3.5 rounded-xl border border-black/6 bg-neutral-50/50 flex items-center justify-between gap-3">
-                      <div>
-                        <span className="text-[10px] font-bold text-[#FF4E7A] bg-pink-50 px-2 py-0.5 rounded-md">{c.week}</span>
-                        <p className="font-bold text-xs sm:text-sm text-[#1B1B23] mt-1">{c.title}</p>
-                      </div>
-                      <span className="text-xs text-[#8C8C9E] font-medium flex-shrink-0">{c.duration}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {event.category === "FOOD_DRINK" && details.tastingMenu && (
-              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
-                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Tasting Menu & Pairings</h2>
-                <div className="space-y-2">
-                  {details.tastingMenu.map((m, idx) => (
-                    <div key={idx} className="p-3.5 rounded-xl border border-black/6 bg-neutral-50/50 flex items-center justify-between gap-3">
-                      <div>
-                        <span className="text-[10px] font-bold text-[#FF4E7A] bg-pink-50 px-2 py-0.5 rounded-md">{m.course}</span>
-                        <p className="font-bold text-xs sm:text-sm text-[#1B1B23] mt-1">{m.dish}</p>
-                      </div>
-                      {m.pairing && (
-                        <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md flex-shrink-0">
-                          🍷 {m.pairing}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {event.category === "EXHIBITIONS" && details.timedEntrySlots && (
-              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
-                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Timed Entry Arrival Windows</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {details.timedEntrySlots.map((slot, idx) => (
-                    <div key={idx} className="p-3 rounded-xl border border-black/6 bg-neutral-50/50 flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#1B1B23]">{slot.slot}</span>
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">{slot.availability}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 4. ORGANIZED BY SECTION (Matching District Screenshot) */}
+            {/* 3. ORGANIZED BY SECTION (Matching District Screenshot) */}
             <div className="space-y-2.5">
               <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Organized by</h2>
               <div className="bg-white rounded-2xl p-4 sm:p-5 border border-black/6 shadow-2xs flex items-center gap-4">
