@@ -69,32 +69,32 @@ export function AgendaFeature({ event, details }) {
   const currentRows = days[activeDayIdx]?.rows || (Array.isArray(scheduleData) ? scheduleData : fallbackRows);
 
   return (
-    <div className="bg-white rounded-3xl p-5 sm:p-7 border border-black/6 shadow-2xs space-y-6 animate-in fade-in duration-200">
+    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-black/6 shadow-2xs space-y-4 animate-in fade-in duration-200">
       {/* Header & Day Selector */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 border-b border-black/6 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 border-b border-black/6 pb-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">
+            <h3 className="text-base sm:text-lg font-bold text-[#1B1B23] tracking-tight">
               Agenda & Session Schedule
             </h3>
-            <span className="text-[10px] font-bold text-[#FF4E7A] bg-pink-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider flex-shrink-0">
+            <span className="text-[9px] sm:text-[10px] font-bold text-[#FF4E7A] bg-pink-50 px-2 py-0.5 rounded-full uppercase tracking-wider flex-shrink-0">
               Live Flow
             </span>
           </div>
-          <p className="text-xs text-[#8C8C9E] mt-1">
+          <p className="text-xs text-[#8C8C9E] mt-0.5">
             Complete track breakdown, speaker stages, and hands-on workshops.
           </p>
         </div>
 
         {/* Day Switcher Pills if multi-day */}
         {days.length > 1 && (
-          <div className="inline-flex items-center gap-1.5 p-1 bg-neutral-100/80 rounded-2xl border border-black/5 flex-shrink-0 self-start md:self-auto overflow-x-auto max-w-full scrollbar-none flex-nowrap">
+          <div className="inline-flex items-center gap-1 p-1 bg-neutral-100/80 rounded-xl border border-black/5 flex-shrink-0 self-start sm:self-auto overflow-x-auto max-w-full scrollbar-none flex-nowrap">
             {days.map((day, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => setActiveDayIdx(idx)}
-                className={`whitespace-nowrap flex-nowrap flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5 min-w-max ${
+                className={`whitespace-nowrap flex-nowrap flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5 min-w-max ${
                   activeDayIdx === idx
                     ? "bg-[#FF4E7A] text-white shadow-xs shadow-[#FF4E7A]/25"
                     : "text-[#6E6969] hover:text-[#1B1B23] hover:bg-white/60"
@@ -111,14 +111,14 @@ export function AgendaFeature({ event, details }) {
       </div>
 
       {days[activeDayIdx]?.label && (
-        <div className="flex items-center gap-2 text-xs font-bold text-[#1B1B23] bg-neutral-50 px-3.5 py-2 rounded-xl border border-black/5 w-fit">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B1B23] bg-neutral-50 px-3 py-1.5 rounded-xl border border-black/5 w-fit">
           <span className="text-[#FF4E7A]">📅</span>
           <span>{days[activeDayIdx].label}</span>
         </div>
       )}
 
       {/* Clean Straight-Line Timeline with Small Dots */}
-      <div className="pt-2 sm:pt-3">
+      <div className="pt-1 sm:pt-2">
         {currentRows.map((row, idx) => {
           const isKeynote = row.highlight;
           const isLast = idx === currentRows.length - 1;
@@ -126,11 +126,11 @@ export function AgendaFeature({ event, details }) {
           return (
             <div
               key={idx}
-              className="grid grid-cols-[68px_20px_1fr] sm:grid-cols-[88px_28px_1fr] items-start gap-1.5 sm:gap-3 group"
+              className="grid grid-cols-[64px_18px_1fr] sm:grid-cols-[78px_24px_1fr] items-start gap-1 sm:gap-2.5 group"
             >
               {/* Left Column: Time (Right-Aligned) */}
               <div className="pt-0.5 text-right font-mono pr-1 sm:pr-2">
-                <span className="text-xs sm:text-sm font-bold block text-[#1B1B23] transition-colors group-hover:text-[#FF4E7A]">
+                <span className="text-xs sm:text-[13px] font-bold block text-[#1B1B23] transition-colors group-hover:text-[#FF4E7A]">
                   {row.time}
                 </span>
                 {row.endTime && (
@@ -141,7 +141,7 @@ export function AgendaFeature({ event, details }) {
               </div>
 
               {/* Center Column: Continuous Straight Line with Centered Small Dot */}
-              <div className="relative flex flex-col items-center h-full min-h-[58px] sm:min-h-[64px]">
+              <div className="relative flex flex-col items-center h-full min-h-[50px] sm:min-h-[56px]">
                 {/* Continuous straight line */}
                 <div
                   className={`absolute top-0 w-0.5 bg-neutral-200 transition-colors ${
@@ -149,15 +149,15 @@ export function AgendaFeature({ event, details }) {
                   }`}
                 />
                 {/* Small dot centered on the line, aligned with the time row - highlights only on row hover */}
-                <div className="relative z-10 mt-1.5 w-2.5 h-2.5 rounded-full transition-all duration-200 flex-shrink-0 bg-white border-2 border-neutral-300 group-hover:border-[#FF4E7A] group-hover:bg-[#FF4E7A] group-hover:scale-125" />
+                <div className="relative z-10 mt-1.5 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-200 flex-shrink-0 bg-white border-2 border-neutral-300 group-hover:border-[#FF4E7A] group-hover:bg-[#FF4E7A] group-hover:scale-125" />
               </div>
 
               {/* Right Column: Session Details */}
-              <div className={`pb-6 sm:pb-7 space-y-1.5 ${isLast ? "pb-2" : ""}`}>
+              <div className={`pb-4 sm:pb-5 space-y-1 ${isLast ? "pb-1" : ""}`}>
                 {/* Badges: Stage, Duration, Keynote */}
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   {row.stage && (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#6E6969] bg-neutral-100 px-2 py-0.5 rounded-md border border-black/5">
+                    <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-[#6E6969] bg-neutral-100 px-2 py-0.5 rounded-md border border-black/5">
                       <MapPin className="w-3 h-3 text-[#FF4E7A]" />
                       <span>{row.stage}</span>
                     </span>

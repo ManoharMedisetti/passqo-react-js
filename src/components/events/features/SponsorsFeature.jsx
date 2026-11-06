@@ -41,29 +41,29 @@ export function SponsorsFeature({ event, details }) {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-5 sm:p-7 border border-black/6 shadow-2xs space-y-5 animate-in fade-in duration-200">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-black/6 pb-4">
+    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-black/6 shadow-2xs space-y-3.5 animate-in fade-in duration-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-black/6 pb-2.5">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">
+            <h3 className="text-base sm:text-lg font-bold text-[#1B1B23] tracking-tight">
               Partners & Official Sponsors
             </h3>
-            <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
-              <Crown className="w-3 h-3 text-amber-600" /> Tiered Sponsors
+            <span className="text-[9px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.2 rounded-full flex items-center gap-1">
+              <Crown className="w-2.5 h-2.5 text-amber-600" /> Tiered Sponsors
             </span>
           </div>
-          <p className="text-xs text-[#8C8C9E] mt-1">
+          <p className="text-xs text-[#8C8C9E] mt-0.5">
             Proudly supported by leading industry innovators and global partners.
           </p>
         </div>
-        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full flex items-center gap-1">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+        <span className="text-[10px] sm:text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full flex items-center gap-1 w-fit flex-shrink-0">
+          <ShieldCheck className="w-3 h-3 text-emerald-600" />
           <span>Verified Sponsors</span>
         </span>
       </div>
 
       {/* Grid of Partners with Gold, Silver, Bronze Tags & Symbols */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
         {sponsors.map((sp, idx) => {
           const badge = getTierBadge(sp.tier);
           const initials = (sp.name || "P").slice(0, 2).toUpperCase();
@@ -71,12 +71,12 @@ export function SponsorsFeature({ event, details }) {
           return (
             <div
               key={idx}
-              className="p-4 rounded-2xl border border-black/6 bg-neutral-50/50 hover:bg-white hover:border-black/15 hover:shadow-xs transition-all duration-200 flex flex-col justify-between space-y-3 group"
+              className="p-3 rounded-xl border border-black/6 bg-neutral-50/50 hover:bg-white hover:border-black/15 hover:shadow-xs transition-all duration-200 flex flex-col justify-between space-y-2 group"
             >
               {/* Top Tag with Symbol */}
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-lg border flex items-center gap-1.5 ${badge.style}`}
+                  className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 ${badge.style}`}
                 >
                   <span className="text-xs">{badge.symbol}</span>
                   <span>{badge.label}</span>

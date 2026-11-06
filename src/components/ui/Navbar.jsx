@@ -55,8 +55,10 @@ export function Navbar({ wide = false, compact = false, miniSearch = false }) {
 
     const updateHeight = () => {
       const el = document.getElementById("main-navbar");
-      if (el) {
+      if (el && el.offsetHeight > 0) {
         document.documentElement.style.setProperty("--navbar-height", `${el.offsetHeight}px`);
+      } else {
+        document.documentElement.style.setProperty("--navbar-height", "56px");
       }
     };
 

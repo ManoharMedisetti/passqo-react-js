@@ -19,17 +19,17 @@ export function ThingsToKnowFeature({ event, details }) {
   const customItems = details?.thingsToKnow || details?.policies || [];
 
   return (
-    <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
-      <div className="flex items-center justify-between border-b border-black/6 pb-3">
-        <h3 className="text-lg sm:text-xl font-bold text-[#1B1B23] tracking-tight">
+    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-black/6 shadow-2xs space-y-3">
+      <div className="flex items-center justify-between border-b border-black/6 pb-2.5">
+        <h3 className="text-base sm:text-lg font-bold text-[#1B1B23] tracking-tight">
           {headerTitle}
         </h3>
-        <span className="text-xs font-bold text-[#8C8C9E]">
+        <span className="text-[11px] font-bold text-[#8C8C9E]">
           Entry Guidelines
         </span>
       </div>
 
-      <ul className="space-y-2.5 text-xs sm:text-sm text-[#4A4A58]">
+      <ul className="space-y-2 text-xs sm:text-[13px] text-[#4A4A58]">
         {/* Age Restriction */}
         <li className="flex items-start gap-2.5">
           <span className="text-[#FF4E7A] text-base leading-none">•</span>

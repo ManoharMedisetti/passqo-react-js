@@ -1251,11 +1251,11 @@ function EventDetailPageInner() {
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* LEFT COLUMN: ABOUT, DETAILS, AND SECTIONS                       */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-7 xl:col-span-8 space-y-6 sm:space-y-7">
+          <div className="lg:col-span-7 xl:col-span-8 space-y-4 sm:space-y-5">
 
             {/* 1. ABOUT SECTION (Matching District Screenshot) */}
-            <div ref={aboutSectionRef} className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-2.5">
-              <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">About</h2>
+            <div ref={aboutSectionRef} className="bg-white rounded-2xl p-4 sm:p-5 border border-black/6 shadow-2xs space-y-2.5">
+              <h2 className="text-base sm:text-lg font-bold text-[#1B1B23] tracking-tight">About</h2>
               <div className={`text-xs sm:text-sm text-[#4A4A58] leading-relaxed ${showAllAbout ? "" : "line-clamp-3 sm:line-clamp-4"}`}>
                 {event.description ? (
                   <RichTextDisplay html={event.description} />
@@ -1281,16 +1281,16 @@ function EventDetailPageInner() {
             <EventFeatureTabs event={event} details={details} />
 
             {/* 3. ORGANIZED BY SECTION (Clickable Organiser Profile Modal) */}
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">Organized by</h2>
+                <h2 className="text-base sm:text-lg font-bold text-[#1B1B23] tracking-tight">Organized by</h2>
                 <span className="text-xs text-[#8C8C9E] font-medium hidden sm:inline">Click to view organiser details</span>
               </div>
               <div
                 onClick={() => setActiveModal("organiser")}
                 className="bg-white/80 backdrop-blur-2xl backdrop-saturate-180 rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-white/90 shadow-[0_8px_30px_rgba(0,0,0,0.04),inset_0_1.5px_2px_rgba(255,255,255,1),inset_0_-1px_1.5px_rgba(255,255,255,0.4)] flex items-center gap-4 cursor-pointer hover:border-black/20 hover:shadow-md transition-all group"
               >
-                <div className="w-14 h-14 rounded-full bg-[#1B1B23] flex items-center justify-center text-white flex-shrink-0 shadow-sm p-1 overflow-hidden ring-2 ring-white">
+                <div className="w-12 h-12 rounded-full bg-[#1B1B23] flex items-center justify-center text-white flex-shrink-0 shadow-sm p-1 overflow-hidden ring-2 ring-white">
                   {event.organiser?.image && event.organiser.image !== "/icons/organiser.svg" ? (
                     <img src={event.organiser.image} alt="" className="w-full h-full object-cover rounded-full" />
                   ) : (
@@ -1323,8 +1323,8 @@ function EventDetailPageInner() {
             </div>
 
             {/* 5. MORE / FAQS & TERMS SECTION (Matching District Screenshot) */}
-            <div className="space-y-2.5">
-              <h2 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">More</h2>
+            <div className="space-y-2">
+              <h2 className="text-base sm:text-lg font-bold text-[#1B1B23] tracking-tight">More</h2>
               <div className="bg-white rounded-2xl border border-black/6 shadow-2xs divide-y divide-black/6 overflow-hidden">
                 <button
                   type="button"

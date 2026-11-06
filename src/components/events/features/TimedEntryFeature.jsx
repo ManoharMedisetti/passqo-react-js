@@ -11,34 +11,34 @@ export function TimedEntryFeature({ event, details }) {
   ];
 
   return (
-    <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-4 animate-in fade-in duration-200">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-black/6 pb-3">
+    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-black/6 shadow-2xs space-y-3 animate-in fade-in duration-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-black/6 pb-2.5">
         <div>
-          <h3 className="text-lg sm:text-xl font-bold text-[#1B1B23] tracking-tight">
+          <h3 className="text-base sm:text-lg font-bold text-[#1B1B23] tracking-tight">
             Timed Entry Arrival Windows
           </h3>
           <p className="text-xs text-[#8C8C9E] mt-0.5">
             Timed access ensures an intimate, uncrowded viewing experience for every visitor.
           </p>
         </div>
-        <span className="text-xs font-bold text-[#FF4E7A] bg-pink-50 px-2.5 py-1 rounded-full flex items-center gap-1">
-          <Clock className="w-3.5 h-3.5" />
+        <span className="text-[10px] sm:text-xs font-bold text-[#FF4E7A] bg-pink-50 px-2.5 py-0.5 rounded-full flex items-center gap-1 w-fit flex-shrink-0">
+          <Clock className="w-3 h-3" />
           <span>Crowd Control Managed</span>
         </span>
       </div>
 
-      <div className="bg-amber-50/70 border border-amber-200/60 rounded-xl p-3 flex items-start gap-2.5 text-xs text-amber-900">
-        <ShieldAlert className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
+      <div className="bg-amber-50/70 border border-amber-200/60 rounded-xl p-2.5 flex items-start gap-2 text-xs text-amber-900">
+        <ShieldAlert className="w-3.5 h-3.5 text-amber-700 flex-shrink-0 mt-0.5" />
         <p>
           Please arrive within your designated 30-minute arrival window. Once inside the gallery, you may stay as long as you wish until closing.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
         {slots.map((item, idx) => (
           <div
             key={idx}
-            className={`p-3.5 rounded-xl border transition-all flex items-center justify-between gap-2 ${
+            className={`p-2.5 sm:p-3 rounded-xl border transition-all flex items-center justify-between gap-2 ${
               item.status === "full"
                 ? "bg-neutral-100/60 border-black/5 opacity-60"
                 : "bg-neutral-50/60 hover:bg-neutral-50 border-black/8 hover:border-black/20"
@@ -48,7 +48,7 @@ export function TimedEntryFeature({ event, details }) {
               <p className="font-bold text-xs sm:text-sm text-[#1B1B23]">
                 {item.slot}
               </p>
-              <p className="text-[11px] text-[#8C8C9E] mt-0.5">
+              <p className="text-[10px] sm:text-[11px] text-[#8C8C9E] mt-0.5">
                 {item.capacity}
               </p>
             </div>

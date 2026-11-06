@@ -33,28 +33,28 @@ export function ProfilesFeature({ event, details }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-4 animate-in fade-in duration-200">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-black/6 pb-3">
+    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-black/6 shadow-2xs space-y-3.5 animate-in fade-in duration-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-black/6 pb-2.5">
         <div>
-          <h3 className="text-lg sm:text-xl font-bold text-[#1B1B23] tracking-tight">
+          <h3 className="text-base sm:text-lg font-bold text-[#1B1B23] tracking-tight">
             {sectionTitle}
           </h3>
           <p className="text-xs text-[#8C8C9E] mt-0.5">
             Learn directly from industry leaders, masters, and recognized pioneers.
           </p>
         </div>
-        <span className="text-xs font-bold text-[#FF4E7A] bg-pink-50 px-2.5 py-1 rounded-full w-fit flex-shrink-0">
+        <span className="text-[10px] sm:text-xs font-bold text-[#FF4E7A] bg-pink-50 px-2.5 py-0.5 rounded-full w-fit flex-shrink-0">
           {profiles.length} {roleBadge}s
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {profiles.map((profile, idx) => (
           <div
             key={idx}
-            className="p-4 rounded-xl border border-black/6 bg-neutral-50/50 hover:bg-neutral-50 hover:border-black/15 transition-all flex items-start gap-3.5 group"
+            className="p-3 rounded-xl border border-black/6 bg-neutral-50/50 hover:bg-neutral-50 hover:border-black/15 transition-all flex items-start gap-3 group"
           >
-            <div className="w-14 h-14 rounded-full overflow-hidden bg-neutral-200 flex-shrink-0 shadow-2xs ring-2 ring-white">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-neutral-200 flex-shrink-0 shadow-2xs ring-2 ring-white">
               <img
                 src={profile.image || "/images/figma-sample/goa/headliner.png"}
                 alt={profile.name}
@@ -62,25 +62,25 @@ export function ProfilesFeature({ event, details }) {
               />
             </div>
 
-            <div className="flex-1 min-w-0 space-y-1">
+            <div className="flex-1 min-w-0 space-y-0.5">
               <div className="flex items-center justify-between gap-1">
-                <p className="font-extrabold text-sm text-[#1B1B23] truncate">
+                <p className="font-extrabold text-xs sm:text-sm text-[#1B1B23] truncate">
                   {profile.name}
                 </p>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">
                   {profile.tag || roleBadge}
                 </span>
               </div>
-              <p className="text-xs text-[#FF4E7A] font-semibold truncate">
+              <p className="text-[11px] sm:text-xs text-[#FF4E7A] font-semibold truncate">
                 {profile.role || profile.title}
               </p>
               {profile.company && (
-                <p className="text-[11px] text-[#8C8C9E] font-medium truncate">
+                <p className="text-[10px] sm:text-[11px] text-[#8C8C9E] font-medium truncate">
                   {profile.company}
                 </p>
               )}
               {profile.topic && (
-                <p className="text-[11px] text-[#4A4A58] line-clamp-2 italic pt-1 leading-snug">
+                <p className="text-[11px] text-[#4A4A58] line-clamp-2 italic pt-0.5 leading-snug">
                   "{profile.topic}"
                 </p>
               )}

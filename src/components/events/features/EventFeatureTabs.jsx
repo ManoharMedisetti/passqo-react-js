@@ -267,10 +267,7 @@ export function EventFeatureTabs({ event, details }) {
     // Smoothly scroll the page so the section starts right below the main navbar
     if (rootContainerRef.current) {
       const rootDocTop = rootContainerRef.current.getBoundingClientRect().top + window.scrollY;
-      const mainNavEl = document.getElementById("main-navbar");
-      const navHeight = mainNavEl ? mainNavEl.offsetHeight : 56;
-
-      const targetY = rootDocTop - navHeight;
+      const targetY = rootDocTop - 64;
 
       window.scrollTo({
         top: Math.max(0, targetY),
@@ -295,24 +292,23 @@ export function EventFeatureTabs({ event, details }) {
   }
 
   return (
-    <div ref={rootContainerRef} className="space-y-4 scroll-mt-28">
-      {/* ── STICKY DOCK (100% PURE GLASS ONLY) ── */}
+    <div ref={rootContainerRef} className="space-y-3 sm:space-y-3.5 scroll-mt-24">
+      {/* ── STICKY FEATURES NAVBAR: STOPS & FIXES RIGHT BELOW TOP NAVBAR (56px = top-14) ── */}
       <div
         ref={stickyBarRef}
-        style={{ top: "var(--navbar-height, 56px)" }}
-        className="sticky z-30 px-3 sm:px-6 py-2 flex justify-center transition-all duration-200"
+        className="sticky top-14 z-30 py-1.5 sm:py-2 px-1 sm:px-2 flex justify-center transition-all duration-200 bg-[#F8F5F0]/90 backdrop-blur-md rounded-2xl"
       >
-        {/* ── ULTRA-PREMIUM APPLE LIQUID GLASS CAPSULE ── */}
-        <div className="relative max-w-full inline-flex items-center rounded-full bg-white/80 backdrop-blur-2xl backdrop-saturate-200 border border-white/90 shadow-[0_8px_30px_rgba(0,0,0,0.06),inset_0_1.5px_2px_rgba(255,255,255,1),inset_0_-1px_1.5px_rgba(255,255,255,0.4)] p-1">
-          {/* Apple Left Chevron Button - Transparent Backside, hidden for first 2 tabs and <=3 tabs */}
+        {/* ── ULTRA-PREMIUM APPLE LIQUID GLASS CAPSULE (Compact & Responsive) ── */}
+        <div className="relative max-w-full inline-flex items-center rounded-full bg-white/90 backdrop-blur-2xl backdrop-saturate-180 border border-white/90 shadow-[0_4px_20px_rgba(0,0,0,0.06),inset_0_1.5px_2px_rgba(255,255,255,1),inset_0_-1px_1.5px_rgba(255,255,255,0.4)] p-0.5 sm:p-1">
+          {/* Apple Left Chevron Button */}
           {showLeftArrow && (
             <button
               type="button"
               onClick={() => scrollByAmount(-220)}
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-transparent hover:bg-black/5 active:bg-black/10 flex items-center justify-center text-[#1C1C26] active:scale-90 transition-all flex-shrink-0 cursor-pointer mr-0.5 z-20 group"
+              className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-transparent hover:bg-black/5 active:bg-black/10 flex items-center justify-center text-[#1C1C26] active:scale-90 transition-all flex-shrink-0 cursor-pointer mr-0.5 z-20 group"
               aria-label="Scroll left"
             >
-              <ChevronLeft className="w-4 h-4 stroke-[2.4] text-[#1C1C26] group-hover:-translate-x-0.5 transition-transform" />
+              <ChevronLeft className="w-3.5 h-3.5 stroke-[2.4] text-[#1C1C26] group-hover:-translate-x-0.5 transition-transform" />
             </button>
           )}
 
@@ -321,7 +317,7 @@ export function EventFeatureTabs({ event, details }) {
             <div
               ref={scrollContainerRef}
               onScroll={updateScrollState}
-              className="flex items-center overflow-x-auto scroll-smooth scrollbar-none no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-full py-0 px-1 sm:px-1.5"
+              className="flex items-center overflow-x-auto scroll-smooth scrollbar-none no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-full py-0 px-0.5 sm:px-1"
             >
               {availableTabs.map((tab, idx) => {
                 const Icon = tab.icon;
@@ -334,7 +330,7 @@ export function EventFeatureTabs({ event, details }) {
                     <button
                       type="button"
                       onClick={(e) => handleTabSelect(tab.id, e.currentTarget)}
-                      className={`group relative flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors duration-200 cursor-pointer select-none active:scale-97 ${
+                      className={`group relative flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors duration-200 cursor-pointer select-none active:scale-97 ${
                         isActive ? "text-white font-bold z-10" : "text-[#23232C] hover:text-black"
                       }`}
                     >
@@ -352,16 +348,16 @@ export function EventFeatureTabs({ event, details }) {
                       )}
 
                       <Icon
-                        className={`w-4 h-4 relative z-10 transition-transform duration-200 group-hover:scale-105 ${
+                        className={`w-3.5 h-3.5 relative z-10 transition-transform duration-200 group-hover:scale-105 ${
                           isActive ? "text-white" : "text-[#23232C] group-hover:text-black"
                         }`}
                       />
                       <span className="relative z-10">{tab.label}</span>
                     </button>
 
-                    {/* Clean Hairline Divider matching reference image */}
+                    {/* Clean Hairline Divider */}
                     {showDivider && (
-                      <div className="h-4 w-[1px] bg-black/10 mx-1 flex-shrink-0" />
+                      <div className="h-3.5 w-[1px] bg-black/10 mx-0.5 sm:mx-1 flex-shrink-0" />
                     )}
                   </div>
                 );
@@ -369,15 +365,15 @@ export function EventFeatureTabs({ event, details }) {
             </div>
           </LayoutGroup>
 
-          {/* Apple Right Chevron Button - Transparent Backside, hidden for last 2 tabs and <=3 tabs */}
+          {/* Apple Right Chevron Button */}
           {showRightArrow && (
             <button
               type="button"
               onClick={() => scrollByAmount(220)}
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-transparent hover:bg-black/5 active:bg-black/10 flex items-center justify-center text-[#1C1C26] active:scale-90 transition-all flex-shrink-0 cursor-pointer ml-0.5 z-20 group"
+              className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-transparent hover:bg-black/5 active:bg-black/10 flex items-center justify-center text-[#1C1C26] active:scale-90 transition-all flex-shrink-0 cursor-pointer ml-0.5 z-20 group"
               aria-label="Scroll right"
             >
-              <ChevronRight className="w-4 h-4 stroke-[2.4] text-[#1C1C26] group-hover:translate-x-0.5 transition-transform" />
+              <ChevronRight className="w-3.5 h-3.5 stroke-[2.4] text-[#1C1C26] group-hover:translate-x-0.5 transition-transform" />
             </button>
           )}
         </div>
