@@ -535,7 +535,7 @@ export function BookingPage() {
                     }
                   }}
                   disabled={!name.trim() || !email.trim()}
-                  className="w-full sm:w-auto min-w-[220px] px-8 py-3.5 rounded-xl bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm transition-all shadow-md cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto min-w-[240px] px-8 py-4 h-13 rounded-2xl bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm sm:text-base transition-all shadow-lg shadow-[#FF4E7A]/25 cursor-pointer active:scale-95 flex items-center justify-center gap-2 select-none"
                 >
                   <span>{totalPrice === 0 ? "Confirm Registration" : "Continue"}</span>
                   <span>→</span>
@@ -1006,7 +1006,7 @@ export function BookingPage() {
             type="button"
             onClick={handleConfirmBooking}
             disabled={isProcessingPayment}
-            className="w-full bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-75 disabled:cursor-wait text-white rounded-2xl p-4.5 flex items-center justify-between cursor-pointer transition-all shadow-md active:scale-98 select-none"
+            className="w-full bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-75 disabled:cursor-wait text-white rounded-2xl p-4.5 sm:p-5 min-h-[64px] flex items-center justify-between cursor-pointer transition-all shadow-lg shadow-[#FF4E7A]/25 active:scale-98 select-none"
           >
             {isProcessingPayment ? (
               <div className="w-full flex items-center justify-center gap-2.5 py-1">
@@ -1082,13 +1082,13 @@ export function BookingPage() {
       })()}
 
       {/* ── PASSQO LIQUID GLASS FIXED BOTTOM BAR (Always fixed in the same position on Mobile & Tablets < lg across all 3 steps!) ── */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-2xl backdrop-saturate-180 border-t border-white/90 shadow-[0_-8px_32px_rgba(0,0,0,0.08),inset_0_1.5px_2px_rgba(255,255,255,0.9)] px-4 sm:px-8 py-3.5 pb-safe transition-all">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-2xl backdrop-saturate-180 border-t border-white/90 shadow-[0_-8px_32px_rgba(0,0,0,0.1),inset_0_1.5px_2px_rgba(255,255,255,0.9)] px-4 sm:px-8 py-3.5 sm:py-4 pb-safe transition-all">
         <div className="max-w-[1060px] mx-auto flex items-center justify-between gap-4">
           {/* Price Summary */}
           <div>
             <div className="flex items-baseline gap-1.5">
               <span className="text-xs text-[#8C8C9E] font-semibold">Total:</span>
-              <span className="text-xl sm:text-2xl font-black text-[#1B1B23]">
+              <span className="text-2xl sm:text-3xl font-black text-[#1B1B23]">
                 {step === 3
                   ? finalTotal === 0
                     ? "Free"
@@ -1098,14 +1098,14 @@ export function BookingPage() {
                   : `€${totalPrice.toFixed(2)}`}
               </span>
             </div>
-            <p className="text-[11px] font-semibold text-[#8C8C9E]">
+            <p className="text-xs font-semibold text-[#8C8C9E] mt-0.5">
               {step === 1 && (totalTickets > 0 ? `${totalTickets} Ticket${totalTickets > 1 ? "s" : ""} selected` : "Select tickets")}
               {step === 2 && "Step 2 of 3 · Buyer details"}
               {step === 3 && (appliedDiscount > 0 ? `€${appliedDiscount.toFixed(2)} promo applied` : "Step 3 of 3 · Final payment")}
             </p>
           </div>
 
-          {/* Fixed Action Button in EXACT SAME POSITION */}
+          {/* Fixed Action Button in EXACT SAME POSITION (Tall, High-Affordance & Clickable) */}
           <div>
             {step === 1 && (
               <button
@@ -1114,7 +1114,7 @@ export function BookingPage() {
                   if (totalTickets > 0) goToStep(2);
                 }}
                 disabled={totalTickets === 0}
-                className="bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs sm:text-sm px-8 py-3 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
+                className="bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm sm:text-base px-8 sm:px-10 py-3.5 sm:py-4 h-12 sm:h-13 min-w-[170px] sm:min-w-[200px] rounded-2xl transition-all shadow-lg shadow-[#FF4E7A]/25 active:scale-95 cursor-pointer flex items-center justify-center gap-2 select-none"
               >
                 <span>Continue</span>
                 <span>→</span>
@@ -1133,7 +1133,7 @@ export function BookingPage() {
                   }
                 }}
                 disabled={!name.trim() || !email.trim()}
-                className="bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs sm:text-sm px-8 py-3 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
+                className="bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm sm:text-base px-8 sm:px-10 py-3.5 sm:py-4 h-12 sm:h-13 min-w-[170px] sm:min-w-[200px] rounded-2xl transition-all shadow-lg shadow-[#FF4E7A]/25 active:scale-95 cursor-pointer flex items-center justify-center gap-2 select-none"
               >
                 <span>{totalPrice === 0 ? "Confirm" : "Continue"}</span>
                 <span>→</span>
@@ -1145,16 +1145,16 @@ export function BookingPage() {
                 type="button"
                 onClick={handleConfirmBooking}
                 disabled={isProcessingPayment}
-                className="bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-75 disabled:cursor-wait text-white font-extrabold text-xs sm:text-sm px-8 py-3 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
+                className="bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-75 disabled:cursor-wait text-white font-extrabold text-sm sm:text-base px-8 sm:px-10 py-3.5 sm:py-4 h-12 sm:h-13 min-w-[170px] sm:min-w-[200px] rounded-2xl transition-all shadow-lg shadow-[#FF4E7A]/25 active:scale-95 cursor-pointer flex items-center justify-center gap-2 select-none"
               >
                 {isProcessingPayment ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Processing...</span>
                   </div>
                 ) : (
                   <>
-                    <Lock className="w-3.5 h-3.5 text-white" />
+                    <Lock className="w-4 h-4 text-white" />
                     <span>Pay €{finalTotal.toFixed(2)}</span>
                     <span>→</span>
                   </>

@@ -1413,9 +1413,10 @@ function EventDetailPageInner() {
                   <button
                     type="button"
                     onClick={() => navigate(`/events/${event.id}/book`)}
-                    className="bg-[#1B1B23] hover:bg-[#2D2D3A] text-white font-bold text-xs sm:text-sm px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-all shadow-sm active:scale-98 cursor-pointer"
+                    className="bg-[#1B1B23] hover:bg-black text-white font-extrabold text-sm sm:text-base px-7 sm:px-8 py-3.5 h-12 rounded-2xl transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-2"
                   >
-                    Book tickets
+                    <span>Book tickets</span>
+                    <span>→</span>
                   </button>
                 )}
               </div>
@@ -1509,10 +1510,10 @@ function EventDetailPageInner() {
       </div>
 
       {/* ── STICKY TABLET & MOBILE BUY BAR (Fixed at bottom on tablet & mobile screens) ── */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/85 backdrop-blur-2xl backdrop-saturate-180 border-t border-white/90 shadow-[0_-8px_32px_rgba(0,0,0,0.08),inset_0_1.5px_2px_rgba(255,255,255,0.9)] px-4 sm:px-6 py-3.5 z-40 lg:hidden pb-safe">
-        <div className="flex items-center justify-between max-w-lg mx-auto gap-3">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-2xl backdrop-saturate-180 border-t border-white/90 shadow-[0_-8px_32px_rgba(0,0,0,0.1),inset_0_1.5px_2px_rgba(255,255,255,0.9)] px-4 sm:px-8 py-3.5 sm:py-4 z-40 lg:hidden pb-safe">
+        <div className="flex items-center justify-between max-w-lg mx-auto gap-4">
           <div>
-            <p className="font-extrabold text-xl leading-tight text-[#1B1B23]">
+            <p className="font-black text-2xl sm:text-3xl leading-tight text-[#1B1B23]">
               {totalItems > 0
                 ? totalPrice === 0
                   ? "Free"
@@ -1521,7 +1522,7 @@ function EventDetailPageInner() {
                   ? "Free"
                   : `€${minTierPrice}`}
             </p>
-            <p className="text-xs font-semibold text-[#8C8C9E]">
+            <p className="text-xs font-semibold text-[#8C8C9E] mt-0.5">
               {totalItems > 0
                 ? `${totalItems} Ticket${totalItems > 1 ? "s" : ""} selected`
                 : minTierPrice === 0
@@ -1531,19 +1532,19 @@ function EventDetailPageInner() {
           </div>
 
           {isPastEvent ? (
-            <span className="bg-neutral-100 text-neutral-400 font-bold px-5 py-3 rounded-xl text-xs">
+            <span className="bg-neutral-100 text-neutral-400 font-bold px-6 py-3.5 rounded-2xl text-xs sm:text-sm h-12 flex items-center justify-center">
               Event Ended
             </span>
           ) : event.isSoldOut ? (
             event.waitlistEnabled ? (
               <Link
                 to={`/waitlist/${event.id}`}
-                className="bg-[#1B1B23] hover:bg-[#2D2D3A] text-white font-bold px-5 py-3 rounded-xl text-xs transition-colors shadow-sm"
+                className="bg-[#1B1B23] hover:bg-black text-white font-extrabold px-7 py-3.5 rounded-2xl text-sm h-12 flex items-center justify-center transition-colors shadow-md active:scale-95"
               >
                 Join Waitlist
               </Link>
             ) : (
-              <span className="bg-neutral-100 text-neutral-400 font-bold px-5 py-3 rounded-xl text-xs">
+              <span className="bg-neutral-100 text-neutral-400 font-bold px-6 py-3.5 rounded-2xl text-xs sm:text-sm h-12 flex items-center justify-center">
                 Sold Out
               </span>
             )
@@ -1551,9 +1552,10 @@ function EventDetailPageInner() {
             <button
               type="button"
               onClick={() => navigate(`/events/${event.id}/book`)}
-              className="bg-[#1B1B23] hover:bg-[#2D2D3A] text-white font-bold px-6 py-3 rounded-xl transition-all shadow-md text-xs sm:text-sm active:scale-95 cursor-pointer"
+              className="bg-[#1B1B23] hover:bg-black text-white font-extrabold text-sm sm:text-base px-8 sm:px-10 py-3.5 sm:py-4 h-12 sm:h-13 min-w-[170px] sm:min-w-[200px] rounded-2xl transition-all shadow-lg active:scale-95 cursor-pointer flex items-center justify-center gap-2 select-none"
             >
-              Book tickets
+              <span>Book tickets</span>
+              <span>→</span>
             </button>
           )}
         </div>
