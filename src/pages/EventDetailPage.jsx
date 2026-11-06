@@ -1,14 +1,13 @@
-import { Suspense, useEffect, useState, useRef, useMemo } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/ui/Navbar";
-import { BottomNav } from "@/components/ui/BottomNav";
 import { Footer } from "@/components/ui/Footer";
 import { api } from "@/lib/api";
 import { isAuthenticated, getUser } from "@/lib/auth/storage";
 import { useAuthModal } from "@/context/AuthContext";
 import { RichTextDisplay } from "@/components/ui/RichTextDisplay";
 import { FEATURES } from "@/lib/features";
-import { CalendarPlus, Heart, Share2, UserPlus, MapPin, Calendar, Clock, ChevronRight, ChevronDown, ChevronUp, Check, Sparkles, ShieldCheck, X, HelpCircle, FileText, ExternalLink, Navigation, Copy, Car, Mail } from "lucide-react";
+import { CalendarPlus, Heart, Share2, UserPlus, MapPin, Calendar, Clock, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Check, Sparkles, ShieldCheck, X, HelpCircle, FileText, ExternalLink, Navigation, Copy, Car, Mail } from "lucide-react";
 import { getWishlist, toggleWishlist } from "@/components/events/EventCard";
 import { eventDetailsOf } from "@/lib/eventDetails";
 import {
@@ -460,16 +459,26 @@ function EventDetailPageInner() {
   const [addressCopied, setAddressCopied] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
+  const [isHeroScrolled, setIsHeroScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsHeroScrolled(window.scrollY >= 120);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     if (!isGalleryOpen) return;
     const onKey = (e) => {
       if (e.key === "Escape") setIsGalleryOpen(false);
       if (e.key === "ArrowLeft") {
-        setActiveGalleryIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
+        setActiveGalleryIndex((prev) => Math.max(0, prev - 1));
       }
       if (e.key === "ArrowRight") {
-        setActiveGalleryIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
+        setActiveGalleryIndex((prev) => prev + 1);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -776,6 +785,41 @@ function EventDetailPageInner() {
   const galleryFirst = details.gallery?.items?.[0]?.url;
   const sideTop = heroSide[0] ?? event.artist?.image;
   const sideBottom = heroSide[1] ?? galleryFirst;
+
+  const galleryImages = (() => {
+    const list = [];
+    if (event?.image) list.push(event.image);
+    if (sideTop && !list.includes(sideTop)) list.push(sideTop);
+    if (sideBottom && !list.includes(sideBottom)) list.push(sideBottom);
+    if (Array.isArray(details?.heroImages)) {
+      details.heroImages.forEach((img) => {
+        if (img && !list.includes(img)) list.push(img);
+      });
+    }
+    if (Array.isArray(details?.gallery?.items)) {
+      details.gallery.items.forEach((item) => {
+        const u = typeof item === "string" ? item : item?.url;
+        if (u && !list.includes(u)) list.push(u);
+      });
+    }
+    if (Array.isArray(event?.gallery)) {
+      event.gallery.forEach((u) => {
+        if (u && !list.includes(u)) list.push(u);
+      });
+    }
+    const fallbacks = [
+      "/images/figma-sample/goa/gallery-1.png",
+      "/images/figma-sample/goa/gallery-2.png",
+      "/images/figma-sample/goa/gallery-3.png",
+      "/images/figma-sample/goa/headliner.png",
+      "/images/figma-sample/goa/support-1.png",
+      "/images/figma-sample/goa/support-2.png",
+    ];
+    fallbacks.forEach((fb) => {
+      if (list.length < 6 && !list.includes(fb)) list.push(fb);
+    });
+    return list;
+  })();
   const calendarUrl = (() => {
     const fmt = (d) => d.toISOString().replace(/[-:]|\.\d{3}/g, "");
     const end = endDateObj ?? new Date(date.getTime() + 3 * 3600_000);
@@ -879,21 +923,127 @@ function EventDetailPageInner() {
   const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
   const appleMapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(fullAddress)}`;
 
-  return (
-    <div className="min-h-screen bg-[#F8F5F0] pt-16 sm:pt-20">
-      <Navbar />
+  const handleBackToEvents = () => {
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
 
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-2 sm:pt-3 space-y-3.5 sm:space-y-4 pb-16 lg:pb-12">
+  return (
+    <div className="min-h-screen bg-[#F8F5F0] pt-0 lg:pt-16">
+      {/* ── MOBILE / TABLET FIXED TOP BAR (< lg): Buttons & Event Name Fixed at Top After Scrolling ── */}
+      <div
+        className={`lg:hidden fixed top-0 left-0 right-0 z-40 px-3.5 sm:px-5 py-2.5 sm:py-3 transition-all duration-300 flex items-center justify-between gap-2 ${
+          isHeroScrolled
+            ? "bg-white/90 backdrop-blur-2xl backdrop-saturate-180 border-b border-black/8 shadow-[0_4px_20px_rgba(0,0,0,0.06),inset_0_-1px_1px_rgba(255,255,255,0.7)]"
+            : "bg-transparent border-b border-transparent"
+        }`}
+      >
+        {/* Left: Liquid Glass Back Button */}
+        <button
+          type="button"
+          onClick={handleBackToEvents}
+          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full transition-all flex items-center justify-center cursor-pointer active:scale-90 flex-shrink-0 ${
+            isHeroScrolled
+              ? "bg-white hover:bg-neutral-50 border border-black/10 text-[#1B1B23] shadow-xs"
+              : "bg-white/85 hover:bg-white backdrop-blur-2xl backdrop-saturate-180 border border-white/90 shadow-sm text-[#1B1B23]"
+          }`}
+          aria-label="Go back"
+        >
+          <ChevronLeft className="w-5 h-5 -translate-x-0.5 text-[#1B1B23]" />
+        </button>
+
+        {/* Center: Event Name (Fixed at top after scrolling!) */}
+        <div className="flex-1 min-w-0 px-2 text-center">
+          <h2
+            className={`font-extrabold text-xs sm:text-sm text-[#1B1B23] truncate transition-opacity duration-200 ${
+              isHeroScrolled ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
+          >
+            {event.name}
+          </h2>
+          {isHeroScrolled && (
+            <p className="text-[10px] font-semibold text-[#FF4E7A] truncate">
+              {dateLabel}
+            </p>
+          )}
+        </div>
+
+        {/* Right: Quick Action Buttons (Heart / Fav, Share, Calendar) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          <button
+            type="button"
+            onClick={handleInterested}
+            className={`
+              w-9 h-9 sm:w-auto sm:h-auto text-xs font-semibold sm:py-1.5 sm:px-3 rounded-full border transition-all flex items-center justify-center gap-1.5 backdrop-blur-xl cursor-pointer shadow-sm active:scale-90
+              ${interested
+                ? "bg-[#FF4E7A] border-[#FF4E7A] text-white shadow-[#FF4E7A]/30 shadow-md"
+                : isHeroScrolled
+                ? "bg-neutral-100/90 hover:bg-neutral-200/90 border-black/10 text-[#1B1B23]"
+                : "bg-black/45 hover:bg-black/65 border-white/25 text-white"
+              }
+            `}
+            title="Add to wishlist"
+          >
+            <Heart className={`w-3.5 h-3.5 ${interested ? "fill-white text-white" : isHeroScrolled ? "text-[#1B1B23]" : "text-white"}`} />
+            <span className="hidden sm:inline">Interested</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className={`w-9 h-9 sm:w-auto sm:h-auto border text-xs font-semibold sm:py-1.5 sm:px-3 rounded-full transition-all flex items-center justify-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-90 ${
+              isHeroScrolled
+                ? "bg-neutral-100/90 hover:bg-neutral-200/90 border-black/10 text-[#1B1B23]"
+                : "bg-black/45 hover:bg-black/65 border-white/25 text-white"
+            }`}
+            title="Share event"
+          >
+            <Share2 className={`w-3.5 h-3.5 ${isHeroScrolled ? "text-[#1B1B23]" : "text-white"}`} />
+            <span className="hidden sm:inline">Share</span>
+          </button>
+
+          <a
+            href={calendarUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`w-9 h-9 sm:w-auto sm:h-auto border text-xs font-semibold sm:py-1.5 sm:px-3 rounded-full transition-all flex items-center justify-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-90 ${
+              isHeroScrolled
+                ? "bg-neutral-100/90 hover:bg-neutral-200/90 border-black/10 text-[#1B1B23]"
+                : "bg-black/45 hover:bg-black/65 border-white/25 text-white"
+            }`}
+            title="Add to calendar"
+          >
+            <CalendarPlus className={`w-3.5 h-3.5 ${isHeroScrolled ? "text-[#1B1B23]" : "text-white"}`} />
+            <span className="hidden sm:inline">Calendar</span>
+          </a>
+
+          {copied && (
+            <span className="text-[11px] font-semibold text-white bg-emerald-600/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm animate-fade-in border border-emerald-400/40">
+              {copied}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Top Navbar: Hidden on Tablet & Mobile, shown on Desktop with small navbar & small search icon */}
+      <div className="hidden lg:block">
+        <Navbar compact miniSearch wide />
+      </div>
+
+      <div className="max-w-[1240px] mx-auto px-0 lg:px-8 pt-0 lg:pt-3 pb-24 lg:pb-12">
         {/* ── Private Notice (if applicable) ── */}
         {event.isPrivate && isOwner && (
-          <div className="bg-[#1B1B23] text-white rounded-xl px-4 py-2.5 flex items-center gap-2 text-xs sm:text-sm shadow-xs">
+          <div className="mx-4 sm:mx-6 lg:mx-0 mb-3.5 bg-[#1B1B23] text-white rounded-xl px-4 py-2.5 flex items-center gap-2 text-xs sm:text-sm shadow-xs">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
             <span>This event is private. Only people with the link can see it.</span>
           </div>
         )}
 
-        {/* ── TOP EVENT TITLE & DATE (Matching District Screenshot - NO breadcrumb line) ── */}
-        <div className="space-y-1">
+        {/* ── TOP EVENT TITLE & DATE (Desktop only >= lg; on Tablet & Mobile it is layered on top of hero artwork) ── */}
+        <div className="hidden lg:block space-y-1 m-0 lg:mb-4">
           <p className="text-xs sm:text-sm font-semibold text-[#FF4E7A] tracking-wide">
             {dateLabel}
           </p>
@@ -910,10 +1060,10 @@ function EventDetailPageInner() {
           </div>
         </div>
 
-        {/* ── HERO ARTWORK SECTION: MAIN BANNER + MEDIA BESIDE (MATCHING IMAGE 1) ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 items-stretch">
-          {/* Main Artwork Banner */}
-          <div className="lg:col-span-8 relative min-h-[260px] sm:h-[340px] lg:h-[400px] xl:h-[430px] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#121218] shadow-sm group">
+        {/* ── HERO ARTWORK SECTION: MAIN BANNER + MEDIA BESIDE ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-4 items-stretch">
+          {/* Main Artwork Banner: Clean natural scroll on mobile/tablet */}
+          <div className="lg:col-span-8 relative min-h-[340px] h-[380px] sm:h-[440px] md:h-[480px] lg:h-[400px] xl:h-[430px] rounded-t-none rounded-b-3xl sm:rounded-b-[32px] lg:rounded-3xl overflow-hidden bg-[#121218] shadow-sm group">
             {/* Ambient Blurred Background Glow */}
             {event.image ? (
               <img
@@ -925,25 +1075,25 @@ function EventDetailPageInner() {
             ) : (
               <div className="absolute inset-0 bg-gradient-to-r from-pink-900/40 via-purple-900/30 to-black/60 filter blur-xl opacity-50" />
             )}
-            <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/25 pointer-events-none" />
 
             {/* Centered Crisp Event Poster Artwork */}
             <img
               src={event.image || "/images/figma-sample/goa/goa-hero.png"}
               alt={event.name}
-              className="relative w-full h-full object-contain sm:object-cover mx-auto"
+              className="relative w-full h-full object-cover mx-auto"
             />
 
-            {/* Quick Action Pills Overlaid on Top Right of Image */}
-            <div className="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 flex items-center gap-1.5 sm:gap-2 z-10">
+            {/* ── DESKTOP TOP RIGHT PILLS (>= lg only) ── */}
+            <div className="hidden lg:flex absolute top-3.5 right-3.5 sm:top-4 sm:right-4 items-center gap-1.5 sm:gap-2 z-20">
               <button
                 type="button"
                 onClick={handleInterested}
                 className={`
-                  text-xs font-semibold py-1.5 px-3 rounded-full border transition-all flex items-center gap-1.5 backdrop-blur-md cursor-pointer shadow-sm active:scale-95
+                  text-xs font-semibold py-1.5 px-3 rounded-full border transition-all flex items-center gap-1.5 backdrop-blur-xl cursor-pointer shadow-sm active:scale-95
                   ${interested
-                    ? "bg-[#FF4E7A] border-[#FF4E7A] text-white"
-                    : "bg-black/50 hover:bg-black/70 border-white/20 text-white"
+                    ? "bg-[#FF4E7A] border-[#FF4E7A] text-white shadow-[#FF4E7A]/30 shadow-md"
+                    : "bg-black/45 hover:bg-black/65 border-white/25 text-white"
                   }
                 `}
               >
@@ -954,7 +1104,7 @@ function EventDetailPageInner() {
               <button
                 type="button"
                 onClick={handleShare}
-                className="bg-black/50 hover:bg-black/70 border border-white/20 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-md shadow-sm cursor-pointer active:scale-95"
+                className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
                 title="Share event"
               >
                 <Share2 className="w-3.5 h-3.5" />
@@ -964,7 +1114,7 @@ function EventDetailPageInner() {
               <button
                 type="button"
                 onClick={handleInvite}
-                className="bg-black/50 hover:bg-black/70 border border-white/20 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-md shadow-sm cursor-pointer active:scale-95"
+                className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
                 title="Invite friends"
               >
                 <UserPlus className="w-3.5 h-3.5" />
@@ -975,7 +1125,7 @@ function EventDetailPageInner() {
                 href={calendarUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-black/50 hover:bg-black/70 border border-white/20 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-md shadow-sm cursor-pointer active:scale-95"
+                className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
                 title="Add to calendar"
               >
                 <CalendarPlus className="w-3.5 h-3.5" />
@@ -983,59 +1133,120 @@ function EventDetailPageInner() {
               </a>
 
               {copied && (
-                <span className="text-[11px] font-semibold text-white bg-emerald-600 px-2.5 py-1 rounded-full shadow-sm animate-fade-in">
+                <span className="text-[11px] font-semibold text-white bg-emerald-600/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm animate-fade-in border border-emerald-400/40">
                   {copied}
                 </span>
               )}
             </div>
 
-            {/* Badges Overlaid on Bottom Left of Image */}
-            <div className="absolute bottom-3 left-3 flex items-center gap-2 z-10">
-              <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/15">
-                {categoryLabel(event.category).toUpperCase()}
-              </span>
-              {FEATURES.blockchain && event.isBlockchain && (
-                <span className="text-[10px] font-semibold text-[#00C896] bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/15">
-                  ⛓ On-Chain
-                </span>
-              )}
-              {event.isSellingFast && !event.isSoldOut && (
-                <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-[#FF4E7A] px-2.5 py-0.5 rounded-full shadow-2xs">
-                  SELLING FAST
-                </span>
-              )}
+            {/* Mobile / Tablet Overlay: Event Date, Title & Badges ON TOP of Hero Image */}
+            <div className="lg:hidden absolute bottom-0 inset-x-0 p-4 sm:p-6 bg-gradient-to-t from-black/95 via-black/65 to-transparent z-10 pt-16 flex flex-col justify-end">
+              <p className="text-xs sm:text-sm font-semibold text-[#FF7597] tracking-wide mb-1 drop-shadow-sm">
+                {dateLabel}
+              </p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-snug drop-shadow-md mb-2.5">
+                {event.name}
+              </h1>
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/20">
+                    {categoryLabel(event.category).toUpperCase()}
+                  </span>
+                  {event.format === "VIRTUAL" && (
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-blue-500/80 backdrop-blur-md px-2.5 py-0.5 rounded-full">
+                      ONLINE
+                    </span>
+                  )}
+                  {FEATURES.blockchain && event.isBlockchain && (
+                    <span className="text-[10px] font-semibold text-[#00C896] bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/15">
+                      ⛓ On-Chain
+                    </span>
+                  )}
+                  {event.isSellingFast && !event.isSoldOut && (
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-[#FF4E7A] px-2.5 py-0.5 rounded-full shadow-2xs">
+                      SELLING FAST
+                    </span>
+                  )}
+                  {event.isSoldOut && (
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-neutral-700/90 px-2.5 py-0.5 rounded-full">
+                      SOLD OUT
+                    </span>
+                  )}
+                </div>
+
+                {/* Mobile View Gallery Pill */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveGalleryIndex(0);
+                    setIsGalleryOpen(true);
+                  }}
+                  className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/25 text-white text-xs font-semibold py-1 px-3 rounded-full flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95 transition-all"
+                >
+                  <span>Gallery ({galleryImages.length})</span>
+                  <span className="text-[11px]">↗</span>
+                </button>
+              </div>
             </div>
-          </div>
+
+              {/* Badges Overlaid on Bottom Left of Image (Desktop only >= lg) */}
+              <div className="hidden lg:flex absolute bottom-3 left-3 items-center gap-2 z-10">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/15">
+                  {categoryLabel(event.category).toUpperCase()}
+                </span>
+                {FEATURES.blockchain && event.isBlockchain && (
+                  <span className="text-[10px] font-semibold text-[#00C896] bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/15">
+                    ⛓ On-Chain
+                  </span>
+                )}
+                {event.isSellingFast && !event.isSoldOut && (
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-[#FF4E7A] px-2.5 py-0.5 rounded-full shadow-2xs">
+                    SELLING FAST
+                  </span>
+                )}
+              </div>
+            </div>
 
           {/* Right Side Media Cards (Desktop >= lg, matching Image 1) */}
           <div className="hidden lg:flex lg:col-span-4 lg:h-[400px] xl:h-[430px] flex-col gap-3.5">
-            <div className="relative flex-1 min-h-0 rounded-2xl overflow-hidden bg-neutral-200 shadow-2xs group">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveGalleryIndex(1);
+                setIsGalleryOpen(true);
+              }}
+              className="relative flex-1 min-h-0 rounded-2xl overflow-hidden bg-neutral-200 shadow-2xs group cursor-pointer w-full text-left"
+            >
               <img
                 src={sideTop || "/images/figma-sample/goa/headliner.png"}
-                alt=""
+                alt="Event media"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
-            </div>
+            </button>
 
-            <a
-              href="#gallery"
-              className="relative flex-1 min-h-0 rounded-2xl overflow-hidden bg-neutral-900 shadow-2xs flex items-center justify-center group"
+            <button
+              type="button"
+              onClick={() => {
+                setActiveGalleryIndex(0);
+                setIsGalleryOpen(true);
+              }}
+              className="relative flex-1 min-h-0 rounded-2xl overflow-hidden bg-neutral-900 shadow-2xs flex items-center justify-center group cursor-pointer w-full"
             >
               <img
                 src={sideBottom || "/images/figma-sample/goa/gallery-1.png"}
-                alt=""
+                alt="View gallery"
                 className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-45 transition-opacity duration-300 group-hover:scale-105"
               />
               <span className="relative text-white font-semibold text-base flex items-center gap-1.5 z-10 drop-shadow-md">
                 <span>View gallery</span>
                 <span className="text-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200">↗</span>
               </span>
-            </a>
+            </button>
           </div>
         </div>
 
         {/* ── TWO-COLUMN FIRST-FOLD LAYOUT (VISIBLE ON LOAD WITHOUT SCROLLING) ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start pt-1 sm:pt-2">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start mt-4 sm:mt-5 lg:mt-4 px-4 sm:px-6 lg:px-0">
 
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* LEFT COLUMN: ABOUT, DETAILS, AND SECTIONS                       */}
@@ -1163,8 +1374,8 @@ function EventDetailPageInner() {
           {/* ═════════════════════════════════════════════════════════════════ */}
           <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 self-start space-y-3.5 z-20">
 
-            {/* 1. BOOK TICKETS CARD (Liquid Glass Capsule) */}
-            <div className="bg-white/80 backdrop-blur-2xl backdrop-saturate-180 rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-white/90 shadow-[0_8px_30px_rgba(0,0,0,0.04),inset_0_1.5px_2px_rgba(255,255,255,1),inset_0_-1px_1.5px_rgba(255,255,255,0.4)] transition-all">
+            {/* 1. BOOK TICKETS CARD (Liquid Glass Capsule - Desktop only; Tablet & Mobile use fixed bottom bar) */}
+            <div className="hidden lg:block bg-white/80 backdrop-blur-2xl backdrop-saturate-180 rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-white/90 shadow-[0_8px_30px_rgba(0,0,0,0.04),inset_0_1.5px_2px_rgba(255,255,255,1),inset_0_-1px_1.5px_rgba(255,255,255,0.4)] transition-all">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="font-extrabold text-xl sm:text-2xl text-[#1B1B23] tracking-tight">
@@ -1297,8 +1508,8 @@ function EventDetailPageInner() {
         </div>
       </div>
 
-      {/* ── STICKY MOBILE BUY BAR (Fixed at bottom on mobile screens) ── */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-black/8 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 py-3 z-40 lg:hidden">
+      {/* ── STICKY TABLET & MOBILE BUY BAR (Fixed at bottom on tablet & mobile screens) ── */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/85 backdrop-blur-2xl backdrop-saturate-180 border-t border-white/90 shadow-[0_-8px_32px_rgba(0,0,0,0.08),inset_0_1.5px_2px_rgba(255,255,255,0.9)] px-4 sm:px-6 py-3.5 z-40 lg:hidden pb-safe">
         <div className="flex items-center justify-between max-w-lg mx-auto gap-3">
           <div>
             <p className="font-extrabold text-xl leading-tight text-[#1B1B23]">
@@ -1310,7 +1521,7 @@ function EventDetailPageInner() {
                   ? "Free"
                   : `€${minTierPrice}`}
             </p>
-            <p className="text-xs font-medium text-[#8C8C9E]">
+            <p className="text-xs font-semibold text-[#8C8C9E]">
               {totalItems > 0
                 ? `${totalItems} Ticket${totalItems > 1 ? "s" : ""} selected`
                 : minTierPrice === 0
@@ -1340,7 +1551,7 @@ function EventDetailPageInner() {
             <button
               type="button"
               onClick={() => navigate(`/events/${event.id}/book`)}
-              className="bg-[#1B1B23] hover:bg-[#2D2D3A] text-white font-bold px-6 py-3 rounded-xl transition-all shadow-sm text-xs active:scale-98 cursor-pointer"
+              className="bg-[#1B1B23] hover:bg-[#2D2D3A] text-white font-bold px-6 py-3 rounded-xl transition-all shadow-md text-xs sm:text-sm active:scale-95 cursor-pointer"
             >
               Book tickets
             </button>
@@ -1775,8 +1986,102 @@ function EventDetailPageInner() {
         </div>
       )}
 
+      {/* ── FULLSCREEN GALLERY LIGHTBOX MODAL ── */}
+      {isGalleryOpen && (
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsGalleryOpen(false);
+          }}
+          className="fixed inset-0 z-50 bg-black/92 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 animate-in fade-in duration-200 select-none"
+        >
+          {/* Top Bar: Title, Counter & Close */}
+          <div className="flex items-center justify-between z-10 max-w-6xl w-full mx-auto">
+            <div>
+              <h3 className="text-white font-bold text-sm sm:text-base truncate max-w-xs sm:max-w-md">
+                {event.name}
+              </h3>
+              <p className="text-xs text-neutral-400 font-mono mt-0.5">
+                {(activeGalleryIndex % (galleryImages.length || 1)) + 1} of {galleryImages.length}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsGalleryOpen(false)}
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/10"
+              aria-label="Close gallery"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Main Stage: Center Image + Chevrons */}
+          <div className="relative flex-1 flex items-center justify-center my-3 max-w-6xl w-full mx-auto overflow-hidden">
+            {/* Previous Chevron Button */}
+            <button
+              type="button"
+              onClick={() =>
+                setActiveGalleryIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1))
+              }
+              className="absolute left-2 sm:left-4 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-90"
+              aria-label="Previous photo"
+            >
+              <ChevronLeft className="w-6 h-6 -translate-x-0.5" />
+            </button>
+
+            {/* Main Stage Image */}
+            <div className="relative max-h-[62vh] sm:max-h-[68vh] max-w-full flex items-center justify-center">
+              <img
+                key={activeGalleryIndex}
+                src={galleryImages[activeGalleryIndex % (galleryImages.length || 1)] || galleryImages[0]}
+                alt={`Gallery photo ${(activeGalleryIndex % (galleryImages.length || 1)) + 1}`}
+                className="max-h-[62vh] sm:max-h-[68vh] w-auto max-w-full object-contain rounded-2xl sm:rounded-3xl shadow-2xl animate-in zoom-in-95 duration-150"
+              />
+            </div>
+
+            {/* Next Chevron Button */}
+            <button
+              type="button"
+              onClick={() =>
+                setActiveGalleryIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0))
+              }
+              className="absolute right-2 sm:right-4 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-90"
+              aria-label="Next photo"
+            >
+              <ChevronRight className="w-6 h-6 translate-x-0.5" />
+            </button>
+          </div>
+
+          {/* Bottom 1:1 Square Thumbnail Strip */}
+          <div className="max-w-4xl w-full mx-auto z-10 pt-1">
+            <div className="flex items-center justify-center gap-2.5 sm:gap-3 overflow-x-auto scrollbar-none py-2 px-1">
+              {galleryImages.map((img, idx) => {
+                const isActive = idx === activeGalleryIndex;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveGalleryIndex(idx)}
+                    className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer transition-all duration-200 ${
+                      isActive
+                        ? "ring-2 ring-[#FF4E7A] ring-offset-2 ring-offset-black scale-105 opacity-100"
+                        : "opacity-45 hover:opacity-85 border border-white/10"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
-      <BottomNav />
     </div>
   );
 }

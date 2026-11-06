@@ -15,7 +15,7 @@ export function DietaryAccessibilityFeature({ event, details }) {
 
   return (
     <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-4 animate-in fade-in duration-200">
-      <div className="flex items-center justify-between border-b border-black/6 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-black/6 pb-3">
         <div>
           <h3 className="text-lg sm:text-xl font-bold text-[#1B1B23] tracking-tight">
             Dietary Preferences & Accessibility
@@ -24,7 +24,7 @@ export function DietaryAccessibilityFeature({ event, details }) {
             We are dedicated to providing a fully inclusive and comfortable experience for all guests.
           </p>
         </div>
-        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full flex items-center gap-1">
+        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full flex items-center gap-1 w-fit flex-shrink-0">
           <HeartHandshake className="w-3.5 h-3.5" />
           <span>Inclusive Event</span>
         </span>

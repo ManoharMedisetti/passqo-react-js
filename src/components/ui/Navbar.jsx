@@ -42,7 +42,7 @@ export function AnimatedSearchPlaceholder({ className = "", textColor = "text-ne
   );
 }
 
-export function Navbar({ wide = false }) {
+export function Navbar({ wide = false, compact = false, miniSearch = false }) {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const [scrolled, setScrolled] = useState(false);
@@ -88,6 +88,8 @@ export function Navbar({ wide = false }) {
       className={`fixed top-0 left-0 right-0 z-[100] px-3.5 sm:px-4 lg:px-8 transition-all duration-300 ${
         isHeroTransparent
           ? "bg-transparent md:bg-white/75 md:backdrop-blur-2xl md:backdrop-saturate-180 border-b border-transparent md:border-white/60 md:shadow-[0_4px_20px_rgba(0,0,0,0.04)] py-2.5 sm:py-3 lg:py-3.5"
+          : compact
+          ? "bg-white/80 backdrop-blur-2xl backdrop-saturate-180 border-b border-white/60 shadow-[0_4px_20px_rgba(0,0,0,0.04),inset_0_-1px_1px_rgba(255,255,255,0.6)] py-1.5 lg:py-2"
           : "bg-white/65 backdrop-blur-xl backdrop-saturate-180 border-b border-white/60 shadow-[0_4px_20px_rgba(0,0,0,0.04)] md:bg-white/80 md:backdrop-blur-2xl md:border-white/60 md:shadow-[0_4px_24px_rgba(0,0,0,0.06),inset_0_-1px_1px_rgba(255,255,255,0.6)] py-1.5 sm:py-2 lg:py-2"
       }`}
     >
@@ -102,43 +104,58 @@ export function Navbar({ wide = false }) {
             src="/images/Logos/navbar%20logo.png"
             alt="Passqo"
             className={`${
-              scrolled ? "h-6.5 sm:h-7 lg:h-8" : "h-8 lg:h-9 xl:h-10"
+              compact ? "h-6 sm:h-6.5 lg:h-7" : scrolled ? "h-6.5 sm:h-7 lg:h-8" : "h-8 lg:h-9 xl:h-10"
             } w-auto object-contain transition-all duration-300 hover:scale-105 active:scale-95`}
           />
         </Link>
 
-        {/* Center: Location + Search pill (Lower height h-9 / h-10 when scrolled, original h-11 / h-12 when top) */}
-        <div className="flex items-center gap-2.5 lg:gap-3 flex-1 max-w-[540px] justify-center min-w-0">
+        {/* Center: Location + Search pill / Small icon */}
+        <div className="flex items-center gap-2 lg:gap-2.5 flex-1 max-w-[480px] justify-center min-w-0">
           <div className="flex-shrink-0">
-            <LocationPill compact={scrolled} />
+            <LocationPill compact={scrolled || compact} />
           </div>
 
-          <motion.button
-            type="button"
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 450, damping: 25 }}
-            onClick={() => openSearch()}
-            aria-label="Open search popup"
-            className="w-full max-w-[280px] lg:max-w-[360px] min-w-0 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4E7A] rounded-full group"
-          >
-            <div className={`flex items-center justify-between gap-2.5 rounded-full ${
-              scrolled ? "h-9 lg:h-10" : "h-11 lg:h-12"
-            } pl-3.5 sm:pl-4 pr-3.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-black/[0.08] group-hover:border-black/20 text-[#1B1B23] transition-all duration-300`}>
-              <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                <Search className="w-4 h-4 flex-shrink-0 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
-                <AnimatedSearchPlaceholder
-                  className="flex-1 min-w-0"
-                  textColor="text-neutral-500 font-normal"
-                />
+          {miniSearch || compact ? (
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 450, damping: 25 }}
+              onClick={() => openSearch()}
+              aria-label="Search"
+              title="Search events, artists, venues…"
+              className="w-9 h-9 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-black/[0.08] hover:border-black/25 flex items-center justify-center text-[#1B1B23] transition-all cursor-pointer group flex-shrink-0"
+            >
+              <Search className="w-4 h-4 text-neutral-500 group-hover:text-[#1B1B23] transition-colors" />
+            </motion.button>
+          ) : (
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 450, damping: 25 }}
+              onClick={() => openSearch()}
+              aria-label="Open search popup"
+              className="w-full max-w-[280px] lg:max-w-[360px] min-w-0 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4E7A] rounded-full group"
+            >
+              <div className={`flex items-center justify-between gap-2.5 rounded-full ${
+                scrolled ? "h-9 lg:h-10" : "h-11 lg:h-12"
+              } pl-3.5 sm:pl-4 pr-3.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-black/[0.08] group-hover:border-black/20 text-[#1B1B23] transition-all duration-300`}>
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  <Search className="w-4 h-4 flex-shrink-0 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
+                  <AnimatedSearchPlaceholder
+                    className="flex-1 min-w-0"
+                    textColor="text-neutral-500 font-normal"
+                  />
+                </div>
               </div>
-            </div>
-          </motion.button>
+            </motion.button>
+          )}
         </div>
 
         {/* Right side — NavUser */}
         <div className="flex items-center flex-shrink-0 relative z-20">
-          <NavUser scrolled={scrolled} />
+          <NavUser scrolled={scrolled || compact} compact={compact} />
         </div>
       </div>
 

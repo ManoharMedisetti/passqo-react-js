@@ -42,7 +42,7 @@ export function SponsorsFeature({ event, details }) {
 
   return (
     <div className="bg-white rounded-3xl p-5 sm:p-7 border border-black/6 shadow-2xs space-y-5 animate-in fade-in duration-200">
-      <div className="flex items-center justify-between border-b border-black/6 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-black/6 pb-4">
         <div>
           <div className="flex items-center gap-2">
             <h3 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">

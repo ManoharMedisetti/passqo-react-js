@@ -71,13 +71,13 @@ export function AgendaFeature({ event, details }) {
   return (
     <div className="bg-white rounded-3xl p-5 sm:p-7 border border-black/6 shadow-2xs space-y-6 animate-in fade-in duration-200">
       {/* Header & Day Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/6 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 border-b border-black/6 pb-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
             <h3 className="text-xl sm:text-2xl font-bold text-[#1B1B23] tracking-tight">
               Agenda & Session Schedule
             </h3>
-            <span className="text-[10px] font-bold text-[#FF4E7A] bg-pink-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="text-[10px] font-bold text-[#FF4E7A] bg-pink-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider flex-shrink-0">
               Live Flow
             </span>
           </div>
@@ -88,20 +88,20 @@ export function AgendaFeature({ event, details }) {
 
         {/* Day Switcher Pills if multi-day */}
         {days.length > 1 && (
-          <div className="inline-flex items-center gap-1.5 p-1 bg-neutral-100/80 rounded-2xl border border-black/5 self-start sm:self-auto">
+          <div className="inline-flex items-center gap-1.5 p-1 bg-neutral-100/80 rounded-2xl border border-black/5 flex-shrink-0 self-start md:self-auto overflow-x-auto max-w-full scrollbar-none flex-nowrap">
             {days.map((day, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => setActiveDayIdx(idx)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                className={`whitespace-nowrap flex-nowrap flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5 min-w-max ${
                   activeDayIdx === idx
                     ? "bg-[#FF4E7A] text-white shadow-xs shadow-[#FF4E7A]/25"
                     : "text-[#6E6969] hover:text-[#1B1B23] hover:bg-white/60"
                 }`}
               >
-                <span>Day {idx + 1}</span>
-                <span className="text-[10px] opacity-75">
+                <span className="whitespace-nowrap font-bold">Day {idx + 1}</span>
+                <span className="text-[10px] opacity-90 whitespace-nowrap font-normal">
                   ({day.rows?.length || 0} sessions)
                 </span>
               </button>
