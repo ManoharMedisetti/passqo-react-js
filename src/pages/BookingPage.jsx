@@ -132,17 +132,27 @@ export function BookingPage() {
     setTimerExpired(false);
   };
 
-  const goToStep = (targetStep) => {
+  const goToStep = (targetStep, replace = false) => {
     const stepQuery = targetStep === 3 ? "payment" : targetStep === 2 ? "details" : "tickets";
-    navigate(`/events/${eventId}/book?step=${stepQuery}`);
+    navigate(`/events/${eventId}/book?step=${stepQuery}`, { replace });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleBack = () => {
+    // Reverse wizard flow matching every standard app:
+    // Payment (Step 3) -> Buyer Details (Step 2) -> Ticket Selection (Step 1) -> Event Detail -> Home
     if (step === 3) {
-      goToStep(2);
+      if (window.history.state && window.history.state.idx > 0) {
+        navigate(-1);
+      } else {
+        goToStep(2, true);
+      }
     } else if (step === 2) {
-      goToStep(1);
+      if (window.history.state && window.history.state.idx > 0) {
+        navigate(-1);
+      } else {
+        goToStep(1, true);
+      }
     } else {
       navigate(`/events/${eventId}`);
     }
@@ -313,7 +323,7 @@ export function BookingPage() {
             {/* Step 1: Buyer details */}
             <button
               type="button"
-              onClick={() => goToStep(2)}
+              onClick={() => goToStep(2, true)}
               className="flex items-center gap-2 text-xs font-bold text-[#1B1B23] cursor-pointer"
             >
               <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border transition-all ${
@@ -583,7 +593,7 @@ export function BookingPage() {
                             </p>
                             <button
                               type="button"
-                              onClick={() => goToStep(1)}
+                              onClick={() => goToStep(1, true)}
                               className="text-[11px] text-[#8C8C9E] hover:text-[#FF4E7A] underline mt-0.5 cursor-pointer transition-colors"
                             >
                               Edit tickets
@@ -647,7 +657,7 @@ export function BookingPage() {
                         </p>
                         <button
                           type="button"
-                          onClick={() => goToStep(1)}
+                          onClick={() => goToStep(1, true)}
                           className="text-[11px] text-[#8C8C9E] hover:text-[#FF4E7A] underline mt-0.5 cursor-pointer transition-colors"
                         >
                           Edit tickets
@@ -755,7 +765,7 @@ export function BookingPage() {
 
             <button
               type="button"
-              onClick={() => goToStep(2)}
+              onClick={() => goToStep(2, true)}
               className="w-8 h-8 rounded-full hover:bg-neutral-100 flex items-center justify-center text-[#8C8C9E] hover:text-[#FF4E7A] transition-colors cursor-pointer flex-shrink-0"
               title="Edit buyer details"
             >

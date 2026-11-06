@@ -924,11 +924,8 @@ function EventDetailPageInner() {
   const appleMapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(fullAddress)}`;
 
   const handleBackToEvents = () => {
-    if (window.history.state && window.history.state.idx > 0) {
-      navigate(-1);
-    } else {
-      navigate("/");
-    }
+    // Back button on Event Detail page always navigates cleanly to Home
+    navigate("/");
   };
 
   return (
