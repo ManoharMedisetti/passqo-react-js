@@ -6,14 +6,23 @@ const AGE_RESTRICTION_LABELS = {
   TWENTY_ONE_PLUS: "🔞 21+",
 };
 
-export function ThingsToKnowFeature({ event }) {
+export function ThingsToKnowFeature({ event, details }) {
   const [showAll, setShowAll] = useState(false);
+  const category = event?.category || "MUSIC_ENTERTAINMENT";
+
+  let headerTitle = "Things to know & Venue Policies";
+  if (category === "HEALTH_WELLNESS") headerTitle = "Things to know & What to bring";
+  else if (category === "FOOD_DRINK") headerTitle = "Things to know & Dining Policies";
+  else if (category === "EXHIBITIONS") headerTitle = "Things to know & Gallery Guidelines";
+  else if (category === "SPORTS") headerTitle = "Things to know & Stadium Guidelines";
+
+  const customItems = details?.thingsToKnow || details?.policies || [];
 
   return (
-    <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5 animate-in fade-in duration-200">
+    <div className="bg-white rounded-2xl p-5 sm:p-6 border border-black/6 shadow-2xs space-y-3.5">
       <div className="flex items-center justify-between border-b border-black/6 pb-3">
         <h3 className="text-lg sm:text-xl font-bold text-[#1B1B23] tracking-tight">
-          Things to know & Venue Policies
+          {headerTitle}
         </h3>
         <span className="text-xs font-bold text-[#8C8C9E]">
           Entry Guidelines
@@ -21,40 +30,56 @@ export function ThingsToKnowFeature({ event }) {
       </div>
 
       <ul className="space-y-2.5 text-xs sm:text-sm text-[#4A4A58]">
+        {/* Age Restriction */}
         <li className="flex items-start gap-2.5">
           <span className="text-[#FF4E7A] text-base leading-none">•</span>
           <span>
-            {event.ageRestriction && event.ageRestriction !== "NONE"
+            {event?.ageRestriction && event.ageRestriction !== "NONE"
               ? `Entry restricted: ${AGE_RESTRICTION_LABELS[event.ageRestriction] || event.ageRestriction}`
-              : "Entry allowed for all ages"}
+              : "Entry allowed for all age groups"}
           </span>
         </li>
+
+        {/* Custom items from event details if any */}
+        {Array.isArray(customItems) &&
+          customItems.slice(0, showAll ? customItems.length : 3).map((item, i) => (
+            <li key={i} className="flex items-start gap-2.5">
+              <span className="text-[#FF4E7A] text-base leading-none">•</span>
+              <span>{typeof item === "string" ? item : item.title || item.text}</span>
+            </li>
+          ))}
+
+        {/* Standard venue guidelines */}
         <li className="flex items-start gap-2.5">
           <span className="text-[#FF4E7A] text-base leading-none">•</span>
-          <span>Tickets required for ages 4 and above</span>
+          <span>Valid ticket QR code and government photo ID are required at turnstiles</span>
         </li>
         <li className="flex items-start gap-2.5">
           <span className="text-[#FF4E7A] text-base leading-none">•</span>
-          <span>Pets are not allowed inside the venue (Guide dogs permitted)</span>
+          <span>Tickets required for attendees aged 4 and above</span>
         </li>
         <li className="flex items-start gap-2.5">
           <span className="text-[#FF4E7A] text-base leading-none">•</span>
-          <span>Physical government ID (Aadhaar / Passport / Driving License) is required for entry</span>
+          <span>Pets are not permitted inside performance areas (Certified guide dogs welcome)</span>
         </li>
 
         {showAll && (
           <>
             <li className="flex items-start gap-2.5">
               <span className="text-[#FF4E7A] text-base leading-none">•</span>
-              <span>Outside food, alcoholic beverages, and glassware are strictly prohibited</span>
+              <span>Outside food, alcoholic beverages, cans, and glassware are strictly prohibited</span>
             </li>
             <li className="flex items-start gap-2.5">
               <span className="text-[#FF4E7A] text-base leading-none">•</span>
-              <span>Security frisking and contactless ticket QR scanning at all turnstiles</span>
+              <span>Security screening and bag inspection are mandatory for all attendees</span>
             </li>
             <li className="flex items-start gap-2.5">
               <span className="text-[#FF4E7A] text-base leading-none">•</span>
-              <span>Professional cameras with detachable zoom lenses require press accreditation</span>
+              <span>Professional cameras with detachable zoom lenses require accredited media pass</span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <span className="text-[#FF4E7A] text-base leading-none">•</span>
+              <span>Re-entry is subject to venue management discretion and wristband verification</span>
             </li>
           </>
         )}

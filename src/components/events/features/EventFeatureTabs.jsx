@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import {
   Music2,
   Layers,
@@ -30,7 +30,6 @@ import { MerchandiseFeature } from "./MerchandiseFeature";
 import { NetworkingFeature } from "./NetworkingFeature";
 import { DietaryAccessibilityFeature } from "./DietaryAccessibilityFeature";
 import { DonationFeature } from "./DonationFeature";
-import { ThingsToKnowFeature } from "./ThingsToKnowFeature";
 
 export function EventFeatureTabs({ event, details }) {
   const category = event?.category || "MUSIC_ENTERTAINMENT";
@@ -78,18 +77,7 @@ export function EventFeatureTabs({ event, details }) {
       });
     }
 
-    // 3. Stages & Acoustic Zones
-    const hasStages = Array.isArray(details?.stages) && details.stages.length > 0;
-    if (hasStages) {
-      list.push({
-        id: "stages",
-        label: "Stages & Zones",
-        icon: Layers,
-        component: <StagesFeature event={event} details={details} />,
-      });
-    }
-
-    // 4. Agenda / Schedule
+    // 3. Agenda / Schedule (Core Event Timeline)
     const hasSchedule = Boolean(
       (Array.isArray(details?.schedule?.days) && details.schedule.days.length > 0) ||
       (Array.isArray(details?.schedule) && details.schedule.length > 0) ||
@@ -109,37 +97,18 @@ export function EventFeatureTabs({ event, details }) {
       });
     }
 
-    // 5. Sponsors / Partners
-    const hasSponsors = Boolean(
-      (Array.isArray(details?.sponsors) && details.sponsors.length > 0) ||
-      details?.features?.partnerSponsors ||
-      event?.category === "BUSINESS_TECH"
-    );
-    if (hasSponsors) {
+    // 4. Stages & Acoustic Zones (Venue Spatial Layout)
+    const hasStages = Array.isArray(details?.stages) && details.stages.length > 0;
+    if (hasStages) {
       list.push({
-        id: "sponsors",
-        label: "Partners & Sponsors",
-        icon: Award,
-        component: <SponsorsFeature event={event} details={details} />,
+        id: "stages",
+        label: "Stages & Zones",
+        icon: Layers,
+        component: <StagesFeature event={event} details={details} />,
       });
     }
 
-    // 6. Networking & B2B Matchmaking
-    const hasNetworking = Boolean(
-      details?.networking ||
-      details?.features?.b2bNetworking ||
-      category === "BUSINESS_TECH"
-    );
-    if (hasNetworking) {
-      list.push({
-        id: "networking",
-        label: "Networking & Corp",
-        icon: Users,
-        component: <NetworkingFeature event={event} details={details} />,
-      });
-    }
-
-    // 7. Curriculum & Syllabus (Workshops, Tech Bootcamps, Masterclasses)
+    // 5. Curriculum & Syllabus (Workshops, Tech Bootcamps, Masterclasses)
     const hasCurriculum = Boolean(
       details?.curriculum ||
       details?.features?.curriculumSyllabus ||
@@ -154,7 +123,7 @@ export function EventFeatureTabs({ event, details }) {
       });
     }
 
-    // 8. Tasting Menu (Food & Drink, Wine Tastings, Supper Clubs)
+    // 6. Tasting Menu (Food & Drink, Wine Tastings, Supper Clubs)
     const hasTasting = Boolean(
       details?.tastingMenu ||
       details?.features?.tastingMenu ||
@@ -169,7 +138,7 @@ export function EventFeatureTabs({ event, details }) {
       });
     }
 
-    // 9. Timed Entry Slots (Exhibitions, Galleries, Immersive Arts)
+    // 7. Timed Entry Slots (Exhibitions, Galleries, Immersive Arts)
     const hasTimedEntry = Boolean(
       details?.timedEntry ||
       details?.features?.timedEntrySlots ||
@@ -184,7 +153,22 @@ export function EventFeatureTabs({ event, details }) {
       });
     }
 
-    // 10. Official Merchandise
+    // 8. Networking & B2B Matchmaking (Attendee Collaboration)
+    const hasNetworking = Boolean(
+      details?.networking ||
+      details?.features?.b2bNetworking ||
+      category === "BUSINESS_TECH"
+    );
+    if (hasNetworking) {
+      list.push({
+        id: "networking",
+        label: "Networking & Corp",
+        icon: Users,
+        component: <NetworkingFeature event={event} details={details} />,
+      });
+    }
+
+    // 9. Official Merchandise (Merch & Apparel)
     const hasMerch = Boolean(
       (Array.isArray(details?.merchandise) && details.merchandise.length > 0) ||
       details?.features?.merchandisePreorder
@@ -195,6 +179,21 @@ export function EventFeatureTabs({ event, details }) {
         label: "Official Merch",
         icon: ShoppingBag,
         component: <MerchandiseFeature event={event} details={details} />,
+      });
+    }
+
+    // 10. Sponsors & Institutional Partners
+    const hasSponsors = Boolean(
+      (Array.isArray(details?.sponsors) && details.sponsors.length > 0) ||
+      details?.features?.partnerSponsors ||
+      event?.category === "BUSINESS_TECH"
+    );
+    if (hasSponsors) {
+      list.push({
+        id: "sponsors",
+        label: "Partners & Sponsors",
+        icon: Award,
+        component: <SponsorsFeature event={event} details={details} />,
       });
     }
 
@@ -213,7 +212,7 @@ export function EventFeatureTabs({ event, details }) {
       });
     }
 
-    // 12. Community Donations
+    // 12. Community Support & Donations
     const hasDonations = Boolean(
       details?.features?.donationBasedTickets ||
       details?.donationTiers?.length > 0
@@ -224,27 +223,6 @@ export function EventFeatureTabs({ event, details }) {
         label: "Community Support",
         icon: Heart,
         component: <DonationFeature event={event} details={details} />,
-      });
-    }
-
-    // 13. Things to Know
-    const hasRules = Boolean(
-      event?.ageRestriction !== undefined ||
-      details?.thingsToKnow?.length > 0 ||
-      details?.policies?.length > 0
-    );
-    if (hasRules) {
-      let label = "Things to Know";
-      if (category === "HEALTH_WELLNESS") label = "What to Bring";
-      else if (category === "FOOD_DRINK") label = "Dining Policies";
-      else if (category === "EXHIBITIONS") label = "Gallery Guidelines";
-      else if (category === "SPORTS") label = "Gates & Seating";
-
-      list.push({
-        id: "rules",
-        label,
-        icon: Info,
-        component: <ThingsToKnowFeature event={event} details={details} />,
       });
     }
 
@@ -339,54 +317,57 @@ export function EventFeatureTabs({ event, details }) {
           )}
 
           {/* Inner Horizontal Track */}
-          <div
-            ref={scrollContainerRef}
-            onScroll={updateScrollState}
-            className="flex items-center overflow-x-auto scroll-smooth scrollbar-none no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-full py-0 px-1 sm:px-1.5"
-          >
-            {availableTabs.map((tab, idx) => {
-              const Icon = tab.icon;
-              const isActive = currentTab?.id === tab.id;
-              const nextIsActive = availableTabs[idx + 1]?.id === currentTab?.id;
-              const showDivider = idx < availableTabs.length - 1 && !isActive && !nextIsActive;
+          <LayoutGroup id="event-feature-tabs-pill">
+            <div
+              ref={scrollContainerRef}
+              onScroll={updateScrollState}
+              className="flex items-center overflow-x-auto scroll-smooth scrollbar-none no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-full py-0 px-1 sm:px-1.5"
+            >
+              {availableTabs.map((tab, idx) => {
+                const Icon = tab.icon;
+                const isActive = currentTab?.id === tab.id;
+                const nextIsActive = availableTabs[idx + 1]?.id === currentTab?.id;
+                const showDivider = idx < availableTabs.length - 1 && !isActive && !nextIsActive;
 
-              return (
-                <div key={tab.id} className="relative flex items-center flex-shrink-0">
-                  <button
-                    type="button"
-                    onClick={(e) => handleTabSelect(tab.id, e.currentTarget)}
-                    className={`group relative flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors duration-200 cursor-pointer select-none active:scale-97 ${
-                      isActive ? "text-white font-bold z-10" : "text-[#23232C] hover:text-black"
-                    }`}
-                  >
-                    {/* Classic Liquid Pink Active Pill matching reference image */}
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeFeaturePill"
-                        className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FF2B60] via-[#FF4877] to-[#FF5E85] shadow-[0_4px_14px_rgba(255,46,99,0.32),inset_0_1.5px_2px_rgba(255,255,255,0.6),inset_0_-1px_1.5px_rgba(0,0,0,0.12)] overflow-hidden"
-                        transition={{ type: "spring", stiffness: 420, damping: 32 }}
-                      >
-                        {/* Upper Curvature Glass Sheen Overlay */}
-                        <div className="absolute inset-x-2 top-0.5 h-[48%] rounded-t-full bg-gradient-to-b from-white/45 via-white/10 to-transparent pointer-events-none" />
-                      </motion.div>
-                    )}
-
-                    <Icon
-                      className={`w-4 h-4 relative z-10 transition-transform duration-200 group-hover:scale-105 ${
-                        isActive ? "text-white" : "text-[#23232C] group-hover:text-black"
+                return (
+                  <div key={tab.id} className="relative flex items-center flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={(e) => handleTabSelect(tab.id, e.currentTarget)}
+                      className={`group relative flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors duration-200 cursor-pointer select-none active:scale-97 ${
+                        isActive ? "text-white font-bold z-10" : "text-[#23232C] hover:text-black"
                       }`}
-                    />
-                    <span className="relative z-10">{tab.label}</span>
-                  </button>
+                    >
+                      {/* Classic Liquid Pink Active Pill matching reference image - only animates when activeTab changes */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeFeaturePill"
+                          layoutDependency={activeTab}
+                          className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FF2B60] via-[#FF4877] to-[#FF5E85] shadow-[0_4px_14px_rgba(255,46,99,0.32),inset_0_1.5px_2px_rgba(255,255,255,0.6),inset_0_-1px_1.5px_rgba(0,0,0,0.12)] overflow-hidden"
+                          transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                        >
+                          {/* Upper Curvature Glass Sheen Overlay */}
+                          <div className="absolute inset-x-2 top-0.5 h-[48%] rounded-t-full bg-gradient-to-b from-white/45 via-white/10 to-transparent pointer-events-none" />
+                        </motion.div>
+                      )}
 
-                  {/* Clean Hairline Divider matching reference image */}
-                  {showDivider && (
-                    <div className="h-4 w-[1px] bg-black/10 mx-1 flex-shrink-0" />
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                      <Icon
+                        className={`w-4 h-4 relative z-10 transition-transform duration-200 group-hover:scale-105 ${
+                          isActive ? "text-white" : "text-[#23232C] group-hover:text-black"
+                        }`}
+                      />
+                      <span className="relative z-10">{tab.label}</span>
+                    </button>
+
+                    {/* Clean Hairline Divider matching reference image */}
+                    {showDivider && (
+                      <div className="h-4 w-[1px] bg-black/10 mx-1 flex-shrink-0" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </LayoutGroup>
 
           {/* Apple Right Chevron Button - Transparent Backside, hidden for last 2 tabs and <=3 tabs */}
           {showRightArrow && (
