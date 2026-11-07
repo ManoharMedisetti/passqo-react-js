@@ -459,26 +459,35 @@ function EventDetailPageInner() {
   const [addressCopied, setAddressCopied] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
+  const [activeMobileHeroIndex, setActiveMobileHeroIndex] = useState(0);
   const [isHeroScrolled, setIsHeroScrolled] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsHeroScrolled(window.scrollY >= 120);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  /* ── GALLERY & LIGHTBOX CONTROLS (UNCONDITIONAL TOP-LEVEL HOOKS) ── */
+  const activeThumbnailRef = useRef(null);
+  const galleryLengthRef = useRef(1);
+
+  const galleryTouchStartX = useRef(null);
+  const galleryTouchStartY = useRef(null);
+  const galleryTouchEndX = useRef(null);
+  const galleryTouchEndY = useRef(null);
+  const isGalleryDragging = useRef(false);
+
+  const heroTouchStartX = useRef(null);
+  const heroTouchStartY = useRef(null);
+  const heroTouchEndX = useRef(null);
+  const heroTouchEndY = useRef(null);
+  const isHeroDragging = useRef(false);
 
   useEffect(() => {
     if (!isGalleryOpen) return;
     const onKey = (e) => {
+      const len = galleryLengthRef.current || 1;
       if (e.key === "Escape") setIsGalleryOpen(false);
       if (e.key === "ArrowLeft") {
-        setActiveGalleryIndex((prev) => Math.max(0, prev - 1));
+        setActiveGalleryIndex((prev) => (prev > 0 ? prev - 1 : len - 1));
       }
       if (e.key === "ArrowRight") {
-        setActiveGalleryIndex((prev) => prev + 1);
+        setActiveGalleryIndex((prev) => (prev + 1) % len);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -489,6 +498,108 @@ function EventDetailPageInner() {
       document.body.style.overflow = prevOverflow;
     };
   }, [isGalleryOpen]);
+
+  useEffect(() => {
+    if (isGalleryOpen && activeThumbnailRef.current) {
+      activeThumbnailRef.current.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [activeGalleryIndex, isGalleryOpen]);
+
+  useEffect(() => {
+    if (!isGalleryOpen) {
+      setActiveMobileHeroIndex(activeGalleryIndex);
+    }
+  }, [isGalleryOpen, activeGalleryIndex]);
+
+  const onGalleryTouchStart = (e) => {
+    galleryTouchStartX.current = e.touches ? e.touches[0].clientX : e.clientX;
+    galleryTouchStartY.current = e.touches ? e.touches[0].clientY : e.clientY;
+    galleryTouchEndX.current = galleryTouchStartX.current;
+    galleryTouchEndY.current = galleryTouchStartY.current;
+    isGalleryDragging.current = true;
+  };
+
+  const onGalleryTouchMove = (e) => {
+    if (!isGalleryDragging.current || galleryTouchStartX.current === null) return;
+    galleryTouchEndX.current = e.touches ? e.touches[0].clientX : e.clientX;
+    galleryTouchEndY.current = e.touches ? e.touches[0].clientY : e.clientY;
+  };
+
+  const onGalleryTouchEnd = () => {
+    if (!isGalleryDragging.current || galleryTouchStartX.current === null || galleryTouchEndX.current === null) {
+      isGalleryDragging.current = false;
+      return;
+    }
+    const diffX = galleryTouchStartX.current - galleryTouchEndX.current;
+    const diffY = (galleryTouchStartY.current ?? 0) - (galleryTouchEndY.current ?? 0);
+    const minSwipeDistance = 35;
+    const len = galleryLengthRef.current || 1;
+
+    if (Math.abs(diffX) > minSwipeDistance && Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
+        // Swipe Right to Left -> Next Photo
+        setActiveGalleryIndex((prev) => (prev + 1) % len);
+      } else {
+        // Swipe Left to Right -> Previous Photo
+        setActiveGalleryIndex((prev) => (prev > 0 ? prev - 1 : len - 1));
+      }
+    }
+    galleryTouchStartX.current = null;
+    galleryTouchStartY.current = null;
+    galleryTouchEndX.current = null;
+    galleryTouchEndY.current = null;
+    isGalleryDragging.current = false;
+  };
+
+  const onHeroTouchStart = (e) => {
+    heroTouchStartX.current = e.touches ? e.touches[0].clientX : e.clientX;
+    heroTouchStartY.current = e.touches ? e.touches[0].clientY : e.clientY;
+    heroTouchEndX.current = heroTouchStartX.current;
+    heroTouchEndY.current = heroTouchStartY.current;
+    isHeroDragging.current = true;
+  };
+
+  const onHeroTouchMove = (e) => {
+    if (!isHeroDragging.current || heroTouchStartX.current === null) return;
+    heroTouchEndX.current = e.touches ? e.touches[0].clientX : e.clientX;
+    heroTouchEndY.current = e.touches ? e.touches[0].clientY : e.clientY;
+  };
+
+  const onHeroTouchEnd = () => {
+    if (!isHeroDragging.current || heroTouchStartX.current === null || heroTouchEndX.current === null) {
+      isHeroDragging.current = false;
+      return;
+    }
+    const diffX = heroTouchStartX.current - heroTouchEndX.current;
+    const diffY = (heroTouchStartY.current ?? 0) - (heroTouchEndY.current ?? 0);
+    const minSwipeDistance = 35;
+    const len = galleryLengthRef.current || 1;
+
+    if (Math.abs(diffX) > minSwipeDistance && Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
+        // Swipe Right to Left -> Next
+        setActiveMobileHeroIndex((prev) => (prev + 1) % len);
+      } else {
+        // Swipe Left to Right -> Prev
+        setActiveMobileHeroIndex((prev) => (prev > 0 ? prev - 1 : len - 1));
+      }
+    }
+    heroTouchStartX.current = null;
+    heroTouchStartY.current = null;
+    heroTouchEndX.current = null;
+    heroTouchEndY.current = null;
+    isHeroDragging.current = false;
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsHeroScrolled(window.scrollY >= 120);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
 
   useEffect(() => {
     if (!activeModal) return;
@@ -820,6 +931,10 @@ function EventDetailPageInner() {
     });
     return list;
   })();
+
+  if (galleryImages?.length) {
+    galleryLengthRef.current = galleryImages.length;
+  }
   const calendarUrl = (() => {
     const fmt = (d) => d.toISOString().replace(/[-:]|\.\d{3}/g, "");
     const end = endDateObj ?? new Date(date.getTime() + 3 * 3600_000);
@@ -1059,26 +1174,29 @@ function EventDetailPageInner() {
 
         {/* ── HERO ARTWORK SECTION: MAIN BANNER + MEDIA BESIDE ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-4 items-stretch">
-          {/* Main Artwork Banner: Clean natural scroll on mobile/tablet */}
-          <div className="lg:col-span-8 relative min-h-[340px] h-[380px] sm:h-[440px] md:h-[480px] lg:h-[400px] xl:h-[430px] rounded-t-none rounded-b-3xl sm:rounded-b-[32px] lg:rounded-3xl overflow-hidden bg-[#121218] shadow-sm group">
+          {/* Main Artwork Banner: Clean natural scroll on mobile/tablet with touch swipe */}
+          <div
+            onTouchStart={onHeroTouchStart}
+            onTouchMove={onHeroTouchMove}
+            onTouchEnd={onHeroTouchEnd}
+            className="lg:col-span-8 relative min-h-[340px] h-[380px] sm:h-[440px] md:h-[480px] lg:h-[400px] xl:h-[430px] rounded-t-none rounded-b-3xl sm:rounded-b-[32px] lg:rounded-3xl overflow-hidden bg-[#121218] shadow-sm group touch-pan-y"
+          >
             {/* Ambient Blurred Background Glow */}
-            {event.image ? (
-              <img
-                src={event.image}
-                alt=""
-                aria-hidden="true"
-                className="absolute inset-0 w-full h-full object-cover filter blur-2xl opacity-40 scale-125 select-none pointer-events-none"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-900/40 via-purple-900/30 to-black/60 filter blur-xl opacity-50" />
-            )}
+            <img
+              src={galleryImages[activeMobileHeroIndex] || event.image || "/images/figma-sample/goa/goa-hero.png"}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover filter blur-2xl opacity-40 scale-125 select-none pointer-events-none transition-all duration-300"
+            />
             <div className="absolute inset-0 bg-black/25 pointer-events-none" />
 
             {/* Centered Crisp Event Poster Artwork */}
             <img
-              src={event.image || "/images/figma-sample/goa/goa-hero.png"}
+              key={activeMobileHeroIndex}
+              src={galleryImages[activeMobileHeroIndex] || event.image || "/images/figma-sample/goa/goa-hero.png"}
               alt={event.name}
-              className="relative w-full h-full object-cover mx-auto"
+              className="relative w-full h-full object-cover mx-auto select-none pointer-events-none animate-in fade-in duration-200"
+              draggable={false}
             />
 
             {/* ── DESKTOP TOP RIGHT PILLS (>= lg only) ── */}
@@ -1172,18 +1290,41 @@ function EventDetailPageInner() {
                   )}
                 </div>
 
-                {/* Mobile View Gallery Pill */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveGalleryIndex(0);
-                    setIsGalleryOpen(true);
-                  }}
-                  className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/25 text-white text-xs font-semibold py-1 px-3 rounded-full flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95 transition-all"
-                >
-                  <span>Gallery ({galleryImages.length})</span>
-                  <span className="text-[11px]">↗</span>
-                </button>
+                {/* Mobile View Gallery Pill & Dots Indicator */}
+                <div className="flex items-center gap-2">
+                  {galleryImages.length > 1 && (
+                    <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/15">
+                      {galleryImages.slice(0, 5).map((_, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMobileHeroIndex(idx);
+                          }}
+                          className={`h-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+                            idx === (activeMobileHeroIndex % Math.min(5, galleryImages.length))
+                              ? "w-3.5 bg-[#FF4E7A]"
+                              : "w-1.5 bg-white/45 hover:bg-white/70"
+                          }`}
+                          aria-label={`Go to slide ${idx + 1}`}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveGalleryIndex(activeMobileHeroIndex);
+                      setIsGalleryOpen(true);
+                    }}
+                    className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/25 text-white text-xs font-semibold py-1 px-3 rounded-full flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95 transition-all"
+                  >
+                    <span>Gallery ({activeMobileHeroIndex + 1}/{galleryImages.length})</span>
+                    <span className="text-[11px]">↗</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -2016,14 +2157,23 @@ function EventDetailPageInner() {
             </button>
           </div>
 
-          {/* Main Stage: Center Image + Chevrons */}
-          <div className="relative flex-1 flex items-center justify-center my-3 max-w-6xl w-full mx-auto overflow-hidden">
+          {/* Main Stage: Center Image + Chevrons with Touch & Drag Swipe */}
+          <div
+            onTouchStart={onGalleryTouchStart}
+            onTouchMove={onGalleryTouchMove}
+            onTouchEnd={onGalleryTouchEnd}
+            onMouseDown={onGalleryTouchStart}
+            onMouseMove={onGalleryTouchMove}
+            onMouseUp={onGalleryTouchEnd}
+            className="relative flex-1 flex items-center justify-center my-3 max-w-6xl w-full mx-auto overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing select-none"
+          >
             {/* Previous Chevron Button */}
             <button
               type="button"
-              onClick={() =>
-                setActiveGalleryIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1))
-              }
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveGalleryIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
+              }}
               className="absolute left-2 sm:left-4 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-90"
               aria-label="Previous photo"
             >
@@ -2031,21 +2181,23 @@ function EventDetailPageInner() {
             </button>
 
             {/* Main Stage Image */}
-            <div className="relative max-h-[62vh] sm:max-h-[68vh] max-w-full flex items-center justify-center">
+            <div className="relative max-h-[62vh] sm:max-h-[68vh] max-w-full flex items-center justify-center pointer-events-none">
               <img
                 key={activeGalleryIndex}
                 src={galleryImages[activeGalleryIndex % (galleryImages.length || 1)] || galleryImages[0]}
                 alt={`Gallery photo ${(activeGalleryIndex % (galleryImages.length || 1)) + 1}`}
-                className="max-h-[62vh] sm:max-h-[68vh] w-auto max-w-full object-contain rounded-2xl sm:rounded-3xl shadow-2xl animate-in zoom-in-95 duration-150"
+                className="max-h-[62vh] sm:max-h-[68vh] w-auto max-w-full object-contain rounded-2xl sm:rounded-3xl shadow-2xl animate-in zoom-in-95 duration-150 select-none pointer-events-none"
+                draggable={false}
               />
             </div>
 
             {/* Next Chevron Button */}
             <button
               type="button"
-              onClick={() =>
-                setActiveGalleryIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0))
-              }
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveGalleryIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
+              }}
               className="absolute right-2 sm:right-4 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-90"
               aria-label="Next photo"
             >
@@ -2061,6 +2213,7 @@ function EventDetailPageInner() {
                 return (
                   <button
                     key={idx}
+                    ref={isActive ? activeThumbnailRef : null}
                     type="button"
                     onClick={() => setActiveGalleryIndex(idx)}
                     className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer transition-all duration-200 ${
@@ -2072,7 +2225,8 @@ function EventDetailPageInner() {
                     <img
                       src={img}
                       alt={`Thumbnail ${idx + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover select-none pointer-events-none"
+                      draggable={false}
                     />
                   </button>
                 );

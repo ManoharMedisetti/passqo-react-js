@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { SubPageHeader } from "@/components/ui/SubPageHeader";
+import { TicketModal } from "@/components/tickets/TicketModal";
 import {
   Radio,
   CheckCircle2,
@@ -9,10 +10,11 @@ import {
   ChevronRight,
   ArrowLeft,
   Ticket as TicketIcon,
+  QrCode,
   MoreVertical,
 } from "lucide-react";
 
-// Real mock data from PassQO codebase (No placeholder references)
+// Real mock data from PassQO codebase with rich ticket details
 const TICKETS_DATA = [
   {
     id: "evt-tech-summit",
@@ -24,6 +26,10 @@ const TICKETS_DATA = [
     meta: "1 ticket • Streaming right now",
     title: "Universal Tech & AI Developer Summit 2026",
     venue: "Convention Centre Dublin (CCD) • Online Interactive Stream",
+    date: "Fri, 13 Nov 2026 • 10:00 AM",
+    tier: "Full Access Pass • VIP",
+    gate: "Main Entrance CCD",
+    holder: "John Doe",
     image: "/images/figma-sample/goa/performance.png",
     fallbackImage: "/virtual.webp",
     bottomLeft: {
@@ -32,9 +38,8 @@ const TICKETS_DATA = [
       color: "text-[#00A86B]",
     },
     bottomRight: {
-      type: "action",
-      text: "Join Event",
-      route: "/events/evt-tech-summit",
+      type: "view",
+      text: "Show ticket",
       color: "text-[#FF4E7A]",
     },
   },
@@ -48,6 +53,10 @@ const TICKETS_DATA = [
     meta: "2 tickets • Fri, 20 Nov, 6:00 PM",
     title: "Dublin Bay Electronic Music Festival",
     venue: "3Arena & Docklands, Dublin",
+    date: "Fri, 20 Nov 2026 • 6:00 PM",
+    tier: "General Admission • Tier 1",
+    gate: "Gate 3 • Docklands",
+    holder: "John Doe",
     image: "/images/figma-sample/goa/goa-hero.png",
     fallbackImage: "/music-entertainment.webp",
     bottomLeft: {
@@ -56,9 +65,8 @@ const TICKETS_DATA = [
       color: "text-neutral-600",
     },
     bottomRight: {
-      type: "action",
-      text: "View Ticket",
-      route: "/events/evt-dublin-bay-electronic",
+      type: "view",
+      text: "Show ticket",
       color: "text-[#FF4E7A]",
     },
   },
@@ -72,6 +80,10 @@ const TICKETS_DATA = [
     meta: "2 tickets • Sun, 29 Nov, 6:30 PM",
     title: "Acoustic Sunset & Indie Melodies Showcase",
     venue: "The Grand Social, Dublin",
+    date: "Sun, 29 Nov 2026 • 6:30 PM",
+    tier: "Stalls General Seating",
+    gate: "East Gate",
+    holder: "John Doe",
     image: "/images/figma-sample/goa/artist-poster.png",
     fallbackImage: "/community.webp",
     bottomLeft: {
@@ -96,6 +108,10 @@ const TICKETS_DATA = [
     meta: "2 tickets • Sat, 05 Dec, 3:00 PM",
     title: "Clay & Cocktails: Ceramic Studio Workshop",
     venue: "Kilkenny Design & Ceramic Studio, Kilkenny",
+    date: "Sat, 05 Dec 2026 • 3:00 PM",
+    tier: "Workshop & Cocktail Pass",
+    gate: "Studio 4",
+    holder: "John Doe",
     image: "/images/figma-sample/goa/headliner.png",
     fallbackImage: "/food-drink.webp",
     bottomLeft: {
@@ -120,6 +136,10 @@ const TICKETS_DATA = [
     meta: "1 ticket • Sun, 22 Nov, 6:30 AM",
     title: "Galway Bay Sunrise Yoga & Sound Bath Retreat",
     venue: "Salthill Promenade Shala, Galway",
+    date: "Sun, 22 Nov 2026 • 6:30 AM",
+    tier: "Sunrise Shala Access",
+    gate: "Salthill Promenade",
+    holder: "John Doe",
     image: "/images/figma-sample/goa/gallery-3.png",
     fallbackImage: "/health-wellness.webp",
     bottomLeft: {
@@ -157,6 +177,7 @@ export function MyTicketsPage() {
 
   const [activeTab, setActiveTab] = useState("all"); // "all" | "upcoming" | "live" | "past" | "waitlist" | "resale"
   const [tickets, setTickets] = useState(TICKETS_DATA);
+  const [selectedTicket, setSelectedTicket] = useState(null);
 
   const counts = {
     upcoming: 3,
@@ -170,7 +191,7 @@ export function MyTicketsPage() {
     activeTab === "all"
       ? tickets
       : activeTab === "upcoming"
-      ? tickets.filter((t) => t.tab === "upcoming" || t.status === "upcoming")
+      ? tickets.filter((t) => t.tab === "upcoming")
       : activeTab === "live"
       ? tickets.filter((t) => t.isLive)
       : activeTab === "past"
@@ -202,17 +223,30 @@ export function MyTicketsPage() {
           </p>
         </div>
 
-        {/* Selection Radio / Filter Pills (Matching I.html) */}
+        {/* Tab Filters (Frame 96 Pill Layout) */}
         <nav
-          className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-2 scrollbar-hide mb-6 select-none"
-          aria-label="Ticket category filter pills"
+          className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none"
+          aria-label="Ticket filters"
         >
+          {/* All */}
+          <button
+            type="button"
+            onClick={() => setActiveTab("all")}
+            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+              activeTab === "all"
+                ? "bg-[#FF4E7A] text-white shadow-xs"
+                : "bg-white text-neutral-700 hover:bg-neutral-100 border border-black/5"
+            }`}
+          >
+            All
+          </button>
+
           {/* Upcoming */}
           <button
             type="button"
-            onClick={() => setActiveTab(activeTab === "upcoming" ? "all" : "upcoming")}
+            onClick={() => setActiveTab("upcoming")}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-              activeTab === "upcoming" || activeTab === "all"
+              activeTab === "upcoming"
                 ? "bg-[#FF4E7A] text-white shadow-xs"
                 : "bg-white text-neutral-700 hover:bg-neutral-100 border border-black/5"
             }`}
@@ -220,7 +254,7 @@ export function MyTicketsPage() {
             <span>Upcoming</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[11px] font-semibold ${
-                activeTab === "upcoming" || activeTab === "all"
+                activeTab === "upcoming"
                   ? "bg-white/25 text-white"
                   : "bg-neutral-100 text-neutral-600"
               }`}
@@ -239,6 +273,7 @@ export function MyTicketsPage() {
                 : "bg-white text-neutral-700 hover:bg-neutral-100 border border-black/5"
             }`}
           >
+            <span className="w-2 h-2 rounded-full bg-[#E53E3E] animate-pulse" />
             <span>Live</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[11px] font-semibold ${
@@ -325,8 +360,12 @@ export function MyTicketsPage() {
               key={ticket.id}
               className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs overflow-hidden transition-all hover:shadow-md group"
             >
-              {/* Main Card Surface */}
-              <div className="p-4 sm:p-5 flex items-start justify-between gap-4">
+              {/* Main Card Surface - Click to show ticket */}
+              <div
+                onClick={() => setSelectedTicket(ticket)}
+                className="p-4 sm:p-5 flex items-start justify-between gap-4 cursor-pointer"
+                title="Click to view ticket and QR code"
+              >
                 <div className="flex items-start gap-4 min-w-0 flex-1">
                   {/* Poster Thumbnail */}
                   <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl sm:rounded-2xl overflow-hidden bg-neutral-100 flex-shrink-0">
@@ -362,17 +401,22 @@ export function MyTicketsPage() {
                   </div>
                 </div>
 
-                {/* More / Overflow Menu Button */}
+                {/* Show QR / View Ticket Action Button */}
                 <button
                   type="button"
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer flex-shrink-0"
-                  aria-label="More options"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedTicket(ticket);
+                  }}
+                  className="w-9 h-9 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-[#FF4E7A]/10 hover:border-[#FF4E7A]/30 hover:text-[#FF4E7A] text-neutral-600 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                  aria-label="Show ticket QR code"
+                  title="Show ticket QR code"
                 >
-                  <MoreVertical className="w-4 h-4" />
+                  <QrCode className="w-4.5 h-4.5 stroke-[1.8]" />
                 </button>
               </div>
 
-              {/* Card Bottom Bar (Status on Left, Action on Right) */}
+              {/* Card Bottom Bar (Status on Left, Actions on Right) */}
               <div className="bg-[#FAF7F4] border-t border-black/5 px-4 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between text-xs sm:text-sm">
                 {/* Left Status */}
                 <div className="flex items-center gap-1.5 min-w-0">
@@ -389,9 +433,20 @@ export function MyTicketsPage() {
                   </span>
                 </div>
 
-                {/* Right Feedback / Action */}
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  {ticket.bottomRight.type === "rate" ? (
+                {/* Right Action Buttons */}
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  {/* Always provide Show ticket action */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTicket(ticket)}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-neutral-700 hover:text-[#FF4E7A] transition-colors cursor-pointer"
+                  >
+                    <QrCode className="w-3.5 h-3.5 text-[#FF4E7A]" />
+                    <span>Show ticket</span>
+                  </button>
+
+                  {/* Secondary Rating / Feedback Action if past */}
+                  {ticket.bottomRight.type === "rate" && (
                     <button
                       type="button"
                       onClick={() => navigate(ticket.bottomRight.route)}
@@ -400,7 +455,8 @@ export function MyTicketsPage() {
                       <span>{ticket.bottomRight.text}</span>
                       <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
                     </button>
-                  ) : ticket.bottomRight.type === "liked" ? (
+                  )}
+                  {ticket.bottomRight.type === "liked" && (
                     <button
                       type="button"
                       onClick={() => navigate(ticket.bottomRight.route)}
@@ -409,7 +465,8 @@ export function MyTicketsPage() {
                       <ThumbsUp className="w-3.5 h-3.5 fill-[#20A05A]" />
                       <span>Liked it!</span>
                     </button>
-                  ) : ticket.bottomRight.type === "disliked" ? (
+                  )}
+                  {ticket.bottomRight.type === "disliked" && (
                     <button
                       type="button"
                       onClick={() => navigate(ticket.bottomRight.route)}
@@ -417,15 +474,6 @@ export function MyTicketsPage() {
                     >
                       <ThumbsDown className="w-3.5 h-3.5 fill-[#C8552D]" />
                       <span>Disliked it!</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => navigate(ticket.bottomRight.route)}
-                      className="inline-flex items-center gap-1 font-bold text-xs sm:text-sm text-[#FF4E7A] hover:text-[#E03A64] hover:underline cursor-pointer"
-                    >
-                      <span>{ticket.bottomRight.text}</span>
-                      <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
                     </button>
                   )}
                 </div>
@@ -452,15 +500,21 @@ export function MyTicketsPage() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => navigate("/events")}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#FF4E7A] hover:bg-[#E03A64] text-white font-bold text-xs sm:text-sm shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0"
+          <Link
+            to="/events"
+            className="px-5 py-2.5 rounded-full bg-[#1B1B23] hover:bg-black text-white text-xs sm:text-sm font-bold shadow-xs transition-all active:scale-95 cursor-pointer whitespace-nowrap self-stretch sm:self-auto text-center"
           >
-            <span>Explore Events →</span>
-          </button>
+            Explore Events
+          </Link>
         </aside>
       </main>
+
+      {/* Ticket Details & QR Code Modal */}
+      <TicketModal
+        isOpen={!!selectedTicket}
+        onClose={() => setSelectedTicket(null)}
+        ticket={selectedTicket}
+      />
     </div>
   );
 }

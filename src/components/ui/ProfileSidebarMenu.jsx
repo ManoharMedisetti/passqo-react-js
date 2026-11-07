@@ -307,7 +307,7 @@ export function ProfileSidebarMenu({ isOpen, onClose, user }) {
         <>
           {isOpen && (
             <div className="fixed inset-0 z-[99999] pointer-events-auto flex justify-end">
-              {/* Backdrop Overlay (Active across all screens, dims background on the left) */}
+              {/* Backdrop Overlay (Desktop/Tablet only: dims the background on the left) */}
               <div
                 onClick={onClose}
                 onWheel={(e) => {
@@ -316,15 +316,14 @@ export function ProfileSidebarMenu({ isOpen, onClose, user }) {
                   }
                 }}
                 onTouchMove={(e) => e.preventDefault()}
-                className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[99998]"
+                className="hidden sm:block fixed inset-0 bg-black/50 backdrop-blur-xs z-[99998]"
                 aria-hidden="true"
               />
 
-              {/* Right Sidebar Drawer: Strictly docked to the right edge with instant display */}
-              {/* Uses the native main browser/PC scrollbar directly at the right screen edge */}
+              {/* Sidebar: 100% FULLSCREEN on mobile (no black gap/strip on the side), right-docked drawer on sm and up */}
               <aside
                 ref={scrollContainerRef}
-                className="fixed top-0 right-0 bottom-0 left-auto ml-auto w-full max-w-[380px] sm:max-w-[420px] h-full min-h-screen z-[99999] bg-[#F5F0EB] shadow-[-8px_0_40px_rgba(0,0,0,0.25)] flex flex-col justify-start overflow-y-auto p-4 sm:p-5 space-y-4"
+                className="fixed inset-0 sm:left-auto sm:right-0 sm:top-0 sm:bottom-0 w-full sm:w-auto sm:max-w-[420px] h-full min-h-screen z-[99999] bg-[#F5F0EB] shadow-none sm:shadow-[-8px_0_40px_rgba(0,0,0,0.25)] flex flex-col justify-start overflow-y-auto p-4 sm:p-5 space-y-4"
                 aria-label="User Account Sidebar"
               >
                 {/* Top Bar: Left Back Button and Right Close Button */}

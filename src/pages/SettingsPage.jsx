@@ -66,6 +66,7 @@ export function SettingsPage() {
   const [activeSection, setActiveSection] = useState("profile");
   const [isCustomEditOpen, setIsCustomEditOpen] = useState(false);
   const isClickingRef = useRef(false);
+  const initialDesktopScrollDone = useRef(false);
 
   // Active section from URL path: /settings/:section
   const validMobileSections = [
@@ -89,9 +90,11 @@ export function SettingsPage() {
     }
   }, []);
 
-  // Sync desktop section and scroll smoothly when URL param changes
+  // Sync desktop section and scroll smoothly ONLY on initial mount if a section was requested in URL
   useEffect(() => {
+    if (initialDesktopScrollDone.current) return;
     if (section && [...validMobileSections, "profile"].includes(section)) {
+      initialDesktopScrollDone.current = true;
       setActiveSection(section);
       if (typeof window !== "undefined" && window.innerWidth >= 768) {
         if (section === "profile") {
@@ -101,7 +104,7 @@ export function SettingsPage() {
           if (el) {
             setTimeout(() => {
               el.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 60);
+            }, 100);
           }
         }
       }
@@ -258,10 +261,6 @@ export function SettingsPage() {
   const scrollToDesktopSection = (sectionId) => {
     setActiveSection(sectionId);
     isClickingRef.current = true;
-    navigate(sectionId === "profile" ? "/settings" : `/settings/${sectionId}`, {
-      replace: true,
-      state: location.state,
-    });
 
     if (sectionId === "profile") {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -273,7 +272,7 @@ export function SettingsPage() {
     }
     setTimeout(() => {
       isClickingRef.current = false;
-    }, 700);
+    }, 800);
   };
 
   // Mobile URL-based navigation pushes to history so swipe back works natively
@@ -312,7 +311,7 @@ export function SettingsPage() {
   const renderProfileCard = () => (
     <section
       id="profile"
-      className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-black/6 shadow-2xs flex items-center justify-between gap-3 scroll-mt-28"
+      className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-black/6 shadow-2xs flex items-center justify-between gap-3 scroll-mt-36 md:scroll-mt-40"
     >
       <div className="flex items-center gap-3.5 min-w-0">
         <div className="w-12 h-12 rounded-full border border-neutral-300 bg-neutral-50 flex items-center justify-center flex-shrink-0 text-neutral-800 shadow-2xs">
@@ -344,7 +343,7 @@ export function SettingsPage() {
   const renderNotificationsCard = () => (
     <section
       id="notifications"
-      className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs p-5 sm:p-6 scroll-mt-28"
+      className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs p-5 sm:p-6 scroll-mt-36 md:scroll-mt-40"
     >
       <div className="flex items-start gap-3 mb-5">
         <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-800 flex-shrink-0">
@@ -434,7 +433,7 @@ export function SettingsPage() {
   const renderSecurityCard = () => (
     <section
       id="security"
-      className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs p-5 sm:p-6 scroll-mt-28"
+      className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs p-5 sm:p-6 scroll-mt-36 md:scroll-mt-40"
     >
       <div className="flex items-start gap-3 mb-5">
         <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-800 flex-shrink-0">
@@ -584,7 +583,7 @@ export function SettingsPage() {
   const renderPrivacyCard = () => (
     <section
       id="privacy"
-      className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs p-5 sm:p-6 scroll-mt-28"
+      className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs p-5 sm:p-6 scroll-mt-36 md:scroll-mt-40"
     >
       <div className="flex items-start gap-3 mb-5">
         <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-800 flex-shrink-0">
@@ -671,7 +670,7 @@ export function SettingsPage() {
   const renderAccessibilityCard = () => (
     <section
       id="accessibility"
-      className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs p-5 sm:p-6 scroll-mt-28"
+      className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs p-5 sm:p-6 scroll-mt-36 md:scroll-mt-40"
     >
       <div className="flex items-start gap-3 mb-5">
         <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-800 flex-shrink-0">
@@ -796,7 +795,7 @@ export function SettingsPage() {
   const renderAccountCard = () => (
     <section
       id="account"
-      className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs divide-y divide-black/5 overflow-hidden scroll-mt-28"
+      className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs divide-y divide-black/5 overflow-hidden scroll-mt-36 md:scroll-mt-40"
     >
       <div className="p-4 sm:p-5 flex items-center justify-between text-xs sm:text-sm">
         <span className="text-neutral-500 font-medium">Account created</span>
