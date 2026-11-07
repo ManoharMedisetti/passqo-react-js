@@ -134,8 +134,9 @@ export function EventCard({
           {/* Top Badges */}
           <div className="absolute top-2.5 sm:top-3 left-2.5 sm:left-3 flex flex-wrap gap-1 sm:gap-1.5 z-10 pointer-events-none">
             {isSellingFast && !isSoldOut && (
-              <span className="inline-flex items-center gap-1 bg-[#FF4E7A] text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-0.5 rounded-full shadow-sm backdrop-blur-xs font-label uppercase tracking-wider">
-                <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-white" /> Selling Fast
+              <span className="inline-flex items-center gap-1.5 bg-black/45 backdrop-blur-md border border-white/20 text-white text-[9px] sm:text-[10px] font-medium px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm tracking-wide select-none">
+                <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF4E7A] fill-[#FF4E7A] animate-pulse" />
+                <span>Selling Fast</span>
               </span>
             )}
             {FEATURES.blockchain && isBlockchain && (

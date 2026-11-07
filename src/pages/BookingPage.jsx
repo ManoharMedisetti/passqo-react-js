@@ -1091,8 +1091,8 @@ export function BookingPage() {
         );
       })()}
 
-      {/* ── PASSQO LIQUID GLASS FIXED BOTTOM BAR (Always fixed in the same position on Mobile & Tablets < lg across all 3 steps!) ── */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-2xl backdrop-saturate-180 border-t border-white/90 shadow-[0_-8px_32px_rgba(0,0,0,0.1),inset_0_1.5px_2px_rgba(255,255,255,0.9)] px-4 sm:px-8 py-3.5 sm:py-4 pb-safe transition-all">
+      {/* ── PASSQO LIQUID GLASS FIXED BOTTOM BAR (Always fixed in the same position on Mobile & Tablets < lg across all 3 steps, and also on PC on Step 1) ── */}
+      <div className={`${step === 1 ? "block" : "lg:hidden"} fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-2xl backdrop-saturate-180 border-t border-white/90 shadow-[0_-8px_32px_rgba(0,0,0,0.1),inset_0_1.5px_2px_rgba(255,255,255,0.9)] px-4 sm:px-8 py-3.5 sm:py-4 pb-safe transition-all`}>
         <div className="max-w-[1060px] mx-auto flex items-center justify-between gap-4">
           {/* Price Summary */}
           <div>

@@ -7,7 +7,7 @@ import { isAuthenticated, getUser } from "@/lib/auth/storage";
 import { useAuthModal } from "@/context/AuthContext";
 import { RichTextDisplay } from "@/components/ui/RichTextDisplay";
 import { FEATURES } from "@/lib/features";
-import { CalendarPlus, Heart, Share2, UserPlus, MapPin, Calendar, Clock, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Check, Sparkles, ShieldCheck, X, HelpCircle, FileText, ExternalLink, Navigation, Copy, Car, Mail } from "lucide-react";
+import { CalendarPlus, Heart, Share2, UserPlus, MapPin, Calendar, Clock, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Check, Sparkles, ShieldCheck, X, HelpCircle, FileText, ExternalLink, Navigation, Copy, Car, Mail, Flame } from "lucide-react";
 import { getWishlist, toggleWishlist } from "@/components/events/EventCard";
 import { eventDetailsOf } from "@/lib/eventDetails";
 import {
@@ -1160,8 +1160,9 @@ function EventDetailPageInner() {
                     </span>
                   )}
                   {event.isSellingFast && !event.isSoldOut && (
-                    <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-[#FF4E7A] px-2.5 py-0.5 rounded-full shadow-2xs">
-                      SELLING FAST
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-medium tracking-wide shadow-sm select-none">
+                      <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF4E7A] fill-[#FF4E7A] animate-pulse" />
+                      <span>Selling Fast</span>
                     </span>
                   )}
                   {event.isSoldOut && (
@@ -1197,8 +1198,9 @@ function EventDetailPageInner() {
                   </span>
                 )}
                 {event.isSellingFast && !event.isSoldOut && (
-                  <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-[#FF4E7A] px-2.5 py-0.5 rounded-full shadow-2xs">
-                    SELLING FAST
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-medium tracking-wide shadow-sm select-none">
+                    <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF4E7A] fill-[#FF4E7A] animate-pulse" />
+                    <span>Selling Fast</span>
                   </span>
                 )}
               </div>
@@ -1382,9 +1384,9 @@ function EventDetailPageInner() {
                     </span>
                   </p>
                   {event.isSellingFast && !event.isSoldOut && (
-                    <span className="text-[11px] font-bold text-[#FF4E7A] flex items-center gap-1 mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#FF4E7A] animate-pulse" />
-                      Selling fast
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-50/80 border border-[#FF4E7A]/20 text-[#FF4E7A] text-[11px] font-semibold mt-1 select-none">
+                      <Flame className="w-3 h-3 fill-[#FF4E7A] text-[#FF4E7A] animate-pulse" />
+                      <span>Selling fast</span>
                     </span>
                   )}
                 </div>
