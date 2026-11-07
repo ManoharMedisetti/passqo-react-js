@@ -20,6 +20,9 @@ import {
   Sparkles,
   AlertCircle,
   Check,
+  Ticket,
+  MapPin,
+  X,
 } from "lucide-react";
 
 export function BookingPage() {
@@ -444,33 +447,6 @@ export function BookingPage() {
               );
             })}
           </div>
-
-          {/* Step 1 Continue / Checkout Action Card directly below ticket tiers */}
-          <div className="bg-white/85 backdrop-blur-2xl backdrop-saturate-180 rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-white/90 shadow-[0_8px_30px_rgba(0,0,0,0.04),inset_0_1.5px_2px_rgba(255,255,255,1),inset_0_-1px_1.5px_rgba(255,255,255,0.4)] flex items-center justify-between gap-4">
-            <div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-xs text-[#8C8C9E] font-semibold">Total:</span>
-                <span className="text-2xl sm:text-3xl font-black text-[#1B1B23]">
-                  {totalPrice === 0 ? "Free" : `€${totalPrice.toFixed(2)}`}
-                </span>
-              </div>
-              <p className="text-xs font-semibold text-[#8C8C9E] mt-0.5">
-                {totalTickets > 0 ? `${totalTickets} Ticket${totalTickets > 1 ? "s" : ""} selected` : "Select tickets to continue"}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (totalTickets > 0) goToStep(2);
-              }}
-              disabled={totalTickets === 0}
-              className="bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm sm:text-base px-8 sm:px-10 py-3.5 sm:py-4 h-12 sm:h-13 min-w-[170px] sm:min-w-[200px] rounded-2xl transition-all shadow-lg shadow-[#FF4E7A]/25 active:scale-95 cursor-pointer flex items-center justify-center gap-2 select-none"
-            >
-              <span>Continue</span>
-              <span>→</span>
-            </button>
-          </div>
         </main>
       )}
 
@@ -557,26 +533,6 @@ export function BookingPage() {
                     <span>International visitor</span>
                   </label>
                 </div>
-              </div>
-
-              {/* Desktop-only Continue CTA directly below form (Mobile & Tablets use bottom fixed bar) */}
-              <div className="hidden lg:block pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!name.trim() || !email.trim()) return;
-                    if (totalPrice === 0) {
-                      handleConfirmBooking();
-                    } else {
-                      goToStep(3);
-                    }
-                  }}
-                  disabled={!name.trim() || !email.trim()}
-                  className="w-full sm:w-auto min-w-[240px] px-8 py-4 h-13 rounded-2xl bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm sm:text-base transition-all shadow-lg shadow-[#FF4E7A]/25 cursor-pointer active:scale-95 flex items-center justify-center gap-2 select-none"
-                >
-                  <span>{totalPrice === 0 ? "Confirm Registration" : "Continue"}</span>
-                  <span>→</span>
-                </button>
               </div>
             </div>
 
@@ -1037,39 +993,6 @@ export function BookingPage() {
           </div>
         );
 
-        {/* Sub-component: Pay Now Button (Pink Stripe-powered CTA) */}
-        const payNowButton = (
-          <button
-            type="button"
-            onClick={handleConfirmBooking}
-            disabled={isProcessingPayment}
-            className="w-full bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-75 disabled:cursor-wait text-white rounded-2xl p-4.5 sm:p-5 min-h-[64px] flex items-center justify-between cursor-pointer transition-all shadow-lg shadow-[#FF4E7A]/25 active:scale-98 select-none"
-          >
-            {isProcessingPayment ? (
-              <div className="w-full flex items-center justify-center gap-2.5 py-1">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span className="font-bold text-sm text-white">Processing with Stripe...</span>
-              </div>
-            ) : (
-              <>
-                <div className="text-left">
-                  <p className="text-lg font-black leading-tight text-white">
-                    €{finalTotal.toFixed(2)}
-                  </p>
-                  <p className="text-[10px] uppercase font-bold text-pink-100 tracking-wider">
-                    Total to pay via Stripe
-                  </p>
-                </div>
-                <div className="flex items-center gap-1.5 font-extrabold text-sm text-white">
-                  <Lock className="w-4 h-4 text-white" />
-                  <span>Pay Now</span>
-                  <span>→</span>
-                </div>
-              </>
-            )}
-          </button>
-        );
-
         return (
           <main className="max-w-[760px] md:max-w-[1100px] w-full mx-auto px-4 sm:px-6 py-6 animate-in fade-in duration-200">
             {/* ── MOBILE VIEW (< md): EVENT SUMMARY ON TOP, THEN COUPONS, THEN BUYER INFO, THEN STRIPE PAYMENT ── */}
@@ -1106,20 +1029,17 @@ export function BookingPage() {
                 {paymentSummaryBox}
               </div>
 
-              {/* Right Column: Sticky Event Summary & Desktop Pay Now Button */}
+              {/* Right Column: Sticky Event Summary */}
               <div className="md:col-span-5 space-y-4 md:sticky md:top-20">
                 {eventSummaryCard}
-                <div className="hidden lg:block">
-                  {payNowButton}
-                </div>
               </div>
             </div>
           </main>
         );
       })()}
 
-      {/* ── PASSQO LIQUID GLASS FIXED BOTTOM BAR (Always fixed in the same position on Mobile & Tablets < lg across all 3 steps, and also on PC on Step 1) ── */}
-      <div className={`${step === 1 ? "block" : "lg:hidden"} fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-2xl backdrop-saturate-180 border-t border-white/90 shadow-[0_-8px_32px_rgba(0,0,0,0.1),inset_0_1.5px_2px_rgba(255,255,255,0.9)] px-4 sm:px-8 py-3.5 sm:py-4 pb-safe transition-all`}>
+      {/* ── PASSQO LIQUID GLASS FIXED BOTTOM BAR (Always fixed in the exact same position across PC, Tablet & Mobile for all steps) ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-2xl backdrop-saturate-180 border-t border-white/90 shadow-[0_-8px_32px_rgba(0,0,0,0.1),inset_0_1.5px_2px_rgba(255,255,255,0.9)] px-4 sm:px-8 py-3.5 sm:py-4 pb-safe transition-all">
         <div className="max-w-[1060px] mx-auto flex items-center justify-between gap-4">
           {/* Price Summary */}
           <div>
@@ -1202,54 +1122,148 @@ export function BookingPage() {
         </div>
       </div>
 
-      {/* ── BOOKING CONFIRMED MODAL ── */}
+      {/* ── AESTHETIC GEN-Z TICKET PASS BOOKING CONFIRMED MODAL ── */}
       {bookingSuccess && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl text-center space-y-4 border border-black/5 animate-in zoom-in-95 duration-150">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-2xl">
-              ✓
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+          <div className="relative bg-white rounded-[28px] sm:rounded-[36px] max-w-[500px] w-full p-6 sm:p-8 shadow-[0_24px_70px_rgba(0,0,0,0.22)] text-center overflow-hidden border border-white/60 animate-in zoom-in-95 duration-200">
+            {/* Corner Decorative Organic Glows (Matching Reference) */}
+            <div className="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-gradient-to-br from-[#FFE1EB]/80 via-[#FFF0F5]/40 to-transparent blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-14 -right-14 w-52 h-52 rounded-full bg-gradient-to-tl from-[#FFE1EB]/80 via-[#FFF0F5]/40 to-transparent blur-2xl pointer-events-none" />
+
+            {/* Top-Right Close Button (X) */}
+            <button
+              type="button"
+              onClick={() => navigate(`/events/${event.id}`)}
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-[#1B1B23] hover:bg-neutral-100 transition-colors z-20 cursor-pointer"
+              aria-label="Close modal"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* 1. Celebration Checkmark Badge with Radiant Festive Rays */}
+            <div className="relative inline-flex items-center justify-center mb-2">
+              <div className="absolute -inset-2 pointer-events-none flex items-center justify-center">
+                <span className="absolute -top-2 left-1/2 -translate-x-1/2 w-0.5 h-2 bg-[#FF7597] rounded-full" />
+                <span className="absolute top-0 -left-1.5 w-2 h-0.5 bg-[#FF7597] rounded-full -rotate-45" />
+                <span className="absolute top-0 -right-1.5 w-2 h-0.5 bg-[#FF7597] rounded-full rotate-45" />
+                <span className="absolute -bottom-1 -left-1 w-2 h-0.5 bg-[#FF7597] rounded-full rotate-45" />
+                <span className="absolute -bottom-1 -right-1 w-2 h-0.5 bg-[#FF7597] rounded-full -rotate-45" />
+              </div>
+              <div className="w-14 h-14 sm:w-15 sm:h-15 rounded-full bg-[#FFE4EC] flex items-center justify-center shadow-xs">
+                <Check className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF4E7A] stroke-[3.5]" />
+              </div>
             </div>
+
+            {/* 2. Booking Confirmed Pill */}
             <div>
-              <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
-                Booking Confirmed
+              <span className="inline-block px-3.5 py-1 rounded-full bg-[#FFF0F4] border border-[#FFD5E2] text-[10px] sm:text-[11px] font-extrabold text-[#FF4E7A] tracking-wider uppercase">
+                BOOKING CONFIRMED
               </span>
-              <h3 className="font-black text-2xl text-[#1B1B23] mt-1">
-                You&apos;re going!
+            </div>
+
+            {/* 3. Headline with celebration sparkles */}
+            <div className="relative inline-flex items-center justify-center mt-2.5 mb-1">
+              <h3 className="font-display font-black text-2xl sm:text-[28px] text-[#1B1B23] tracking-tight">
+                You&apos;re <span className="text-[#FF4E7A]">going!</span>
               </h3>
-              <p className="text-xs text-[#8C8C9E] mt-1">
-                Your tickets have been sent to <span className="font-bold text-[#1B1B23]">{email}</span>
-              </p>
+              {/* Sparkle ticks beside going! */}
+              <div className="absolute -top-1 -right-5 pointer-events-none flex flex-col gap-0.5 select-none">
+                <span className="w-2.5 h-0.5 bg-[#FF7597] rounded-full rotate-25" />
+                <span className="w-1.5 h-0.5 bg-[#FF7597] rounded-full -rotate-20 translate-x-1" />
+              </div>
             </div>
 
-            {/* Mock QR Ticket Card */}
-            <div className="bg-neutral-50 border border-black/6 rounded-2xl p-4 text-left space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] uppercase font-bold text-[#8C8C9E]">Booking Ref</p>
-                  <p className="font-mono font-bold text-sm text-[#1B1B23]">{orderId}</p>
+            {/* 4. Subtitle: Your tickets have been sent to... */}
+            <div className="text-xs sm:text-[13px] text-[#8C8C9E] mt-0.5 mb-5 space-y-0.5">
+              <p>Your tickets have been sent to</p>
+              <p className="font-bold text-[#1B1B23] break-all">{email}</p>
+            </div>
+
+            {/* 5. Authentic Gen-Z Ticket Pass Card with Notch Cutouts */}
+            <div className="relative bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 border border-neutral-200/80 shadow-[0_6px_24px_rgba(0,0,0,0.06)] text-left mb-6">
+              {/* Left semi-circle ticket notch */}
+              <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#FAF7F5] border-r border-neutral-200/80 shadow-[inset_-2px_0_3px_rgba(0,0,0,0.04)]" />
+              {/* Right semi-circle ticket notch */}
+              <div className="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#FAF7F5] border-l border-neutral-200/80 shadow-[inset_2px_0_3px_rgba(0,0,0,0.04)]" />
+
+              <div className="flex items-center gap-3.5 sm:gap-4">
+                {/* Left: Event Thumbnail with pink border & subtle glow */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl sm:rounded-2xl overflow-hidden flex-shrink-0 border-2 border-[#FFD0DD] shadow-xs relative bg-neutral-100">
+                  <img
+                    src={event.image || "/images/figma-sample/goa/goa-hero.png"}
+                    alt={event.name}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <QrCode className="w-10 h-10 text-[#1B1B23]" />
-              </div>
-              <div className="border-t border-black/6 pt-2 text-xs">
-                <p className="font-bold text-[#1B1B23] truncate">{event.name}</p>
-                <p className="text-[#8C8C9E] text-[11px]">{dateFormatted} · {event.venue || event.city}</p>
+
+                {/* Right: Event Details + Divider + Booking Ref & QR Code */}
+                <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                  {/* Top: Event Title & Date / Venue */}
+                  <div>
+                    <p className="text-[10px] font-extrabold text-[#8C8C9E] uppercase tracking-wider">
+                      EVENT
+                    </p>
+                    <h4 className="font-display font-extrabold text-sm sm:text-base text-[#1B1B23] leading-snug line-clamp-2 mt-0.5">
+                      {event.name}
+                    </h4>
+                    <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] sm:text-xs text-[#6B6B80] font-medium mt-1">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-[#FF4E7A] flex-shrink-0" />
+                        <span>{dateFormatted}</span>
+                      </span>
+                      <span className="text-neutral-300">·</span>
+                      <span className="flex items-center gap-1 truncate">
+                        <MapPin className="w-3 h-3 text-[#FF4E7A] flex-shrink-0" />
+                        <span className="truncate">{event.venue || event.city}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Dashed Perforation Line */}
+                  <div className="border-t border-dashed border-neutral-200/90 my-2.5 sm:my-3" />
+
+                  {/* Bottom: Booking Ref & QR Code */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-[10px] font-extrabold text-[#8C8C9E] uppercase tracking-wider">
+                        BOOKING REF
+                      </p>
+                      <p className="font-mono font-black text-xs sm:text-sm text-[#1B1B23] tracking-wider mt-0.5">
+                        {orderId || "PSQ-524401"}
+                      </p>
+                    </div>
+
+                    {/* QR Code */}
+                    <div className="p-1 sm:p-1.5 bg-white rounded-lg border border-neutral-200/80 shadow-2xs flex-shrink-0">
+                      <QrCode className="w-8 h-8 sm:w-9 sm:h-9 text-[#1B1B23]" />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-2 pt-2">
+            {/* 6. Action CTAs (Matching Reference) */}
+            <div className="space-y-3">
+              {/* Primary: View My Tickets */}
+              <button
+                type="button"
+                onClick={() => navigate("/tickets")}
+                className="w-full py-3.5 sm:py-4 rounded-2xl bg-[#FF4E7A] hover:bg-[#E03A64] text-white font-extrabold text-sm sm:text-base shadow-lg shadow-[#FF4E7A]/25 transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer select-none"
+              >
+                <Ticket className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                <span>View My Tickets</span>
+                <span>→</span>
+              </button>
+
+              {/* Secondary: Back to Event Details */}
               <button
                 type="button"
                 onClick={() => navigate(`/events/${event.id}`)}
-                className="w-full py-3 rounded-xl bg-[#FF4E7A] hover:bg-[#E03A64] text-white font-extrabold text-xs transition-colors cursor-pointer"
+                className="w-full text-xs sm:text-sm font-bold text-[#8C8C9E] hover:text-[#1B1B23] transition-colors flex items-center justify-center gap-1.5 cursor-pointer py-1"
               >
-                Back to Event Details
+                <span>←</span>
+                <span>Back to Event Details</span>
               </button>
-              <Link
-                to="/"
-                className="block text-xs font-bold text-[#8C8C9E] hover:text-[#1B1B23] transition-colors py-1"
-              >
-                Discover more events
-              </Link>
             </div>
           </div>
         </div>

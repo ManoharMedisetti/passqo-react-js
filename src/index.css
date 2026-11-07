@@ -175,6 +175,27 @@ html.a11y-reduced-motion *::after {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Ultra-thin aesthetic Passqo pink scrollbar for drawers and sidebars */
+  .scrollbar-thin-pink {
+    scrollbar-width: thin;
+    scrollbar-color: #FF4E7A rgba(0, 0, 0, 0.04);
+  }
+  .scrollbar-thin-pink::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin-pink::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 9999px;
+  }
+  .scrollbar-thin-pink::-webkit-scrollbar-thumb {
+    background: #FF4E7A;
+    border-radius: 9999px;
+  }
+  .scrollbar-thin-pink::-webkit-scrollbar-thumb:hover {
+    background: #E03A64;
+  }
 }
 
 /* ── Fluid / Liquid Modal & Sheet Animations ── */

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getUser, getAccessToken } from "@/lib/auth/storage";
 import { api } from "@/lib/api";
 import { NotificationBell } from "./NotificationBell";
+import { ProfileSidebarMenu } from "./ProfileSidebarMenu";
 import { useAuthModal } from "@/context/AuthContext";
 
 const NAV_LINK = "text-sm font-bold text-[#1B1B23] hover:text-[#FF4E7A] transition-colors whitespace-nowrap";
@@ -10,6 +11,7 @@ const NAV_LINK = "text-sm font-bold text-[#1B1B23] hover:text-[#FF4E7A] transiti
 export function NavUser({ compact = false, glass = false, scrolled = false }) {
   const [user, setUser] = useState(() => getUser() || null);
   const [checked, setChecked] = useState(true);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const { openAuth } = useAuthModal();
 
   useEffect(() => {
@@ -31,8 +33,16 @@ export function NavUser({ compact = false, glass = false, scrolled = false }) {
       setUser(u || null);
     };
 
+    const handleOpenMenu = () => {
+      setIsProfileMenuOpen(true);
+    };
+
     window.addEventListener("passqo-auth-changed", handleAuthChange);
-    return () => window.removeEventListener("passqo-auth-changed", handleAuthChange);
+    window.addEventListener("passqo-open-profile-menu", handleOpenMenu);
+    return () => {
+      window.removeEventListener("passqo-auth-changed", handleAuthChange);
+      window.removeEventListener("passqo-open-profile-menu", handleOpenMenu);
+    };
   }, []);
 
   if (!checked) return null;
@@ -75,37 +85,42 @@ export function NavUser({ compact = false, glass = false, scrolled = false }) {
     );
   }
 
-  const isOrganiser = user.role === "ORGANISER" || user.role === "SUPER_ADMIN";
-
   return (
-    <div className="flex items-center gap-6">
-      {!compact ? (
-        <nav className="flex items-center gap-6 px-2">
-          <Link to="/organizer" className={NAV_LINK}>
-            {isOrganiser ? "Dashboard" : "For Organisers"}
-          </Link>
-          <Link to="/tickets" className={NAV_LINK}>
-            My Tickets
-          </Link>
-        </nav>
-      ) : (
-        isOrganiser && (
-          <Link to="/organizer" className="hidden sm:inline text-xs font-bold text-[#1B1B23] hover:text-[#FF4E7A]">
-            Dashboard
-          </Link>
-        )
-      )}
-      <div className="flex items-center gap-4 lg:gap-6">
+    <>
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* 1. Notifications Button (White circular with black bell and green clapper) */}
         <NotificationBell />
-        <Link to="/profile" aria-label="Profile">
-          <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-[#FF4E7A] flex items-center justify-center ring-2 ring-white">
-            <span className="text-white text-sm font-bold">
-              {(user.name || user.email || "?").charAt(0).toUpperCase()}
-            </span>
-          </div>
-        </Link>
+
+        {/* 2. Profile Button (Hot pink circular with white outline user icon) */}
+        <button
+          type="button"
+          onClick={() => setIsProfileMenuOpen(true)}
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#FF4E7A] hover:bg-[#E03A64] flex items-center justify-center shadow-xs active:scale-95 transition-all cursor-pointer ring-2 ring-white/80 select-none flex-shrink-0"
+          aria-label="Open profile menu"
+          title={user?.name || "Profile menu"}
+        >
+          <svg
+            className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="8" r="4.5" />
+            <path d="M5.5 20C5.5 16.5 8.4 14.5 12 14.5C15.6 14.5 18.5 16.5 18.5 20" />
+          </svg>
+        </button>
       </div>
-    </div>
+
+      {/* Right Sidebar Menu (Slides in from right like reference Frame 118) */}
+      <ProfileSidebarMenu
+        isOpen={isProfileMenuOpen}
+        onClose={() => setIsProfileMenuOpen(false)}
+        user={user}
+      />
+    </>
   );
 }
 

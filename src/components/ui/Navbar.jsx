@@ -108,7 +108,7 @@ export function Navbar({ wide = false, compact = false, miniSearch = false }) {
   return (
     <div
       id="main-navbar"
-      className={`fixed top-0 left-0 right-0 z-[100] px-3.5 sm:px-4 lg:px-8 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-[100] px-3.5 sm:px-4 lg:px-8 transition-all duration-300 scrollbar-hide ${
         isHeroTransparent
           ? "bg-transparent md:bg-white/75 md:backdrop-blur-2xl md:backdrop-saturate-180 border-b border-transparent md:border-white/60 md:shadow-[0_4px_20px_rgba(0,0,0,0.04)] py-2.5 sm:py-3 lg:py-3.5"
           : compact
