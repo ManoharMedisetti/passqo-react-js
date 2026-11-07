@@ -49,10 +49,6 @@ export function Navbar({ wide = false, compact = false, miniSearch = false }) {
   const { openSearch } = useSearchModal();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-
     const updateHeight = () => {
       const el = document.getElementById("main-navbar");
       if (el && el.offsetHeight > 0) {
@@ -60,6 +56,12 @@ export function Navbar({ wide = false, compact = false, miniSearch = false }) {
       } else {
         document.documentElement.style.setProperty("--navbar-height", "56px");
       }
+    };
+
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 20;
+      setScrolled(isScrolled);
+      updateHeight();
     };
 
     const el = document.getElementById("main-navbar");
@@ -80,6 +82,25 @@ export function Navbar({ wide = false, compact = false, miniSearch = false }) {
       window.removeEventListener("resize", updateHeight);
     };
   }, []);
+
+  // Recalculate navbar height when scrolled state transitions
+  useEffect(() => {
+    const updateHeight = () => {
+      const el = document.getElementById("main-navbar");
+      if (el && el.offsetHeight > 0) {
+        document.documentElement.style.setProperty("--navbar-height", `${el.offsetHeight}px`);
+      }
+    };
+    updateHeight();
+    const t1 = setTimeout(updateHeight, 50);
+    const t2 = setTimeout(updateHeight, 150);
+    const t3 = setTimeout(updateHeight, 320);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [scrolled]);
 
   const container = wide ? "max-w-[1216px]" : "max-w-[1120px]";
   const isHeroTransparent = isHome && !scrolled;

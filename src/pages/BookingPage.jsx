@@ -444,6 +444,33 @@ export function BookingPage() {
               );
             })}
           </div>
+
+          {/* Step 1 Continue / Checkout Action Card directly below ticket tiers */}
+          <div className="bg-white/85 backdrop-blur-2xl backdrop-saturate-180 rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-white/90 shadow-[0_8px_30px_rgba(0,0,0,0.04),inset_0_1.5px_2px_rgba(255,255,255,1),inset_0_-1px_1.5px_rgba(255,255,255,0.4)] flex items-center justify-between gap-4">
+            <div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xs text-[#8C8C9E] font-semibold">Total:</span>
+                <span className="text-2xl sm:text-3xl font-black text-[#1B1B23]">
+                  {totalPrice === 0 ? "Free" : `€${totalPrice.toFixed(2)}`}
+                </span>
+              </div>
+              <p className="text-xs font-semibold text-[#8C8C9E] mt-0.5">
+                {totalTickets > 0 ? `${totalTickets} Ticket${totalTickets > 1 ? "s" : ""} selected` : "Select tickets to continue"}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (totalTickets > 0) goToStep(2);
+              }}
+              disabled={totalTickets === 0}
+              className="bg-[#FF4E7A] hover:bg-[#E03A64] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-sm sm:text-base px-8 sm:px-10 py-3.5 sm:py-4 h-12 sm:h-13 min-w-[170px] sm:min-w-[200px] rounded-2xl transition-all shadow-lg shadow-[#FF4E7A]/25 active:scale-95 cursor-pointer flex items-center justify-center gap-2 select-none"
+            >
+              <span>Continue</span>
+              <span>→</span>
+            </button>
+          </div>
         </main>
       )}
 

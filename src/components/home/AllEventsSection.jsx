@@ -818,8 +818,8 @@ export function AllEventsSection({ initialEvents = MOCK_EVENTS }) {
 
       {/* ── Sticky Filters Toolbar: Fixed directly beneath navbar on all screens ── */}
       <div
-        className="sticky z-40 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-2.5 bg-[#F5F0EB]/95 backdrop-blur-md border-b border-black/8 transition-all shadow-[0_4px_16px_rgba(0,0,0,0.04)]"
-        style={{ top: "var(--navbar-height, 72px)" }}
+        className="sticky z-40 -mx-5 sm:-mx-8 lg:-mx-10 px-5 sm:px-8 lg:px-10 py-2 bg-[#F5F0EB]/95 backdrop-blur-md border-b border-black/8 transition-all"
+        style={{ top: "var(--navbar-height, 56px)" }}
       >
         {/* Mobile & Tablet Toolbar (< lg): Matching Reference Image (Filters ▾, Today, Tomorrow, This Weekend, Under 10km, Categories) */}
         <div className="lg:hidden flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide py-1 touch-pan-x select-none">
