@@ -9,6 +9,7 @@ import { NotificationsPage } from "@/pages/NotificationsPage";
 import { MyTicketsPage } from "@/pages/MyTicketsPage";
 import { RateExperiencePage } from "@/pages/RateExperiencePage";
 import { SettingsPage } from "@/pages/SettingsPage";
+import { RewardsPage } from "@/pages/RewardsPage";
 import { SearchProvider } from "@/context/SearchContext";
 import { SearchModal } from "@/components/search/SearchModal";
 import { AuthProvider } from "@/context/AuthContext";
@@ -32,6 +33,7 @@ export function App() {
           <Route path="/tickets" element={<MyTicketsPage />} />
           <Route path="/tickets/:id/rate" element={<RateExperiencePage />} />
           <Route path="/rate-experience" element={<RateExperiencePage />} />
+          <Route path="/rewards" element={<RewardsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/:section" element={<SettingsPage />} />
           {/* Fallback route */}
