@@ -159,7 +159,7 @@ export function ProfileSidebarMenu({ isOpen, onClose, user }) {
       >
         <div className="flex items-center gap-3.5 min-w-0">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-neutral-800">
-            <Award className="w-6 h-6 stroke-[1.8] text-[#FF4E7A]" />
+            <Award className="w-6 h-6 stroke-[1.8]" />
           </div>
           <div className="min-w-0">
             <p className="font-display font-bold text-xs sm:text-sm text-[#1B1B23] truncate group-hover:text-[#FF4E7A] transition-colors">
