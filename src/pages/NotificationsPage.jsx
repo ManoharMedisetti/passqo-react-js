@@ -1,9 +1,29 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { SubPageHeader } from "@/components/ui/SubPageHeader";
-import { Clock, Ticket, Check, ChevronRight, Bell, ArrowLeft } from "lucide-react";
+import { Clock, Ticket, Check, ChevronRight, Bell, ArrowLeft, Zap } from "lucide-react";
 
 const INITIAL_NOTIFICATIONS = [
+  {
+    id: "n-quest-1",
+    type: "reward",
+    title: "Complete profile to earn badge!",
+    timeAgo: "Just now",
+    detail: "Finish your profile details to unlock the 'Profile Prodigy' badge and claim +50 XP.",
+    link: "/rewards",
+    badgeReward: "+50 XP",
+    unread: true,
+  },
+  {
+    id: "n-quest-2",
+    type: "reward",
+    title: "Level 4 Regular Unlocked! 🏆",
+    timeAgo: "1 hour ago",
+    detail: "You reached 600 XP! Free ticket transfers and extended event history are now unlocked.",
+    link: "/rewards",
+    badgeReward: "Level Up",
+    unread: true,
+  },
   {
     id: "n-1",
     type: "waitlist",
@@ -107,6 +127,12 @@ export function NotificationsPage() {
 
   const renderIcon = (type) => {
     switch (type) {
+      case "reward":
+        return (
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-[#FF4E7A]/30 bg-[#FFF0F4] flex items-center justify-center text-[#FF4E7A] flex-shrink-0 shadow-2xs">
+            <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-[#FF4E7A]" />
+          </div>
+        );
       case "waitlist":
         return (
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-neutral-200 bg-white flex items-center justify-center text-neutral-800 flex-shrink-0 shadow-2xs">
@@ -226,15 +252,25 @@ export function NotificationsPage() {
               displayList.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => toggleItemRead(item.id)}
+                  onClick={() => {
+                    toggleItemRead(item.id);
+                    if (item.link) navigate(item.link);
+                  }}
                   className="p-3.5 sm:p-5 flex items-start sm:items-center justify-between gap-3 hover:bg-neutral-50/70 active:bg-neutral-100/50 transition-colors cursor-pointer group"
                 >
                   <div className="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
                     {renderIcon(item.type)}
                     <div className="min-w-0 flex-1">
-                      <h4 className="font-display font-bold text-xs sm:text-sm text-[#1B1B23] group-hover:text-[#FF4E7A] transition-colors leading-snug">
-                        {item.title}
-                      </h4>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-display font-bold text-xs sm:text-sm text-[#1B1B23] group-hover:text-[#FF4E7A] transition-colors leading-snug">
+                          {item.title}
+                        </h4>
+                        {item.badgeReward && (
+                          <span className="px-2 py-0.5 rounded-full bg-[#FF4E7A]/10 text-[#FF4E7A] text-[10px] font-extrabold border border-[#FF4E7A]/20 shadow-2xs">
+                            {item.badgeReward}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[11px] sm:text-xs text-neutral-500 font-medium mt-0.5 leading-relaxed line-clamp-2 sm:line-clamp-none">
                         <span className="font-semibold text-neutral-700">
                           {item.timeAgo}
