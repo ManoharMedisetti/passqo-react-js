@@ -8,7 +8,6 @@ import {
   ThumbsUp,
   ThumbsDown,
   ChevronRight,
-  ArrowLeft,
   Ticket as TicketIcon,
   QrCode,
   MoreVertical,
@@ -160,15 +159,6 @@ export function MyTicketsPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleDesktopBack = () => {
-    if (location.state?.openedFromSidebar) {
-      navigate("/");
-      window.dispatchEvent(new CustomEvent("passqo-open-profile-menu"));
-    } else {
-      navigate("/");
-    }
-  };
-
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     if (document.documentElement) document.documentElement.scrollTop = 0;
@@ -202,17 +192,7 @@ export function MyTicketsPage() {
     <div className="min-h-screen bg-[#F5F0EB] text-[#1B1B23]">
       <SubPageHeader title="My Tickets" />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 md:pt-36 pb-16">
-        {/* Desktop Back Link */}
-        <button
-          type="button"
-          onClick={handleDesktopBack}
-          className="hidden md:inline-flex items-center gap-1.5 text-xs font-bold text-[#FF4E7A] hover:text-[#E03A64] transition-colors mb-4 cursor-pointer"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back</span>
-        </button>
-
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-16 sm:pt-18 md:pt-20 pb-16">
         {/* Page Header matching I.html */}
         <div className="mb-6">
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-[#1B1B23] tracking-tight">

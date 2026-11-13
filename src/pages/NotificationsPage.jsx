@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { SubPageHeader } from "@/components/ui/SubPageHeader";
-import { Clock, Ticket, Check, ChevronRight, Bell, ArrowLeft, Zap } from "lucide-react";
+import { Clock, Ticket, Check, ChevronRight, Bell, Zap } from "lucide-react";
 
 const INITIAL_NOTIFICATIONS = [
   {
@@ -116,15 +116,6 @@ export function NotificationsPage() {
     );
   };
 
-  const handleDesktopBack = () => {
-    if (location.state?.openedFromSidebar) {
-      navigate("/");
-      window.dispatchEvent(new CustomEvent("passqo-open-profile-menu"));
-    } else {
-      navigate("/");
-    }
-  };
-
   const renderIcon = (type) => {
     switch (type) {
       case "reward":
@@ -161,24 +152,14 @@ export function NotificationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F0EB] text-[#1B1B23] overflow-x-hidden">
+    <div className="min-h-screen bg-[#F5F0EB] text-[#2C2738] overflow-x-hidden">
       <SubPageHeader title="Notifications" backTo="/" />
 
-      <main className="max-w-4xl mx-auto px-3.5 sm:px-6 pt-18 sm:pt-24 md:pt-36 pb-16">
-        {/* Desktop Back Link */}
-        <button
-          type="button"
-          onClick={handleDesktopBack}
-          className="hidden md:inline-flex items-center gap-1.5 text-xs font-bold text-[#FF4E7A] hover:text-[#E03A64] transition-colors mb-4 cursor-pointer"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back</span>
-        </button>
-
-        {/* Page Heading */}
+      <main className="max-w-4xl mx-auto px-3.5 sm:px-6 pt-16 sm:pt-18 md:pt-20 pb-16">
+        {/* Page Heading (Clean minimal whitespace below navbar) */}
         <div className="mb-4 sm:mb-6">
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <h1 className="font-display font-extrabold text-xl sm:text-3xl text-[#1B1B23] tracking-tight">
+            <h1 className="font-display font-extrabold text-xl sm:text-3xl text-[#2C2738] tracking-tight">
               Notifications
             </h1>
             {unreadCount > 0 && (
@@ -187,15 +168,15 @@ export function NotificationsPage() {
               </span>
             )}
           </div>
-          <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-0.5 sm:mt-1">
+          <p className="text-xs sm:text-sm text-[#756C84] font-medium mt-0.5 sm:mt-1">
             Stay up to date with your reminders, team activity and invitations.
           </p>
         </div>
 
         {/* Notifications White Card */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs overflow-hidden">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#EDE8E1] shadow-2xs overflow-hidden">
           {/* Card Top Action Bar (Responsive wrap on mobile) */}
-          <div className="p-3 sm:p-5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 border-b border-black/5 bg-white">
+          <div className="p-3 sm:p-5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 border-b border-[#EDE8E1] bg-white">
             {/* Filter Tabs */}
             <div className="flex items-center gap-2">
               <button

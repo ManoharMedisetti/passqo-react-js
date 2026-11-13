@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Radio,
 } from "lucide-react";
+import { MicroSlats } from "@/components/ui/MicroSlats";
 
 export function TicketModal({ isOpen, onClose, ticket }) {
   const [copied, setCopied] = useState(false);
@@ -55,30 +56,54 @@ export function TicketModal({ isOpen, onClose, ticket }) {
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-black/65 backdrop-blur-xs z-[100001] transition-opacity"
+        className="fixed inset-0 bg-[#2C2738]/40 backdrop-blur-md z-[100001] transition-opacity"
         aria-hidden="true"
       />
 
       {/* Ticket Container */}
       <div
-        className="relative z-[100002] w-full max-w-sm sm:max-w-md md:max-w-3xl max-h-[92vh] bg-white rounded-3xl shadow-2xl border border-black/8 flex flex-col justify-between overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200"
+        className="relative z-[100002] w-full max-w-sm sm:max-w-md md:max-w-3xl max-h-[92vh] bg-white rounded-3xl shadow-2xl border border-[#EDE8E1] flex flex-col justify-between overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
         aria-labelledby="ticket-title"
       >
-        {/* Top Header Bar */}
-        <div className="px-5 sm:px-6 py-3.5 bg-neutral-900 text-white flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#00A86B] animate-pulse" />
-            <span className="font-display font-black text-xs uppercase tracking-wider text-neutral-200">
-              PassQO Verified E-Ticket
+        {/* Top Header Bar: Living MicroSlats Animation in PassQo Brand Pink */}
+        <div className="relative h-14 sm:h-16 w-full overflow-hidden flex items-center justify-between px-4 sm:px-6 flex-shrink-0 bg-gradient-to-r from-[#FFF0F4] via-[#FFE5ED] to-[#FFF0F4] border-b border-[#FFD5E0]">
+          {/* MicroSlats WebGL Living Wave Canvas */}
+          <div className="absolute inset-0 pointer-events-auto opacity-75">
+            <MicroSlats
+              preset="swell"
+              color="#FF4E7A"
+              glintColor="#FFFFFF"
+              backgroundColor="transparent"
+              slatWidth={7}
+              slatHeight={22}
+              gap={3}
+              roundness={0.8}
+              interactive={true}
+              speed={0.65}
+              cursorStrength={1.5}
+              cursorSize={55}
+              trail={1.3}
+              intro={true}
+            />
+          </div>
+
+          {/* Clean Glass Verified Tag */}
+          <div className="relative z-10 flex items-center gap-2 pointer-events-none">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-white/80 shadow-[0_2px_8px_rgba(255,78,122,0.12)]">
+              <span className="w-2 h-2 rounded-full bg-[#00C896] animate-pulse shadow-[0_0_8px_rgba(0,200,150,0.6)]" />
+              <span className="font-display font-extrabold text-[11px] sm:text-xs uppercase tracking-wider text-[#2C2738]">
+                PassQO Verified E-Ticket
+              </span>
             </span>
           </div>
 
+          {/* Frosted Glass Close Button */}
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-neutral-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="relative z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-[#2C2738] hover:text-[#FF4E7A] flex items-center justify-center transition-all shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer border border-white/80 active:scale-95"
             aria-label="Close"
           >
             <X className="w-4 h-4" />
@@ -111,33 +136,33 @@ export function TicketModal({ isOpen, onClose, ticket }) {
                 </div>
                 <h2
                   id="ticket-title"
-                  className="font-display font-black text-base sm:text-lg text-[#1B1B23] leading-snug line-clamp-2"
+                  className="font-display font-extrabold text-base sm:text-lg text-[#2C2738] leading-snug line-clamp-2"
                 >
                   {ticket.title}
                 </h2>
-                <p className="text-xs text-neutral-500 font-medium mt-0.5">
+                <p className="text-xs text-[#756C84] font-medium mt-0.5">
                   {ticket.meta}
                 </p>
               </div>
             </div>
 
             {/* Venue & Time Grid */}
-            <div className="space-y-2 bg-[#FAF7F4] rounded-2xl p-3.5 sm:p-4 border border-black/5 text-xs">
-              <div className="flex items-start gap-2.5 text-neutral-700">
+            <div className="space-y-2 bg-[#FBF9F6] rounded-2xl p-3.5 sm:p-4 border border-[#EDE8E1] text-xs">
+              <div className="flex items-start gap-2.5 text-[#2C2738]">
                 <MapPin className="w-4 h-4 text-[#FF4E7A] flex-shrink-0 mt-0.5" />
                 <div className="min-w-0">
-                  <p className="font-bold text-[#1B1B23]">Venue & Location</p>
-                  <p className="text-neutral-600 font-medium leading-relaxed">
+                  <p className="font-bold text-[#2C2738]">Venue & Location</p>
+                  <p className="text-[#756C84] font-medium leading-relaxed">
                     {ticket.venue}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5 text-neutral-700 pt-1.5 border-t border-black/5">
+              <div className="flex items-start gap-2.5 text-[#2C2738] pt-1.5 border-t border-[#EDE8E1]">
                 <Calendar className="w-4 h-4 text-[#FF4E7A] flex-shrink-0 mt-0.5" />
                 <div className="min-w-0">
-                  <p className="font-bold text-[#1B1B23]">Date & Time</p>
-                  <p className="text-neutral-600 font-medium">
+                  <p className="font-bold text-[#2C2738]">Date & Time</p>
+                  <p className="text-[#756C84] font-medium">
                     {ticket.date || "Friday, 20 November 2026 • 6:00 PM"}
                   </p>
                 </div>
@@ -146,38 +171,38 @@ export function TicketModal({ isOpen, onClose, ticket }) {
 
             {/* Pass Metadata Grid */}
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/80">
-                <p className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
+              <div className="p-3 rounded-xl bg-[#FBF9F6] border border-[#EDE8E1]">
+                <p className="text-[10px] uppercase font-bold text-[#8C8599] tracking-wider">
                   Tier / Section
                 </p>
-                <p className="font-extrabold text-[#1B1B23] mt-0.5 truncate">
+                <p className="font-extrabold text-[#2C2738] mt-0.5 truncate">
                   {ticket.tier || "General Admission"}
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/80">
-                <p className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
+              <div className="p-3 rounded-xl bg-[#FBF9F6] border border-[#EDE8E1]">
+                <p className="text-[10px] uppercase font-bold text-[#8C8599] tracking-wider">
                   Gate / Access
                 </p>
-                <p className="font-extrabold text-[#1B1B23] mt-0.5 truncate">
+                <p className="font-extrabold text-[#2C2738] mt-0.5 truncate">
                   {ticket.gate || "Gate A • FastTrack"}
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/80">
-                <p className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
+              <div className="p-3 rounded-xl bg-[#FBF9F6] border border-[#EDE8E1]">
+                <p className="text-[10px] uppercase font-bold text-[#8C8599] tracking-wider">
                   Pass Holder
                 </p>
-                <p className="font-extrabold text-[#1B1B23] mt-0.5 truncate">
+                <p className="font-extrabold text-[#2C2738] mt-0.5 truncate">
                   {ticket.holder || "John Doe"}
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/80">
-                <p className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
+              <div className="p-3 rounded-xl bg-[#FBF9F6] border border-[#EDE8E1]">
+                <p className="text-[10px] uppercase font-bold text-[#8C8599] tracking-wider">
                   Passes Count
                 </p>
-                <p className="font-extrabold text-[#1B1B23] mt-0.5 truncate">
+                <p className="font-extrabold text-[#2C2738] mt-0.5 truncate">
                   {ticket.ticketsCount || 1} Person
                 </p>
               </div>
@@ -189,30 +214,30 @@ export function TicketModal({ isOpen, onClose, ticket }) {
               Desktop: Vertical dashed line with top and bottom semicircular notch cutouts. */}
           <div className="relative flex items-center justify-center flex-shrink-0">
             {/* Mobile horizontal divider */}
-            <div className="md:hidden w-full border-t border-dashed border-neutral-300 relative py-2">
-              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#1B1B23] shadow-inner" />
-              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#1B1B23] shadow-inner" />
+            <div className="md:hidden w-full border-t border-dashed border-[#EDE8E1] relative py-2">
+              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#EDE8E1] shadow-inner" />
+              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#EDE8E1] shadow-inner" />
             </div>
 
             {/* Desktop vertical divider */}
-            <div className="hidden md:block h-full border-r border-dashed border-neutral-300 relative px-2">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#1B1B23] shadow-inner" />
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#1B1B23] shadow-inner" />
+            <div className="hidden md:block h-full border-r border-dashed border-[#EDE8E1] relative px-2">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#EDE8E1] shadow-inner" />
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#EDE8E1] shadow-inner" />
             </div>
           </div>
 
           {/* Right / Bottom QR Code Pane:
               Bigger QR Code on bottom in mobile; side-by-side in desktop */}
-          <div className="md:w-80 lg:w-88 p-5 sm:p-6 lg:p-7 bg-[#FAF7F4] flex flex-col items-center justify-center text-center space-y-4 flex-shrink-0">
-            <span className="text-[11px] font-black uppercase tracking-wider text-neutral-400">
+          <div className="md:w-80 lg:w-88 p-5 sm:p-6 lg:p-7 bg-[#FBF9F6] flex flex-col items-center justify-center text-center space-y-4 flex-shrink-0">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#8C8599]">
               Official Entry Pass
             </span>
 
             {/* Bigger QR Code Container with Scan Frame */}
-            <div className="relative p-3.5 bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-black/8 flex items-center justify-center">
+            <div className="relative p-3.5 bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-[#EDE8E1] flex items-center justify-center">
               {/* Realistic High-Res Vector QR Code */}
               <svg
-                className="w-48 h-48 sm:w-56 sm:h-56 md:w-52 md:h-52 text-[#1B1B23]"
+                className="w-48 h-48 sm:w-56 sm:h-56 md:w-52 md:h-52 text-[#2C2738]"
                 viewBox="0 0 140 140"
                 fill="currentColor"
               >
@@ -282,24 +307,25 @@ export function TicketModal({ isOpen, onClose, ticket }) {
               </svg>
 
               {/* Verified Ribbon */}
-              <div className="absolute -bottom-2.5 px-3 py-0.5 rounded-full bg-[#1B1B23] text-white text-[10px] font-black uppercase tracking-wider shadow-xs">
-                Scan for Entry
+              <div className="absolute -bottom-2.5 px-3 py-0.5 rounded-full bg-[#FF4E7A] text-white text-[10px] font-extrabold uppercase tracking-wider shadow-xs flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                <span>Scan for Entry</span>
               </div>
             </div>
 
             {/* Ticket Code with Copy Action */}
             <div className="pt-1">
-              <p className="text-[10px] uppercase font-bold text-neutral-400">
+              <p className="text-[10px] uppercase font-bold text-[#8C8599]">
                 Ticket Reference Code
               </p>
               <div className="flex items-center justify-center gap-2 mt-1">
-                <span className="font-mono font-black text-sm sm:text-base text-[#1B1B23] tracking-widest bg-white px-3 py-1 rounded-xl border border-neutral-200">
+                <span className="font-mono font-black text-sm sm:text-base text-[#2C2738] tracking-widest bg-white px-3 py-1 rounded-xl border border-[#EDE8E1] shadow-2xs">
                   {ticketCode}
                 </span>
                 <button
                   type="button"
                   onClick={handleCopyCode}
-                  className="p-1.5 rounded-xl bg-white border border-neutral-200 text-neutral-600 hover:text-[#FF4E7A] hover:border-[#FF4E7A] transition-colors cursor-pointer"
+                  className="p-1.5 rounded-xl bg-white border border-[#EDE8E1] text-[#756C84] hover:text-[#FF4E7A] hover:border-[#FF4E7A] transition-colors cursor-pointer shadow-2xs"
                   title="Copy code"
                 >
                   {copied ? (
@@ -311,15 +337,15 @@ export function TicketModal({ isOpen, onClose, ticket }) {
               </div>
             </div>
 
-            <p className="text-[11px] text-neutral-500 font-medium leading-relaxed max-w-[240px]">
+            <p className="text-[11px] text-[#756C84] font-medium leading-relaxed max-w-[240px]">
               Present this digital pass at the entrance scanner. Screenshots or printouts are also valid.
             </p>
           </div>
         </div>
 
         {/* Modal Bottom Action Bar */}
-        <div className="px-5 sm:px-6 py-3.5 bg-neutral-50/80 border-t border-black/6 flex items-center justify-between gap-3 flex-shrink-0">
-          <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-semibold">
+        <div className="px-5 sm:px-6 py-3.5 bg-[#FBF9F6] border-t border-[#EDE8E1] flex items-center justify-between gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1.5 text-xs text-[#756C84] font-semibold">
             <ShieldCheck className="w-4 h-4 text-[#00A86B]" />
             <span>PassQO Encrypted Pass</span>
           </div>
@@ -328,7 +354,7 @@ export function TicketModal({ isOpen, onClose, ticket }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-neutral-700 hover:bg-neutral-200/70 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-[#756C84] hover:bg-[#F2EDE6] hover:text-[#2C2738] transition-colors cursor-pointer"
             >
               Close
             </button>

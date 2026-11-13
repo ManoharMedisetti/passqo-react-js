@@ -12,7 +12,6 @@ import {
   EyeOff,
   SquarePen,
   LogOut,
-  ArrowLeft,
   ChevronRight,
   Sliders,
   Info,
@@ -110,15 +109,6 @@ export function SettingsPage() {
       }
     }
   }, [section]);
-
-  const handleDesktopBack = () => {
-    if (location.state?.openedFromSidebar) {
-      navigate("/");
-      window.dispatchEvent(new CustomEvent("passqo-open-profile-menu"));
-    } else {
-      navigate("/");
-    }
-  };
 
   // ── Scrollspy for Desktop: Automatically update selected sidebar tab depending on scroll position ──
   useEffect(() => {
@@ -838,7 +828,7 @@ export function SettingsPage() {
         onBack={activeMobileSection ? closeMobileSection : undefined}
       />
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 md:pt-36 pb-20">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-18 md:pt-20 pb-20">
         {/* ═══════════════════════════════════════════════════════════
             MOBILE-ONLY SETTINGS VIEW (md:hidden)
             Clean, uncluttered, iOS/Android-style flow with native swipe back support:
@@ -928,17 +918,7 @@ export function SettingsPage() {
             Standard 2-Column Layout (Sticky Left Nav + Stacked Right Cards)
            ═══════════════════════════════════════════════════════════ */}
         <div className="hidden md:block">
-          {/* Desktop Back Link */}
-          <button
-            type="button"
-            onClick={handleDesktopBack}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF4E7A] hover:text-[#E03A64] transition-colors mb-4 cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back</span>
-          </button>
-
-          {/* Page Intro Header */}
+          {/* Page Intro Header (Clean whitespace below minimized navbar) */}
           <div className="mb-8">
             <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-[#1B1B23] tracking-tight">
               Settings

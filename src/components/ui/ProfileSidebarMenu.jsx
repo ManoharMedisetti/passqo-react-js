@@ -195,38 +195,7 @@ export function ProfileSidebarMenu({ isOpen, onClose, user }) {
         <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-[#1B1B23] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
       </button>
 
-      {/* 5. Notifications */}
-      <button
-        type="button"
-        onClick={() => handleItemClick("/notifications")}
-        className="w-full p-3.5 sm:p-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition-colors group cursor-pointer"
-      >
-        <div className="flex items-center gap-3.5 min-w-0">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-              <ellipse cx="12" cy="19.5" rx="2.5" ry="2" fill="#00A86B" />
-              <path
-                d="M12 4.5C8.96 4.5 6.5 6.96 6.5 10V14.5L5 17.5H19L17.5 14.5V10C17.5 6.96 15.04 4.5 12 4.5Z"
-                stroke="#1B1B23"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <div className="min-w-0">
-            <p className="font-display font-bold text-xs sm:text-sm text-[#1B1B23] truncate group-hover:text-[#FF4E7A] transition-colors">
-              Notifications
-            </p>
-            <p className="text-[11px] text-[#8C8C9E] font-medium truncate mt-0.5">
-              Check your notifications from here
-            </p>
-          </div>
-        </div>
-        <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-[#1B1B23] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-      </button>
-
-      {/* 6. Settings */}
+      {/* 5. Settings */}
       <button
         type="button"
         onClick={() => handleItemClick("/settings")}

@@ -59,9 +59,9 @@ export function SubPageHeader({ backTo, onBack, title }) {
 
   return (
     <>
-      {/* Desktop: Standard Glass Navbar */}
+      {/* Desktop: Minimized Compact Navbar for Sidebar / Subpages */}
       <div className="hidden md:block">
-        <Navbar />
+        <Navbar compact miniSearch />
       </div>
 
       {/* Mobile: Clean Fixed Bar (No search, no logo clutter - Back on Left, Profile & Notifications on Right) */}

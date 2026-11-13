@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { getUser, getAccessToken } from "@/lib/auth/storage";
 import { api } from "@/lib/api";
 import { NotificationBell } from "./NotificationBell";
@@ -8,7 +8,9 @@ import { useAuthModal } from "@/context/AuthContext";
 
 const NAV_LINK = "text-sm font-bold text-[#1B1B23] hover:text-[#FF4E7A] transition-colors whitespace-nowrap";
 
-export function NavUser({ compact = false, glass = false, scrolled = false }) {
+export function NavUser({ compact = false, glass = false, scrolled = false, hideNotification = false }) {
+  const location = useLocation();
+  const shouldHideNotification = hideNotification || location.pathname === "/notifications";
   const [user, setUser] = useState(() => getUser() || null);
   const [checked, setChecked] = useState(true);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -88,8 +90,8 @@ export function NavUser({ compact = false, glass = false, scrolled = false }) {
   return (
     <>
       <div className="flex items-center gap-2 sm:gap-2.5">
-        {/* 1. Notifications Button (White circular with black bell and green clapper) */}
-        <NotificationBell />
+        {/* 1. Notifications Button (Hidden when already on /notifications) */}
+        {!shouldHideNotification && <NotificationBell />}
 
         {/* 2. Profile Button (Hot pink circular with white outline user icon) */}
         <button
