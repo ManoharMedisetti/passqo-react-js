@@ -5,10 +5,8 @@ import { SignUpForm } from "./SignUpForm";
 
 /**
  * Full-Page Mobile Auth Screen:
- * - Full page mobile view (not a popup sheet).
- * - No swipe-down dismissal; closed exclusively via the close button (X) or form completion.
- * - Image uses object-top and top safe-area offset so the top ("A MORE CONNECTED YOU", flamingo head) is never clipped.
- * - Solid white, responsive, and seamless continuous scrolling.
+ * - Minimal, clean, white background across both modes.
+ * - Artwork changes based on role (organiserlogin.png for host vs mobilelogin.png for attendee).
  */
 export function MobileAuthCard({
   mode,
@@ -26,29 +24,75 @@ export function MobileAuthCard({
   error,
   setError,
   onSubmit,
+  isOrganizer,
+  setIsOrganizer,
+  onBecomeOrganizer,
 }) {
   return (
-    <div className="w-full h-full min-h-screen bg-white overflow-y-auto overscroll-contain flex flex-col relative">
-      {/* ── TOP HERO BANNER (Flush to Top Edge, Zero Top Space) ── */}
-      <div className="relative w-full bg-[#E2F7F8] flex-shrink-0 overflow-hidden border-b border-black/5 shadow-xs">
+    <div className="w-full h-full min-h-screen bg-white text-[#2C2738] overflow-y-auto overscroll-contain flex flex-col relative">
+      {/* ── TOP HERO BANNER (Flush to Top Edge) ── */}
+      <div
+        className={`relative w-full flex-shrink-0 overflow-hidden border-b border-black/5 shadow-xs transition-colors duration-300 ${
+          isOrganizer ? "bg-[#E0F2FE]" : "bg-[#E2F7F8]"
+        }`}
+      >
         {/* Floating Close Button in top right */}
         <AuthCloseButton
           onClick={onClose}
-          className="absolute top-4 right-4 sm:top-5 sm:right-5 z-30 shadow-md bg-white/95"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 z-30 shadow-md bg-white/95 text-[#2C2738]"
         />
 
-        <div className="w-full h-[290px] xs:h-[310px] sm:h-[350px] max-h-[44dvh] overflow-hidden select-none">
+        <div className="w-full h-[280px] xs:h-[300px] sm:h-[340px] max-h-[42dvh] overflow-hidden select-none">
           <img
-            src="/images/illustrations/mobilelogin.png"
-            alt="Passqo - A More Connected You"
-            className="w-full h-full object-cover object-top select-none"
+            key={isOrganizer ? "mobile-art-organizer" : "mobile-art-attendee"}
+            src={
+              isOrganizer
+                ? "/images/illustrations/organiserlogin.png"
+                : "/images/illustrations/mobilelogin.png"
+            }
+            alt={isOrganizer ? "Passqo Organiser" : "Passqo - A More Connected You"}
+            className={`w-full h-full object-cover select-none animate-in fade-in duration-300 ${
+              isOrganizer ? "object-[center_28%]" : "object-top"
+            }`}
           />
         </div>
       </div>
 
-      {/* ── FORM CONTENT (Natural fluid scroll on mobile) ── */}
-      <div className="w-full px-5 sm:px-6 py-6 pb-28 bg-white flex-1">
+      {/* ── FORM CONTENT (Clean, Minimal, Pure White) ── */}
+      <div className="w-full px-5 sm:px-6 py-5 pb-28 bg-white flex-1">
         <div className="max-w-md mx-auto w-full pb-8">
+          {/* ── ROLE SWITCHER TABS (Mobile) ── */}
+          <div className="flex items-center justify-center gap-1 p-1 bg-[#F5F0EB] rounded-full w-fit mb-4 mx-auto select-none">
+            <button
+              type="button"
+              onClick={() => {
+                setError("");
+                setIsOrganizer(false);
+              }}
+              className={`px-3.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                !isOrganizer
+                  ? "bg-white text-[#FF4E7A] shadow-2xs"
+                  : "text-[#756C84] hover:text-[#2C2738]"
+              }`}
+            >
+              Attendee
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setError("");
+                setIsOrganizer(true);
+              }}
+              className={`px-3.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                isOrganizer
+                  ? "bg-white text-[#0284C7] shadow-2xs"
+                  : "text-[#756C84] hover:text-[#2C2738]"
+              }`}
+            >
+              Organiser
+            </button>
+          </div>
+
           <AnimatePresence mode="wait">
             {mode === "signin" ? (
               <SignInForm
@@ -62,6 +106,12 @@ export function MobileAuthCard({
                 onSwitchToSignUp={() => {
                   setError("");
                   setMode("signup");
+                }}
+                isOrganizer={isOrganizer}
+                onBecomeOrganizer={onBecomeOrganizer}
+                onSwitchToAttendee={() => {
+                  setError("");
+                  setIsOrganizer(false);
                 }}
               />
             ) : (
@@ -81,6 +131,7 @@ export function MobileAuthCard({
                   setError("");
                   setMode("signin");
                 }}
+                isOrganizer={isOrganizer}
               />
             )}
           </AnimatePresence>

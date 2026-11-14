@@ -32,14 +32,14 @@ export function BottomNav() {
       initial={{ y: 70, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 320, damping: 26 }}
-      className="fixed bottom-4 inset-x-0 z-[90] flex items-center justify-center gap-3 px-6 pointer-events-none lg:hidden select-none"
+      className="fixed bottom-4 inset-x-0 z-[90] flex items-center justify-center gap-2.5 sm:gap-3 px-6 pointer-events-none lg:hidden select-none"
     >
       {/* ── PILL 1: Navigation Glass Capsule (Same liquid glass as search & location) ── */}
       <nav
         aria-label="Bottom Navigation"
         className="
           pointer-events-auto flex items-center justify-between
-          h-[54px] min-w-[220px] xs:min-w-[240px] md:min-w-[340px] md:max-w-[420px] p-1.5
+          h-[54px] min-w-[200px] sm:min-w-[240px] md:min-w-[340px] md:max-w-[420px] p-1.5
           bg-white/25 md:bg-white/70 hover:bg-white/35 md:hover:bg-white/80 active:bg-white/30
           backdrop-blur-xl backdrop-saturate-180
           border border-white/40 md:border-white/60 rounded-full
@@ -53,8 +53,8 @@ export function BottomNav() {
             relative h-full flex-1 flex flex-col items-center justify-center gap-0.5 rounded-full transition-all duration-200 active:scale-95
             ${
               isHomeActive
-                ? "bg-gradient-to-r from-[#FF4E7A] to-[#E11D48] text-white font-bold shadow-[0_4px_14px_rgba(225,29,72,0.4)] px-5"
-                : "text-[#2D2D3A] hover:text-black font-semibold px-2.5"
+                ? "bg-gradient-to-r from-[#FF4E7A] to-[#E11D48] text-white font-bold shadow-[0_4px_14px_rgba(225,29,72,0.4)] px-3.5 sm:px-5"
+                : "text-[#2D2D3A] hover:text-[#2C2738] font-semibold px-2 sm:px-2.5"
             }
           `}
         >
@@ -70,8 +70,8 @@ export function BottomNav() {
             relative h-full flex-1 flex flex-col items-center justify-center gap-0.5 rounded-full transition-all duration-200 active:scale-95 focus:outline-none
             ${
               isSearchActive
-                ? "bg-gradient-to-r from-[#FF4E7A] to-[#E11D48] text-white font-bold shadow-[0_4px_14px_rgba(225,29,72,0.4)] px-5"
-                : "text-[#2D2D3A] hover:text-black font-semibold px-2.5"
+                ? "bg-gradient-to-r from-[#FF4E7A] to-[#E11D48] text-white font-bold shadow-[0_4px_14px_rgba(225,29,72,0.4)] px-3.5 sm:px-5"
+                : "text-[#2D2D3A] hover:text-[#2C2738] font-semibold px-2 sm:px-2.5"
             }
           `}
         >
@@ -86,8 +86,8 @@ export function BottomNav() {
             relative h-full flex-1 flex flex-col items-center justify-center gap-0.5 rounded-full transition-all duration-200 active:scale-95
             ${
               isTicketsActive
-                ? "bg-gradient-to-r from-[#FF4E7A] to-[#E11D48] text-white font-bold shadow-[0_4px_14px_rgba(225,29,72,0.4)] px-5"
-                : "text-[#2D2D3A] hover:text-black font-semibold px-2.5"
+                ? "bg-gradient-to-r from-[#FF4E7A] to-[#E11D48] text-white font-bold shadow-[0_4px_14px_rgba(225,29,72,0.4)] px-3.5 sm:px-5"
+                : "text-[#2D2D3A] hover:text-[#2C2738] font-semibold px-2 sm:px-2.5"
             }
           `}
         >
@@ -106,7 +106,7 @@ export function BottomNav() {
           to="/auth/register?as=organizer"
           onClick={handleCreateEventClick}
           className="
-            h-[54px] pl-5 pr-6 flex items-center gap-1.5
+            h-[54px] px-3.5 sm:pl-5 sm:pr-6 flex items-center gap-1 sm:gap-1.5
             bg-gradient-to-r from-[#FF4E7A] to-[#E11D48] hover:brightness-105 active:scale-95
             text-white font-label font-bold text-xs sm:text-[13px]
             rounded-full shadow-[0_8px_24px_rgba(255,78,122,0.45),inset_0_1px_1px_rgba(255,255,255,0.4)]
@@ -114,8 +114,8 @@ export function BottomNav() {
             transition-all duration-200 whitespace-nowrap
           "
         >
-          <Plus className="w-4 h-4 stroke-[3]" />
-          <span>Create Event</span>
+          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[3]" />
+          <span>Create<span className="hidden sm:inline"> Event</span></span>
         </Link>
       </motion.div>
     </motion.div>

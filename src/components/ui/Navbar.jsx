@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { LocationPill } from "./LocationPill";
 import { NavUser } from "./NavUser";
 import { useSearchModal } from "@/context/SearchContext";
+import { useAuthModal } from "@/context/AuthContext";
+import { getUser } from "@/lib/auth/storage";
 
 const SEARCH_PROMPTS = [
   "Search events, artists, venues…",
@@ -44,9 +46,21 @@ export function AnimatedSearchPlaceholder({ className = "", textColor = "text-ne
 
 export function Navbar({ wide = false, compact = false, miniSearch = false }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const { openSearch } = useSearchModal();
+  const { openAuth } = useAuthModal();
+
+  const handleCreateEventClick = (e) => {
+    e.preventDefault();
+    const user = getUser();
+    if (user) {
+      navigate("/organizer");
+    } else {
+      openAuth("signin", { isOrganizer: true, redirectUrl: "/organizer" });
+    }
+  };
 
   useEffect(() => {
     const updateHeight = () => {
@@ -176,8 +190,17 @@ export function Navbar({ wide = false, compact = false, miniSearch = false }) {
           )}
         </div>
 
-        {/* Right side — NavUser */}
-        <div className="flex items-center flex-shrink-0 relative z-20">
+        {/* Right side: Create Event + NavUser (Notification + Profile/Sign In) */}
+        <div className="flex items-center gap-3 lg:gap-4 flex-shrink-0 relative z-20">
+          {/* Create Event Button (Laptops and bigger screens — normal button like Help, not CTA) */}
+          <button
+            type="button"
+            onClick={handleCreateEventClick}
+            className="hidden md:inline-flex items-center text-sm font-bold text-[#2C2738] hover:text-[#FF4E7A] transition-colors whitespace-nowrap cursor-pointer px-1 py-1 focus:outline-none"
+          >
+            Create Event
+          </button>
+
           <NavUser scrolled={scrolled || compact} compact={compact} />
         </div>
       </div>

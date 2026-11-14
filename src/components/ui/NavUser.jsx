@@ -51,17 +51,16 @@ export function NavUser({ compact = false, glass = false, scrolled = false, hide
 
   if (!user) {
     return (
-      <div className={`flex items-center ${compact ? "gap-1.5" : "gap-4 lg:gap-6"}`}>
-        {!compact && (
-          <nav className="hidden lg:flex items-center gap-4 lg:gap-6 px-1">
-            <Link to="/auth/register?as=organizer" className={NAV_LINK}>
-              For Organisers
-            </Link>
+      <div className={`flex items-center ${compact ? "gap-1.5" : "gap-2.5 sm:gap-3"}`}>
+        {!compact && !glass && (
+          <nav className="hidden xl:flex items-center gap-4 px-1">
             <a href="mailto:support@passqo.com" className={NAV_LINK}>
               Help
             </a>
           </nav>
         )}
+        {/* Notification Bell (Shown in desktop/tablet view next to Sign In) */}
+        {!shouldHideNotification && <NotificationBell />}
         <button
           type="button"
           onClick={(e) => {

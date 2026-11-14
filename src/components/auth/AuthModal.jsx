@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthModal } from "@/context/AuthContext";
 import { api } from "@/lib/api";
@@ -7,7 +8,8 @@ import { MobileAuthCard } from "./MobileAuthCard";
 import { DesktopAuthCard } from "./DesktopAuthCard";
 
 export function AuthModal() {
-  const { isOpen, closeAuth, mode, setMode } = useAuthModal();
+  const navigate = useNavigate();
+  const { isOpen, closeAuth, mode, setMode, isOrganizer, setIsOrganizer, redirectUrl } = useAuthModal();
 
   // Form states
   const [name, setName] = useState("");
@@ -28,6 +30,12 @@ export function AuthModal() {
   const handleClose = () => {
     closeAuth();
     setTimeout(resetForm, 250);
+  };
+
+  const handleBecomeOrganizer = () => {
+    setError("");
+    setIsOrganizer(true);
+    setMode("signup");
   };
 
   // Keyboard navigation & body scroll lock
@@ -92,12 +100,24 @@ export function AuthModal() {
         }
 
         if (authData?.token) setAccessToken(authData.token);
-        if (authData?.user) setUser(authData.user);
+        const finalUser = authData?.user
+          ? {
+              ...authData.user,
+              role: isOrganizer ? "ORGANIZER" : authData.user.role || "CUSTOMER",
+            }
+          : null;
+        if (finalUser) setUser(finalUser);
 
         window.dispatchEvent(
-          new CustomEvent("passqo-auth-changed", { detail: { user: authData?.user } })
+          new CustomEvent("passqo-auth-changed", { detail: { user: finalUser } })
         );
         handleClose();
+
+        if (redirectUrl) {
+          navigate(redirectUrl);
+        } else if (isOrganizer) {
+          navigate("/organizer");
+        }
       } else {
         let regData;
         try {
@@ -110,18 +130,30 @@ export function AuthModal() {
               id: "usr-" + Date.now(),
               name: name.trim(),
               email: email.trim(),
-              role: "CUSTOMER",
+              role: isOrganizer ? "ORGANIZER" : "CUSTOMER",
             },
           };
         }
 
         if (regData?.token) setAccessToken(regData.token);
-        if (regData?.user) setUser(regData.user);
+        const finalRegUser = regData?.user
+          ? {
+              ...regData.user,
+              role: isOrganizer ? "ORGANIZER" : regData.user.role || "CUSTOMER",
+            }
+          : null;
+        if (finalRegUser) setUser(finalRegUser);
 
         window.dispatchEvent(
-          new CustomEvent("passqo-auth-changed", { detail: { user: regData?.user } })
+          new CustomEvent("passqo-auth-changed", { detail: { user: finalRegUser } })
         );
         handleClose();
+
+        if (redirectUrl) {
+          navigate(redirectUrl);
+        } else if (isOrganizer) {
+          navigate("/organizer");
+        }
       }
     } catch (err) {
       setError(err?.message || "Authentication failed. Please try again.");
@@ -146,6 +178,9 @@ export function AuthModal() {
     error,
     setError,
     onSubmit: handleSubmit,
+    isOrganizer,
+    setIsOrganizer,
+    onBecomeOrganizer: handleBecomeOrganizer,
   };
 
   return (

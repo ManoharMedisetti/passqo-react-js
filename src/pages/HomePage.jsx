@@ -132,13 +132,13 @@ export function HomePage() {
     <div className="min-h-screen bg-[#F5F0EB] pb-24 lg:pb-0 w-full max-w-full">
       <Navbar />
 
-      {/* ── GAMIFIED FLOATING QUEST PILL (Centered full-width on mobile above bottom nav, right-aligned on desktop) ── */}
+      {/* ── GAMIFIED FLOATING QUEST PILL (Centered full-width with same px-6 margins as bottom nav bar on mobile, right-aligned on desktop) ── */}
       {showQuestBanner && (
-        <div className="fixed z-[150] inset-x-0 pointer-events-none px-3.5 sm:px-4 lg:px-8 md:top-20 lg:top-22 bottom-[76px] sm:bottom-22 md:bottom-auto">
+        <div className="fixed z-[150] inset-x-0 pointer-events-none px-6 lg:px-8 md:top-20 lg:top-22 bottom-[76px] sm:bottom-22 md:bottom-auto">
           <div className="max-w-[1120px] mx-auto flex justify-center md:justify-end w-full">
             <aside
               aria-label="Active Quest"
-              className="pointer-events-auto bg-white/95 backdrop-blur-md rounded-full py-2 px-3.5 sm:px-4 shadow-[0_12px_36px_rgba(255,78,122,0.18)] border border-[#FFD5E0] flex items-center justify-between gap-2.5 sm:gap-3.5 w-full max-w-[540px] md:w-auto md:max-w-none animate-in fade-in slide-in-from-bottom-3 md:slide-in-from-top-3 duration-300 select-none"
+              className="pointer-events-auto bg-white/95 backdrop-blur-md rounded-full py-2 px-4 shadow-[0_12px_36px_rgba(255,78,122,0.18)] border border-[#FFD5E0] flex items-center justify-between gap-2.5 sm:gap-3.5 w-full max-w-[480px] md:w-auto md:max-w-none animate-in fade-in slide-in-from-bottom-3 md:slide-in-from-top-3 duration-300 select-none"
             >
               {/* Left: Title + XP Badge in single line */}
               <div className="flex items-center gap-2 min-w-0">

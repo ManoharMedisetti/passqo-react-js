@@ -11,6 +11,7 @@ import { RateExperiencePage } from "@/pages/RateExperiencePage";
 import { SettingsPage } from "@/pages/SettingsPage";
 import { RewardsPage } from "@/pages/RewardsPage";
 import { ReferEarnPage } from "@/pages/ReferEarnPage";
+import { OrganizerDashboardPage } from "@/pages/OrganizerDashboardPage";
 import { SearchProvider } from "@/context/SearchContext";
 import { SearchModal } from "@/components/search/SearchModal";
 import { AuthProvider } from "@/context/AuthContext";
@@ -37,6 +38,8 @@ export function App() {
           <Route path="/rewards" element={<RewardsPage />} />
           <Route path="/referrals" element={<ReferEarnPage />} />
           <Route path="/refer-and-earn" element={<ReferEarnPage />} />
+          <Route path="/organizer" element={<OrganizerDashboardPage />} />
+          <Route path="/organizer/dashboard" element={<OrganizerDashboardPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/:section" element={<SettingsPage />} />
           {/* Fallback route */}

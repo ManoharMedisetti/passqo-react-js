@@ -11,23 +11,32 @@ export function SignInForm({
   error,
   onSubmit,
   onSwitchToSignUp,
+  isOrganizer = false,
+  onBecomeOrganizer,
+  onSwitchToAttendee,
 }) {
   return (
     <motion.div
-      key="signin"
+      key={`signin-${isOrganizer ? "organizer" : "attendee"}`}
       initial={{ opacity: 0, x: -16 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 16 }}
       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       className="space-y-4"
     >
-      {/* Heading */}
+      {/* ── Heading (Clean, Minimal, Zero Clutter) ── */}
       <div>
-        <h2 className="font-display font-bold text-2xl sm:text-[32px] text-[#FF4E7A] leading-tight">
-          Sign In
+        <h2
+          className={`font-display font-bold text-2xl sm:text-[30px] leading-tight ${
+            isOrganizer ? "text-[#0284C7]" : "text-[#2C2738]"
+          }`}
+        >
+          {isOrganizer ? "Organiser Sign In" : "Sign In"}
         </h2>
-        <p className="text-xs sm:text-sm text-[#4B4B5A] mt-1">
-          Welcome back to Passqo.
+        <p className="text-xs sm:text-sm text-[#756C84] mt-1">
+          {isOrganizer
+            ? "Manage your events and ticket sales."
+            : "Welcome back to Passqo."}
         </p>
       </div>
 
@@ -39,14 +48,15 @@ export function SignInForm({
       )}
 
       {/* Form */}
-      <form onSubmit={onSubmit} className="space-y-3.5 pt-1">
+      <form onSubmit={onSubmit} className="space-y-3.5 pt-0.5">
         <AuthInputField
-          label="Email Address"
+          label={isOrganizer ? "Organiser Email" : "Email Address"}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
+          placeholder={isOrganizer ? "host@company.com" : "you@example.com"}
           autoComplete="email"
+          isOrganizer={isOrganizer}
         />
 
         <AuthInputField
@@ -56,17 +66,23 @@ export function SignInForm({
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
           autoComplete="current-password"
+          isOrganizer={isOrganizer}
         />
 
+        {/* Submit button */}
         <button
           type="submit"
           disabled={loading}
-          className="
-            w-full h-11 sm:h-12 mt-2 bg-[#FF4E7A] hover:bg-[#FF3567]
-            text-white font-bold rounded-xl sm:rounded-2xl text-sm sm:text-base
-            shadow-sm hover:shadow-md transition-all duration-200 active:scale-[0.98]
+          className={`
+            w-full h-11 sm:h-12 mt-1 font-bold rounded-xl text-sm sm:text-base
+            text-white transition-all duration-200 active:scale-[0.98]
             flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer
-          "
+            ${
+              isOrganizer
+                ? "bg-gradient-to-r from-[#0284C7] to-[#0EA5E9] hover:brightness-105 shadow-xs"
+                : "bg-[#FF4E7A] hover:bg-[#E03A64] shadow-xs"
+            }
+          `}
         >
           {loading ? (
             <>
@@ -74,27 +90,49 @@ export function SignInForm({
               <span>Signing in…</span>
             </>
           ) : (
-            <span>Sign In</span>
+            <span>{isOrganizer ? "Sign In as Organiser" : "Sign In"}</span>
           )}
         </button>
       </form>
 
       {/* Footer Switch */}
-      <div className="pt-3 text-center">
-        <p className="text-xs sm:text-sm text-[#6B6B80]">
+      <div className="pt-2 text-center space-y-2.5">
+        <p className="text-xs sm:text-sm text-[#756C84]">
           No account yet?{" "}
           <button
             type="button"
             onClick={onSwitchToSignUp}
-            className="text-[#FF4E7A] font-semibold hover:underline cursor-pointer"
+            className={`font-bold hover:underline cursor-pointer ${
+              isOrganizer ? "text-[#0284C7]" : "text-[#FF4E7A]"
+            }`}
           >
-            Create one free
+            {isOrganizer ? "Register host account" : "Create one free"}
           </button>
         </p>
+
+        {/* ── Minimal Clean Switch Button (No sparkle icon, refined UI/UX) ── */}
+        <div className="pt-2 border-t border-[#EDE8E1]">
+          {isOrganizer ? (
+            <button
+              type="button"
+              onClick={onSwitchToAttendee}
+              className="w-full h-9.5 rounded-xl border border-[#EDE8E1] hover:border-[#FF4E7A]/40 text-[#756C84] hover:text-[#FF4E7A] bg-[#F5F0EB]/50 hover:bg-[#FFF0F4]/40 font-semibold text-xs sm:text-[13px] transition-all flex items-center justify-center cursor-pointer active:scale-98"
+            >
+              <span>Looking to book events? Attendee Sign In →</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onBecomeOrganizer}
+              className="w-full h-9.5 rounded-xl border border-[#EDE8E1] hover:border-[#0284C7]/40 text-[#756C84] hover:text-[#0284C7] bg-[#F5F0EB]/50 hover:bg-[#E0F2FE]/40 font-semibold text-xs sm:text-[13px] transition-all flex items-center justify-center cursor-pointer active:scale-98"
+            >
+              <span>Hosting an event? Switch to Organiser Login →</span>
+            </button>
+          )}
+        </div>
       </div>
     </motion.div>
   );
 }
 
 export default SignInForm;
-
