@@ -109,8 +109,8 @@ export function ReferEarnPage() {
         </div>
       )}
 
-      {/* ── MAIN CONTENT CONTAINER (Exact Desktop Dashboard Layout) ── */}
-      <main className="w-full max-w-[1080px] mx-auto px-4 sm:px-6 lg:px-8 pt-18 sm:pt-20 md:pt-20 pb-8 sm:pb-12 flex-1 flex flex-col justify-center">
+      {/* ── MAIN CONTENT CONTAINER (Optimized for Mobile Clearance & Desktop Layout) ── */}
+      <main className="w-full max-w-[1080px] mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 md:pt-20 pb-8 sm:pb-12 flex-1 flex flex-col justify-center">
 
         {/* ── 1. HERO SECTION: EXACT FIGMA VECTOR + FLAMINGO AND TICKETS ── */}
         <div className="relative mb-4 sm:mb-5 pt-1 sm:pt-2">
@@ -140,9 +140,7 @@ export function ReferEarnPage() {
               </h1>
 
               <p className="text-xs sm:text-sm text-[#756C84] mt-2 sm:mt-2.5 leading-relaxed max-w-sm sm:max-w-md">
-                Share your link, invite friends and earn rewards
-                <br className="hidden sm:inline" />
-                together. More friends, more experiences!
+                Share your link, invite friends and earn rewards together. More friends, more experiences!
               </p>
             </div>
 
@@ -162,48 +160,48 @@ export function ReferEarnPage() {
         </div>
 
         {/* ── 2. METRICS STRIP: 3 HORIZONTAL TILES (Pink, Peach, Mint) ── */}
-        <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 md:gap-4 mb-4 sm:mb-5 select-none relative z-10">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3.5 md:gap-4 mb-4 sm:mb-5 select-none relative z-10">
           
           {/* Metric 1: Referrals */}
-          <div className="rounded-2xl p-3.5 sm:p-4 md:p-5 bg-white border border-black/[0.04] shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex items-center gap-3 sm:gap-4">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#FFF0F4] text-[#FF4E7A] flex items-center justify-center flex-shrink-0">
-              <Users className="w-4.5 h-4.5 stroke-[2]" />
+          <div className="rounded-2xl p-3 sm:p-4 md:p-5 bg-white border border-black/[0.04] shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#FFF0F4] text-[#FF4E7A] flex items-center justify-center flex-shrink-0">
+              <Users className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />
             </div>
             <div className="min-w-0">
-              <span className="font-display font-extrabold text-xl sm:text-2xl md:text-3xl text-[#1B1B23] block leading-none">
+              <span className="font-display font-extrabold text-lg sm:text-2xl md:text-3xl text-[#1B1B23] block leading-none">
                 0
               </span>
-              <span className="text-[11px] sm:text-xs text-[#8C8599] font-normal mt-1 block truncate">
+              <span className="text-[10px] sm:text-xs text-[#8C8599] font-normal mt-1 block">
                 Referrals
               </span>
             </div>
           </div>
 
           {/* Metric 2: XP Earned */}
-          <div className="rounded-2xl p-3.5 sm:p-4 md:p-5 bg-white border border-black/[0.04] shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex items-center gap-3 sm:gap-4">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#FFF9EE] text-[#D97706] flex items-center justify-center flex-shrink-0">
-              <Gift className="w-4.5 h-4.5 stroke-[2]" />
+          <div className="rounded-2xl p-3 sm:p-4 md:p-5 bg-white border border-black/[0.04] shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#FFF9EE] text-[#D97706] flex items-center justify-center flex-shrink-0">
+              <Gift className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />
             </div>
             <div className="min-w-0">
-              <span className="font-display font-extrabold text-xl sm:text-2xl md:text-3xl text-[#1B1B23] block leading-none">
+              <span className="font-display font-extrabold text-lg sm:text-2xl md:text-3xl text-[#1B1B23] block leading-none">
                 +0
               </span>
-              <span className="text-[11px] sm:text-xs text-[#8C8599] font-normal mt-1 block truncate">
+              <span className="text-[10px] sm:text-xs text-[#8C8599] font-normal mt-1 block">
                 XP Earned
               </span>
             </div>
           </div>
 
           {/* Metric 3: Your Level Boost */}
-          <div className="rounded-2xl p-3.5 sm:p-4 md:p-5 bg-white border border-black/[0.04] shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex items-center gap-3 sm:gap-4">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F0FDF9] text-[#00C896] flex items-center justify-center flex-shrink-0">
-              <Zap className="w-4.5 h-4.5 stroke-[2]" />
+          <div className="rounded-2xl p-3 sm:p-4 md:p-5 bg-white border border-black/[0.04] shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F0FDF9] text-[#00C896] flex items-center justify-center flex-shrink-0">
+              <Zap className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />
             </div>
             <div className="min-w-0">
-              <span className="font-display font-extrabold text-xl sm:text-2xl md:text-3xl text-[#1B1B23] block leading-none">
+              <span className="font-display font-extrabold text-lg sm:text-2xl md:text-3xl text-[#1B1B23] block leading-none">
                 ×1
               </span>
-              <span className="text-[11px] sm:text-xs text-[#8C8599] font-normal mt-1 block truncate">
+              <span className="text-[10px] sm:text-xs text-[#8C8599] font-normal mt-1 block truncate">
                 Your Level Boost
               </span>
             </div>
@@ -226,9 +224,9 @@ export function ReferEarnPage() {
 
               {/* Integrated Input & Pink Copy Button */}
               <div className="flex items-center gap-2 bg-[#FAF7F3] p-1.5 rounded-xl sm:rounded-2xl border border-[#EDE8E1] mt-3 max-w-lg">
-                <div className="flex items-center gap-2 flex-1 min-w-0 px-2 py-0.5">
-                  <LinkIcon className="w-4 h-4 text-[#FF4E7A] flex-shrink-0" />
-                  <span className="text-xs font-mono text-[#4A4553] font-medium truncate select-all">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0 px-1.5 sm:px-2 py-0.5">
+                  <LinkIcon className="w-3.5 h-3.5 text-[#FF4E7A] flex-shrink-0" />
+                  <span className="text-[11px] sm:text-xs font-mono text-[#4A4553] font-medium truncate select-all">
                     {referralUrl}
                   </span>
                 </div>
@@ -236,7 +234,7 @@ export function ReferEarnPage() {
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95 flex-shrink-0 ${
+                  className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95 flex-shrink-0 ${
                     copied
                       ? "bg-[#00C896] text-white"
                       : "bg-[#FF4E7A] hover:bg-[#E03A64] text-white"
@@ -359,58 +357,58 @@ export function ReferEarnPage() {
             </div>
 
             {/* Right: Step 1 → Step 2 → Step 3 Pipeline */}
-            <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-2 lg:gap-3">
+            <div className="flex-1 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5 lg:gap-3">
               
               {/* Step 1 */}
-              <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-white text-[#FF4E7A] shadow-2xs flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-white text-[#FF4E7A] shadow-2xs flex items-center justify-center flex-shrink-0">
                   <Send className="w-4 h-4 stroke-[2]" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h4 className="font-bold text-xs text-[#1B1B23] leading-tight truncate">
+                  <h4 className="font-bold text-xs text-[#1B1B23] leading-snug">
                     Share your unique link
                   </h4>
-                  <p className="text-[11px] text-[#8C8599] leading-tight mt-0.5 truncate">
+                  <p className="text-[11px] text-[#8C8599] leading-snug mt-0.5">
                     Send it to your friends on social media.
                   </p>
                 </div>
               </div>
 
-              {/* Arrow 1 */}
-              <span className="hidden sm:inline-flex items-center justify-center text-[#C4BDCC] text-xs font-normal px-1.5 flex-shrink-0 select-none">
+              {/* Arrow 1 (Desktop) */}
+              <span className="hidden lg:inline-flex items-center justify-center text-[#C4BDCC] text-xs font-normal px-1.5 flex-shrink-0 select-none">
                 →
               </span>
 
               {/* Step 2 */}
-              <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-white text-[#D97706] shadow-2xs flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-white text-[#D97706] shadow-2xs flex items-center justify-center flex-shrink-0">
                   <Users className="w-4 h-4 stroke-[2]" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h4 className="font-bold text-xs text-[#1B1B23] leading-tight truncate">
+                  <h4 className="font-bold text-xs text-[#1B1B23] leading-snug">
                     They sign up with your link
                   </h4>
-                  <p className="text-[11px] text-[#8C8599] leading-tight mt-0.5 truncate">
+                  <p className="text-[11px] text-[#8C8599] leading-snug mt-0.5">
                     Your friend creates an account.
                   </p>
                 </div>
               </div>
 
-              {/* Arrow 2 */}
-              <span className="hidden sm:inline-flex items-center justify-center text-[#C4BDCC] text-xs font-normal px-1.5 flex-shrink-0 select-none">
+              {/* Arrow 2 (Desktop) */}
+              <span className="hidden lg:inline-flex items-center justify-center text-[#C4BDCC] text-xs font-normal px-1.5 flex-shrink-0 select-none">
                 →
               </span>
 
               {/* Step 3 */}
-              <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-white text-[#00C896] shadow-2xs flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-white text-[#00C896] shadow-2xs flex items-center justify-center flex-shrink-0">
                   <Gift className="w-4 h-4 stroke-[2]" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h4 className="font-bold text-xs text-[#1B1B23] leading-tight truncate">
+                  <h4 className="font-bold text-xs text-[#1B1B23] leading-snug">
                     You both earn XP
                   </h4>
-                  <p className="text-[11px] text-[#8C8599] leading-tight mt-0.5 truncate">
+                  <p className="text-[11px] text-[#8C8599] leading-snug mt-0.5">
                     You get 200 XP, they get 100 XP!
                   </p>
                 </div>
@@ -438,7 +436,7 @@ export function ReferEarnPage() {
                 More friends. <span className="text-[#FF4E7A]">More events.</span>
               </h4>
               <span className="text-[#FF4E7A] text-xs font-bold tracking-widest select-none">
-                //
+                {"//"}
               </span>
             </div>
             <p className="text-[11px] sm:text-xs text-[#756C84] mt-0.5 leading-relaxed">
