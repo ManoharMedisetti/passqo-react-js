@@ -70,7 +70,7 @@ export function RateExperiencePage() {
     <div className="min-h-screen bg-[#F5F0EB] text-[#1B1B23] overflow-x-hidden">
       <SubPageHeader title="Rate Experience" backTo="/tickets" />
 
-      <main className="max-w-4xl mx-auto px-3.5 sm:px-6 pt-18 sm:pt-24 md:pt-32 pb-20">
+      <main className="max-w-4xl mx-auto px-3.5 sm:px-6 pt-20 sm:pt-24 md:pt-24 pb-20">
         {/* Desktop Breadcrumb Back Link */}
         <Link
           to="/tickets"

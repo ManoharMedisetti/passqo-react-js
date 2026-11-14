@@ -155,7 +155,7 @@ export function NotificationsPage() {
     <div className="min-h-screen bg-[#F5F0EB] text-[#2C2738] overflow-x-hidden">
       <SubPageHeader title="Notifications" backTo="/" />
 
-      <main className="max-w-4xl mx-auto px-3.5 sm:px-6 pt-16 sm:pt-18 md:pt-20 pb-16">
+      <main className="max-w-4xl mx-auto px-3.5 sm:px-6 pt-20 sm:pt-24 md:pt-20 pb-16">
         {/* Page Heading (Clean minimal whitespace below navbar) */}
         <div className="mb-4 sm:mb-6">
           <div className="flex items-center gap-2.5 sm:gap-3">
@@ -175,14 +175,14 @@ export function NotificationsPage() {
 
         {/* Notifications White Card */}
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#EDE8E1] shadow-2xs overflow-hidden">
-          {/* Card Top Action Bar (Responsive wrap on mobile) */}
-          <div className="p-3 sm:p-5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 border-b border-[#EDE8E1] bg-white">
+          {/* Card Top Action Bar (Clean single line row beside All, zero wrapping) */}
+          <div className="p-3 sm:p-4 md:p-5 flex items-center justify-between gap-2 border-b border-[#EDE8E1] bg-white">
             {/* Filter Tabs */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
               <button
                 type="button"
                 onClick={() => setActiveTab("unread")}
-                className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer select-none active:scale-95 ${
+                className={`px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer select-none active:scale-95 whitespace-nowrap ${
                   activeTab === "unread"
                     ? "bg-[#FF4E7A] text-white shadow-2xs"
                     : "text-neutral-600 hover:bg-neutral-100 bg-neutral-50 sm:bg-transparent"
@@ -194,7 +194,7 @@ export function NotificationsPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab("all")}
-                className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer select-none active:scale-95 ${
+                className={`px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer select-none active:scale-95 whitespace-nowrap ${
                   activeTab === "all"
                     ? "bg-[#FF4E7A] text-white shadow-2xs"
                     : "text-neutral-600 hover:bg-neutral-100 bg-neutral-50 sm:bg-transparent"
@@ -204,12 +204,12 @@ export function NotificationsPage() {
               </button>
             </div>
 
-            {/* Mark All As Read */}
+            {/* Mark All As Read (Directly on the same row beside All) */}
             {unreadCount > 0 && (
               <button
                 type="button"
                 onClick={markAllAsRead}
-                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#FF4E7A] hover:text-[#E03A64] transition-colors cursor-pointer select-none ml-auto"
+                className="inline-flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-bold text-[#FF4E7A] hover:text-[#E03A64] transition-colors cursor-pointer select-none whitespace-nowrap active:scale-95 flex-shrink-0"
               >
                 <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
                 <span>Mark all as read</span>

@@ -10,6 +10,7 @@ import { MyTicketsPage } from "@/pages/MyTicketsPage";
 import { RateExperiencePage } from "@/pages/RateExperiencePage";
 import { SettingsPage } from "@/pages/SettingsPage";
 import { RewardsPage } from "@/pages/RewardsPage";
+import { ReferEarnPage } from "@/pages/ReferEarnPage";
 import { SearchProvider } from "@/context/SearchContext";
 import { SearchModal } from "@/components/search/SearchModal";
 import { AuthProvider } from "@/context/AuthContext";
@@ -34,6 +35,8 @@ export function App() {
           <Route path="/tickets/:id/rate" element={<RateExperiencePage />} />
           <Route path="/rate-experience" element={<RateExperiencePage />} />
           <Route path="/rewards" element={<RewardsPage />} />
+          <Route path="/referrals" element={<ReferEarnPage />} />
+          <Route path="/refer-and-earn" element={<ReferEarnPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/:section" element={<SettingsPage />} />
           {/* Fallback route */}

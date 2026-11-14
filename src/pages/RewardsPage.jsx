@@ -123,6 +123,7 @@ export function RewardsPage() {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [leaderboardTab, setLeaderboardTab] = useState("all-time");
+  const [mobileTab, setMobileTab] = useState("levels"); // "levels" | "badges"
 
   const currentLevel = ALL_LEVELS.find((l) => l.isCurrent) || ALL_LEVELS[3];
   const nextLevel = ALL_LEVELS[currentLevel.level] || ALL_LEVELS[4];
@@ -177,11 +178,11 @@ export function RewardsPage() {
         </div>
       )}
 
-      {/* Main Content Container: Clean Apple-Style Whitespace, Top Aligned, Super Responsive on Mobile & Tablets */}
-      <main className="max-w-5xl w-full mx-auto px-3.5 sm:px-6 md:px-8 pt-16 sm:pt-18 md:pt-20 pb-24 sm:pb-16 flex-1 flex flex-col justify-start">
+      {/* Main Content Container: Centered on desktop PC so everything is visible without scrolling; top-aligned & safe on mobile/tablet */}
+      <main className="max-w-5xl w-full mx-auto px-3.5 sm:px-6 md:px-8 pt-20 sm:pt-24 md:pt-16 lg:pt-18 pb-24 sm:pb-16 md:pb-6 flex-1 flex flex-col justify-start md:justify-center md:min-h-[calc(100vh-56px)]">
         
-        {/* Top Header: Clean, Minimalist (No redundant desktop back button) */}
-        <div className="flex items-center justify-between gap-3 mb-4 sm:mb-5">
+        {/* Top Header: Clean, Minimalist */}
+        <div className="flex items-center justify-between gap-3 mb-3.5 md:mb-4">
           <div>
             <h1 className="font-display font-bold text-xl sm:text-2xl text-[#2C2738] tracking-tight">
               Rewards & Levels
@@ -203,14 +204,14 @@ export function RewardsPage() {
         </div>
 
         {/* ── TOP HERO STATUS CARD: APPLE HEALTH DUAL CONCENTRIC ACTIVITY RINGS ── */}
-        <div className="rounded-3xl bg-white border border-[#EDE8E1] p-4 sm:p-5 md:p-6 shadow-sm mb-5">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
+        <div className="rounded-3xl bg-white border border-[#EDE8E1] p-4 sm:p-5 md:p-5.5 shadow-sm mb-3.5 md:mb-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-5 md:gap-6">
             
             {/* Left: Dual Apple Health Concentric Rings + Level Details */}
             <div className="flex items-center gap-3.5 sm:gap-5 flex-1 min-w-0">
               
               {/* Apple Health 2-Ring Concentric SVG Activity Meter */}
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 flex items-center justify-center flex-shrink-0">
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-24 md:h-24 flex items-center justify-center flex-shrink-0">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                   {/* Outer Ring: Level XP Progression (PassQo Pink) */}
                   <circle
@@ -328,15 +329,91 @@ export function RewardsPage() {
           </div>
         </div>
 
-        {/* ── MAIN ARENA: 2 MINIMALIST COLUMNS (No Horizontal Scrollbars!) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch">
+        {/* ── MOBILE & TABLET TOUCH SEGMENTED CONTROL (< md): Levels & Badges Only ── */}
+        <div className="flex md:hidden items-center p-1 bg-[#F0EAE1]/80 backdrop-blur-md rounded-full mb-3.5 border border-[#EDE8E1] select-none">
+          {[
+            { id: "levels", label: "Levels" },
+            { id: "badges", label: "Badges" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setMobileTab(tab.id)}
+              className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-all cursor-pointer text-center whitespace-nowrap active:scale-95 ${
+                mobileTab === tab.id
+                  ? "bg-[#FF4E7A] text-white shadow-xs"
+                  : "text-[#756C84] hover:text-[#2C2738]"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── DESKTOP ONLY: PROMINENT GAMIFIED QUEST / WHAT TO DO NEXT TO INCREASE XP CARD (Same Old Desktop Design) ── */}
+        <div className="hidden md:block rounded-3xl bg-gradient-to-r from-[#FFF5F8] via-white to-[#F0FDF9] border border-[#FFD5E0] p-3.5 sm:p-4 md:p-4.5 shadow-xs mb-3.5 md:mb-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+            
+            {/* Left: Quest Progress & Motivating Gamified Callout */}
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#FF4E7A] text-white flex items-center justify-center font-bold shadow-xs flex-shrink-0">
+                <Zap className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-display font-bold text-sm sm:text-base text-[#2C2738]">
+                    Profile Strength: Intermediate (65%)
+                  </h3>
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#FF4E7A] text-white tracking-wide">
+                    +50 XP QUEST
+                  </span>
+                </div>
+                <p className="text-xs text-[#756C84] mt-0.5">
+                  Complete your profile bio & city to earn <strong>+50 XP</strong> and accelerate your level rank!
+                </p>
+              </div>
+            </div>
+
+            {/* Right: Urgent Action Chips */}
+            <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsEditProfileOpen(true)}
+                className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#FF4E7A] hover:bg-[#E03A64] text-white text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
+              >
+                <span>📋 Complete profile</span>
+                <span className="bg-white/25 text-white text-[10px] px-1.5 py-0.5 rounded-md font-bold">+50 XP</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate("/events")}
+                className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-white hover:bg-[#FBF9F6] border border-[#EDE8E1] text-[#2C2738] text-xs font-bold transition-all cursor-pointer active:scale-95"
+              >
+                <span>🎟️ Book event</span>
+                <span className="text-[#00C896] text-[10px] font-extrabold">+100 XP</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate("/referrals")}
+                className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-white hover:bg-[#FBF9F6] border border-[#EDE8E1] text-[#2C2738] text-xs font-bold transition-all cursor-pointer active:scale-95"
+              >
+                <span>👥 Invite friends</span>
+                <span className="text-[#7C3AED] text-[10px] font-extrabold">+200 XP</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ── DESKTOP PC MAIN ARENA: 2 MINIMALIST COLUMNS (Zero Scrollbar, Exactly Like Old Design) ── */}
+        <div className="hidden md:grid md:grid-cols-2 gap-4 sm:gap-5 md:gap-6 items-stretch">
           
-          {/* ══════════════════════════════════════════════════════════════
-              LEFT COLUMN: LEVEL PROGRESSION (100% Responsive, NO Scrollbar)
-             ══════════════════════════════════════════════════════════════ */}
-          <div className="bg-white rounded-3xl border border-[#EDE8E1] p-4 sm:p-5 md:p-6 shadow-sm flex flex-col justify-between">
+          {/* LEFT COLUMN: LEVEL PROGRESSION (Desktop) */}
+          <div className="bg-white rounded-3xl border border-[#EDE8E1] p-4 sm:p-5 md:p-5.5 shadow-sm flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-3.5 sm:mb-4">
+              <div className="flex items-center justify-between mb-3 sm:mb-3.5">
                 <h3 className="font-display font-bold text-sm sm:text-base text-[#2C2738]">
                   Level Progression
                 </h3>
@@ -350,71 +427,36 @@ export function RewardsPage() {
                 </button>
               </div>
 
-              {/* Modern Interactive Number Line (Levels 1 to 10): 100% responsive, never distorts */}
-              <div className="w-full pt-6 pb-5 px-1 mb-2 select-none">
-                <div className="relative w-full h-1.5 bg-[#F0EAE1] rounded-full">
-                  {/* Active Progress Fill from Level 1 up to Current Level */}
-                  <div
-                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#00C896] to-[#FF4E7A] rounded-full transition-all duration-500"
-                    style={{
-                      width: `${((currentLevel.level - 1) / (ALL_LEVELS.length - 1)) * 100}%`,
-                    }}
-                  />
+              {/* The Sleek 10-Step Circle Rail from Old Desktop Design */}
+              <div className="flex w-full items-center justify-between py-2 mb-4 relative select-none">
+                <div className="absolute top-1/2 left-2 right-2 h-0.5 bg-[#F2EDE6] -translate-y-1/2 z-0" />
 
-                  {/* Evenly Spaced Ticks & Numbers across the line */}
-                  <div className="absolute inset-0 flex items-center justify-between">
-                    {ALL_LEVELS.map((lvl) => {
-                      const isPast = lvl.level < currentLevel.level;
-                      const isCurrent = lvl.level === currentLevel.level;
+                {ALL_LEVELS.map((lvl) => {
+                  const isPast = lvl.level < currentLevel.level;
+                  const isCurrent = lvl.level === currentLevel.level;
 
-                      return (
-                        <button
-                          key={lvl.level}
-                          type="button"
-                          onClick={() => setSelectedLevel(lvl)}
-                          title={`Level ${lvl.level} — ${lvl.name} (${lvl.xpRequired} XP)`}
-                          className="group relative flex flex-col items-center justify-center cursor-pointer focus:outline-none touch-manipulation"
-                        >
-                          {/* Current Level Indicator Badge floating above */}
-                          {isCurrent && (
-                            <span className="absolute -top-6 px-1.5 py-0.5 rounded-md bg-[#FFF0F4] border border-[#FFD5E0] text-[9px] font-extrabold text-[#FF4E7A] whitespace-nowrap shadow-2xs">
-                              YOU
-                            </span>
-                          )}
-
-                          {/* Tick Node on the line */}
-                          <span
-                            className={`rounded-full transition-all duration-200 flex-shrink-0 ${
-                              isCurrent
-                                ? "w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#FF4E7A] ring-4 ring-[#FFD5E0] shadow-xs z-20"
-                                : isPast
-                                ? "w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#00C896] ring-2 ring-white z-10"
-                                : "w-2 h-2 sm:w-2.5 sm:h-2.5 bg-[#D6CFC7] group-hover:bg-[#FF4E7A] group-hover:scale-125 z-10"
-                            }`}
-                          />
-
-                          {/* Number placed cleanly below the line */}
-                          <span
-                            className={`absolute top-4 sm:top-4.5 text-[10px] sm:text-[11px] transition-all font-bold ${
-                              isCurrent
-                                ? "text-[#FF4E7A] font-extrabold scale-110"
-                                : isPast
-                                ? "text-[#00C896]"
-                                : "text-[#A69FB0] group-hover:text-[#2C2738]"
-                            }`}
-                          >
-                            {lvl.level}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                  return (
+                    <button
+                      key={lvl.level}
+                      type="button"
+                      onClick={() => setSelectedLevel(lvl)}
+                      className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold transition-all cursor-pointer flex-shrink-0 ${
+                        isCurrent
+                          ? "bg-[#FF4E7A] text-white shadow-xs ring-4 ring-[#FFD5E0] scale-110"
+                          : isPast
+                          ? "bg-[#00C896] text-white"
+                          : "bg-[#F2EDE6] text-[#A69FB0] hover:bg-[#E8E2D9]"
+                      }`}
+                    >
+                      {lvl.level}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Active Perks: Clean and Minimal */}
-              <div className="bg-[#FBF9F6] border border-[#EDE8E1] rounded-2xl p-3.5 sm:p-4 mb-3.5 sm:mb-4">
-                <div className="flex items-center justify-between mb-2 sm:mb-2.5">
+              <div className="bg-[#FBF9F6] border border-[#EDE8E1] rounded-2xl p-3 sm:p-3.5 mb-3 sm:mb-3.5">
+                <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-[#2C2738]">
                     Current Perks Unlocked
                   </span>
@@ -439,7 +481,7 @@ export function RewardsPage() {
               {/* Next Level Card with Always-Visible Progress Bar & What to Do Guide */}
               <div
                 onClick={() => setSelectedLevel(nextLevel)}
-                className="p-3.5 sm:p-4 rounded-2xl bg-[#FBF9F6] hover:bg-white border border-[#EDE8E1] hover:border-[#FFD5E0] transition-all cursor-pointer group shadow-2xs"
+                className="p-3 sm:p-3.5 rounded-2xl bg-[#FBF9F6] hover:bg-white border border-[#EDE8E1] hover:border-[#FFD5E0] transition-all cursor-pointer group shadow-2xs"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -464,18 +506,18 @@ export function RewardsPage() {
                 </div>
 
                 {/* Always-Visible Progress Bar & XP Remaining */}
-                <div className="mt-2.5 sm:mt-3 pt-2.5 border-t border-[#EDE8E1]">
-                  <div className="flex items-center justify-between text-xs font-medium text-[#756C84] mb-1.5">
+                <div className="mt-2 sm:mt-2.5 pt-2 border-t border-[#EDE8E1]">
+                  <div className="flex items-center justify-between text-[11px] sm:text-xs font-medium text-[#756C84] mb-1">
                     <span>Progress to Level {nextLevel.level}</span>
                     <span className="font-bold text-[#2C2738]">{userXP} / {nextLevel.xpRequired} XP</span>
                   </div>
-                  <div className="h-2 bg-[#F2EDE6] rounded-full overflow-hidden">
+                  <div className="h-1.5 sm:h-2 bg-[#F2EDE6] rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-[#FF4E7A] to-[#FF7A59] rounded-full transition-all duration-500"
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>
-                  <div className="flex items-center justify-between mt-1.5 text-[10px] sm:text-[11px] gap-2">
+                  <div className="flex items-center justify-between mt-1 text-[10px] sm:text-[11px] gap-2">
                     <span className="font-bold text-[#FF4E7A] truncate">{xpNeeded} XP left to unlock</span>
                     <span className="text-[#8C8599] font-semibold group-hover:text-[#FF4E7A] flex items-center gap-1 transition-colors flex-shrink-0">
                       <span>What to do</span>
@@ -487,12 +529,10 @@ export function RewardsPage() {
             </div>
           </div>
 
-          {/* ══════════════════════════════════════════════════════════════
-              RIGHT COLUMN: BADGES (Responsive Grid)
-             ══════════════════════════════════════════════════════════════ */}
-          <div className="bg-white rounded-3xl border border-[#EDE8E1] p-4 sm:p-5 md:p-6 shadow-sm flex flex-col justify-between">
+          {/* RIGHT COLUMN: BADGES (Desktop 2x2 Grid) */}
+          <div className="bg-white rounded-3xl border border-[#EDE8E1] p-4 sm:p-5 md:p-5.5 shadow-sm flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-3.5 sm:mb-4">
+              <div className="flex items-center justify-between mb-3 sm:mb-3.5">
                 <h3 className="font-display font-bold text-sm sm:text-base text-[#2C2738]">
                   Badges
                 </h3>
@@ -506,8 +546,8 @@ export function RewardsPage() {
                 </button>
               </div>
 
-              {/* 2x2 Clean Apple-Style Badge Tiles with Responsive Grid */}
-              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2.5 sm:gap-3">
+              {/* 2x2 Clean Apple-Style Badge Tiles */}
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                 {ALL_BADGES.slice(0, 4).map((b) => {
                   const pct = Math.min(100, Math.round((b.current / b.target) * 100));
 
@@ -518,7 +558,7 @@ export function RewardsPage() {
                       className="rounded-2xl p-3 sm:p-3.5 border border-[#EDE8E1] bg-white hover:border-[#FFD5E0] hover:shadow-xs transition-all cursor-pointer flex flex-col justify-between"
                     >
                       <div>
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between mb-1.5 sm:mb-2">
                           <span className="text-xl sm:text-2xl select-none">{b.icon}</span>
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF0F4] text-[#FF4E7A]">
                             +{b.xp} XP
@@ -533,7 +573,7 @@ export function RewardsPage() {
                       </div>
 
                       {/* Clean Progress Meter */}
-                      <div className="mt-2.5 sm:mt-3 pt-1">
+                      <div className="mt-2 sm:mt-2.5 pt-1">
                         <div className="h-1.5 bg-[#F2EDE6] rounded-full overflow-hidden mb-1">
                           <div
                             className="h-full bg-[#FF4E7A] rounded-full transition-all duration-300"
@@ -550,6 +590,304 @@ export function RewardsPage() {
               </div>
             </div>
           </div>
+
+        </div>
+
+        {/* ── MOBILE & TABLET ONLY: CLEAN TOUCH PROGRESSION & BADGES (< md) ── */}
+        <div className="block md:hidden space-y-4">
+          
+          {/* LEVEL PROGRESSION & WAYS TO EARN XP (When mobileTab === "levels") */}
+          {mobileTab === "levels" && (
+            <>
+              {/* Level Progression Card */}
+              <div className="bg-white rounded-3xl border border-[#EDE8E1] p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-1.5">
+                    <Crown className="w-4 h-4 text-[#FF4E7A]" />
+                    <h3 className="font-display font-bold text-sm text-[#2C2738]">
+                      Level Progression
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsAllLevelsOpen(true)}
+                    className="text-xs font-semibold text-[#FF4E7A] hover:underline flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <span>All 10 levels</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* Number Line That Never Distorts */}
+                <div className="w-full pt-6 pb-5 px-1 mb-2 select-none">
+                  <div className="relative w-full h-1.5 bg-[#F0EAE1] rounded-full">
+                    <div
+                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#00C896] to-[#FF4E7A] rounded-full transition-all duration-500"
+                      style={{
+                        width: `${((currentLevel.level - 1) / (ALL_LEVELS.length - 1)) * 100}%`,
+                      }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-between">
+                      {ALL_LEVELS.map((lvl) => {
+                        const isPast = lvl.level < currentLevel.level;
+                        const isCurrent = lvl.level === currentLevel.level;
+
+                        return (
+                          <button
+                            key={lvl.level}
+                            type="button"
+                            onClick={() => setSelectedLevel(lvl)}
+                            title={`Level ${lvl.level} — ${lvl.name} (${lvl.xpRequired} XP)`}
+                            className="group relative flex flex-col items-center justify-center cursor-pointer focus:outline-none touch-manipulation"
+                          >
+                            {isCurrent && (
+                              <span className="absolute -top-6 px-1.5 py-0.5 rounded-md bg-[#FFF0F4] border border-[#FFD5E0] text-[9px] font-extrabold text-[#FF4E7A] whitespace-nowrap shadow-2xs">
+                                YOU
+                              </span>
+                            )}
+                            <span
+                              className={`rounded-full transition-all duration-200 flex-shrink-0 ${
+                                isCurrent
+                                  ? "w-3.5 h-3.5 bg-[#FF4E7A] ring-4 ring-[#FFD5E0] shadow-xs z-20"
+                                  : isPast
+                                  ? "w-2.5 h-2.5 bg-[#00C896] ring-2 ring-white z-10"
+                                  : "w-2 h-2 bg-[#D6CFC7] group-hover:bg-[#FF4E7A] group-hover:scale-125 z-10"
+                              }`}
+                            />
+                            <span
+                              className={`absolute top-4 text-[10px] transition-all font-bold ${
+                                isCurrent
+                                  ? "text-[#FF4E7A] font-extrabold scale-110"
+                                  : isPast
+                                  ? "text-[#00C896]"
+                                  : "text-[#A69FB0] group-hover:text-[#2C2738]"
+                              }`}
+                            >
+                              {lvl.level}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Active Perks */}
+                <div className="bg-[#FBF9F6] border border-[#EDE8E1] rounded-2xl p-3 mb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-[#2C2738]">Current Perks</span>
+                    <span className="text-[10px] font-semibold text-[#00C896] bg-white px-2 py-0.5 rounded-full border border-[#00C896]/20">Active</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {currentLevel.perks.map((perk, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white text-[#2C2738] text-[11px] font-medium border border-[#EDE8E1]"
+                      >
+                        <Check className="w-3 h-3 text-[#00C896] stroke-[2.5]" />
+                        <span>{perk}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Next Milestone Card */}
+                <div
+                  onClick={() => setSelectedLevel(nextLevel)}
+                  className="p-3 rounded-2xl bg-[#FBF9F6] hover:bg-white border border-[#EDE8E1] hover:border-[#FFD5E0] transition-all cursor-pointer group shadow-2xs"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-xl bg-[#FFF0F4] border border-[#FFD5E0] flex items-center justify-center text-[#FF4E7A] font-bold text-xs flex-shrink-0">
+                        L{nextLevel.level}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-bold text-[#2C2738] group-hover:text-[#FF4E7A] transition-colors truncate">
+                            Next: Level {nextLevel.level} — {nextLevel.name}
+                          </span>
+                          <span className="text-[9px] font-bold text-[#FF4E7A] bg-[#FFF0F4] px-1.5 py-0.2 rounded-md">
+                            Locked
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-[#8C8599] mt-0.5 block truncate">
+                          Unlocks {nextLevel.perks.join(" • ")}
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-[#8C8599] group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+                  </div>
+
+                  <div className="mt-2 pt-2 border-t border-[#EDE8E1]">
+                    <div className="flex items-center justify-between text-[11px] font-medium text-[#756C84] mb-1">
+                      <span>Progress to Level {nextLevel.level}</span>
+                      <span className="font-bold text-[#2C2738]">{userXP} / {nextLevel.xpRequired} XP</span>
+                    </div>
+                    <div className="h-1.5 bg-[#F2EDE6] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#FF4E7A] to-[#FF7A59] rounded-full transition-all duration-500"
+                        style={{ width: `${progressPercent}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between mt-1 text-[10px] gap-2">
+                      <span className="font-bold text-[#FF4E7A] truncate">{xpNeeded} XP left to unlock</span>
+                      <span className="text-[#8C8599] font-semibold group-hover:text-[#FF4E7A] flex items-center gap-1 transition-colors flex-shrink-0">
+                        <span>What to do</span>
+                        <span className="text-xs">→</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── WAYS TO EARN XP (Directly Below Levels with Left Padding on Swiper) ── */}
+              <div>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <div className="flex items-center gap-1.5">
+                    <Zap className="w-4 h-4 text-[#FF4E7A]" />
+                    <h3 className="font-display font-bold text-sm text-[#2C2738]">
+                      Ways to Earn XP
+                    </h3>
+                  </div>
+                  <span className="text-[11px] font-semibold text-[#8C8599]">
+                    Swipe for quests →
+                  </span>
+                </div>
+
+                {/* Horizontal Swipe Rail: Left padding prevents card from attaching flush to the screen edge */}
+                <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory -mx-3.5 sm:-mx-6 pl-5 sm:pl-7 pr-5 sm:pr-7 py-1.5 scroll-pl-5 sm:scroll-pl-7">
+                  {/* Quest 1 */}
+                  <div className="snap-start flex-shrink-0 w-[240px] sm:w-[260px] p-3.5 rounded-2xl bg-white border border-[#FFD5E0] shadow-2xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xl">📋</span>
+                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#FFF0F4] text-[#FF4E7A]">
+                          +50 XP
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-xs text-[#2C2738]">Complete Profile</h4>
+                      <p className="text-[11px] text-[#756C84] mt-0.5 line-clamp-2">
+                        Add your bio & city to level up your attendee status.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditProfileOpen(true)}
+                      className="mt-3 w-full py-1.5 rounded-xl bg-[#FF4E7A] text-white text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-2xs"
+                    >
+                      Complete (+50 XP)
+                    </button>
+                  </div>
+
+                  {/* Quest 2 */}
+                  <div className="snap-start flex-shrink-0 w-[240px] sm:w-[260px] p-3.5 rounded-2xl bg-white border border-[#EDE8E1] shadow-2xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xl">🎟️</span>
+                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#E6FAF4] text-[#00C896]">
+                          +100 XP
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-xs text-[#2C2738]">Book Live Event</h4>
+                      <p className="text-[11px] text-[#756C84] mt-0.5 line-clamp-2">
+                        Check in at any live gig or festival to gain attendance XP.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/events")}
+                      className="mt-3 w-full py-1.5 rounded-xl bg-[#FBF9F6] hover:bg-[#FFF0F4] border border-[#EDE8E1] text-[#2C2738] text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                    >
+                      Explore Events (+100 XP)
+                    </button>
+                  </div>
+
+                  {/* Quest 3 */}
+                  <div className="snap-start flex-shrink-0 w-[240px] sm:w-[260px] p-3.5 rounded-2xl bg-white border border-[#EDE8E1] shadow-2xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xl">👥</span>
+                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#FAF5FF] text-[#7C3AED]">
+                          +200 XP
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-xs text-[#2C2738]">Invite Friends</h4>
+                      <p className="text-[11px] text-[#756C84] mt-0.5 line-clamp-2">
+                        Earn bonus XP when your friends book gigs with your code.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/referrals")}
+                      className="mt-3 w-full py-1.5 rounded-xl bg-[#FBF9F6] hover:bg-[#FFF0F4] border border-[#EDE8E1] text-[#2C2738] text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                    >
+                      Invite Friends (+200 XP)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* BADGES SECTION ON MOBILE & TABLET (When mobileTab === "badges"): 2 Badges Per Row Grid */}
+          {mobileTab === "badges" && (
+            <div>
+              <div className="flex items-center justify-between mb-2.5 px-1">
+                <div className="flex items-center gap-1.5">
+                  <Award className="w-4 h-4 text-[#FF4E7A]" />
+                  <h3 className="font-display font-bold text-sm text-[#2C2738]">
+                    Badges Collection ({ALL_BADGES.length})
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAllBadgesOpen(true)}
+                  className="text-xs font-semibold text-[#FF4E7A] hover:underline flex items-center gap-0.5 cursor-pointer"
+                >
+                  <span>View all</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* 2 Badges Per Row Clean Grid */}
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+                {ALL_BADGES.map((b) => {
+                  const pct = Math.min(100, Math.round((b.current / b.target) * 100));
+
+                  return (
+                    <div
+                      key={b.id}
+                      onClick={() => setSelectedBadge(b)}
+                      className="rounded-2xl p-3 sm:p-3.5 border border-[#EDE8E1] bg-white shadow-2xs hover:border-[#FFD5E0] transition-all cursor-pointer flex flex-col justify-between active:scale-[0.98]"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-2xl select-none">{b.icon}</span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFF0F4] text-[#FF4E7A]">
+                            +{b.xp} XP
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-xs text-[#2C2738] truncate">{b.title}</h4>
+                        <p className="text-[10px] text-[#8C8599] mt-0.5 line-clamp-2">{b.desc}</p>
+                      </div>
+
+                      <div className="mt-2.5 pt-1">
+                        <div className="h-1.5 bg-[#F2EDE6] rounded-full overflow-hidden mb-1">
+                          <div
+                            className="h-full bg-[#FF4E7A] rounded-full transition-all duration-300"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <div className="text-right text-[10px] font-medium text-[#8C8599]">
+                          {b.current}/{b.target} {b.unit}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
         </div>
 

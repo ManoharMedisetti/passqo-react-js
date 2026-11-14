@@ -12,7 +12,7 @@ import { TrendingSection } from "@/components/home/TrendingSection";
 import { BROWSE_CATEGORIES, categoryImage } from "@/lib/eventCategories";
 import { api } from "@/lib/api";
 import { MOCK_EVENTS, MOCK_TRENDING } from "@/lib/mockData";
-import { Zap, X, Sparkles } from "lucide-react";
+import { Zap, X } from "lucide-react";
 import { getUser } from "@/lib/auth/storage";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 
@@ -132,58 +132,48 @@ export function HomePage() {
     <div className="min-h-screen bg-[#F5F0EB] pb-24 lg:pb-0 w-full max-w-full">
       <Navbar />
 
-      {/* ── GAMIFIED FLOATING QUEST PILL (Top-Right Below Navbar on Desktop, Above Bottom Nav on Tabs/Mobiles) ── */}
+      {/* ── GAMIFIED FLOATING QUEST PILL (Aligned to exact right padding of Navbar's Profile Icon across all viewports) ── */}
       {showQuestBanner && (
-        <aside
-          aria-label="Active Quest"
-          className="fixed z-40 bottom-20 sm:bottom-22 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md md:top-20 md:bottom-auto md:right-6 lg:right-8 lg:top-22 bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-full p-3 sm:py-2.5 sm:px-4 shadow-[0_12px_40px_rgba(255,78,122,0.14)] border border-[#FFD5E0] flex items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-3 md:slide-in-from-top-3 duration-300"
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-[#FFF0F4] border border-[#FFD5E0] text-[#FF4E7A] flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-4 h-4 text-[#FF4E7A]" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-[#2C2738] truncate">
+        <div className="fixed z-[150] inset-x-0 pointer-events-none px-3.5 sm:px-4 lg:px-8 md:top-20 lg:top-22 bottom-20 sm:bottom-22 md:bottom-auto">
+          <div className="max-w-[1120px] mx-auto flex justify-end w-full">
+            <aside
+              aria-label="Active Quest"
+              className="pointer-events-auto bg-white/95 backdrop-blur-md rounded-full py-1.5 px-3.5 sm:py-2 sm:px-4 shadow-[0_12px_36px_rgba(255,78,122,0.18)] border border-[#FFD5E0] flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3.5 max-w-[calc(100vw-28px)] sm:max-w-none animate-in fade-in slide-in-from-bottom-3 md:slide-in-from-top-3 duration-300 select-none"
+            >
+              {/* Left: Title + XP Badge in single line */}
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xs sm:text-sm font-bold text-[#2C2738] truncate whitespace-nowrap">
                   Complete your profile
                 </span>
-                <span className="text-[10px] font-extrabold text-[#FF4E7A] bg-[#FFF0F4] px-1.5 py-0.2 rounded-md">
+                <span className="text-[10px] sm:text-[11px] font-extrabold text-[#FF4E7A] bg-[#FFF0F4] border border-[#FFD5E0] px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
                   +50 XP
                 </span>
               </div>
-              <p className="text-[11px] text-[#756C84] truncate">
-                Add city & bio to unlock Explorer Badge & level up
-              </p>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <button
-              type="button"
-              onClick={() => setIsEditProfileOpen(true)}
-              className="bg-[#FF4E7A] hover:bg-[#E03A64] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-xs transition-all cursor-pointer active:scale-95 whitespace-nowrap"
-            >
-              Start (+50 XP)
-            </button>
-            <Link
-              to="/rewards"
-              className="text-[11px] font-bold text-[#8C8599] hover:text-[#FF4E7A] px-1.5 py-1 transition-colors hidden sm:inline-block whitespace-nowrap"
-            >
-              Rewards →
-            </Link>
-            <button
-              type="button"
-              onClick={() => {
-                setShowQuestBanner(false);
-                sessionStorage.setItem("passqo_dismiss_quest", "true");
-              }}
-              className="w-6 h-6 rounded-full hover:bg-[#F5EFF2] text-[#8C8599] hover:text-[#2C2738] flex items-center justify-center transition-colors cursor-pointer"
-              aria-label="Dismiss quest notification"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
+              {/* Right: Start Action & Dismiss Button */}
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsEditProfileOpen(true)}
+                  className="bg-[#FF4E7A] hover:bg-[#E03A64] text-white text-xs font-bold px-3 py-1 sm:py-1.5 rounded-full shadow-xs transition-all cursor-pointer active:scale-95 whitespace-nowrap"
+                >
+                  Start
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowQuestBanner(false);
+                    sessionStorage.setItem("passqo_dismiss_quest", "true");
+                  }}
+                  className="w-6 h-6 rounded-full hover:bg-[#F5EFF2] text-[#8C8599] hover:text-[#2C2738] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                  aria-label="Dismiss quest notification"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </aside>
           </div>
-        </aside>
+        </div>
       )}
 
       {/* ── Hero carousel — sits seamlessly beneath fixed navbar ── */}

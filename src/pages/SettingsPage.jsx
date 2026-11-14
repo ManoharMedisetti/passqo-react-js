@@ -828,7 +828,7 @@ export function SettingsPage() {
         onBack={activeMobileSection ? closeMobileSection : undefined}
       />
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-18 md:pt-20 pb-20">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 md:pt-20 pb-20">
         {/* ═══════════════════════════════════════════════════════════
             MOBILE-ONLY SETTINGS VIEW (md:hidden)
             Clean, uncluttered, iOS/Android-style flow with native swipe back support:

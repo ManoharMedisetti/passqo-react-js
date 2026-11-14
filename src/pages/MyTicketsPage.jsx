@@ -192,7 +192,7 @@ export function MyTicketsPage() {
     <div className="min-h-screen bg-[#F5F0EB] text-[#1B1B23]">
       <SubPageHeader title="My Tickets" />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-16 sm:pt-18 md:pt-20 pb-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 md:pt-20 pb-16">
         {/* Page Header matching I.html */}
         <div className="mb-6">
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-[#1B1B23] tracking-tight">
