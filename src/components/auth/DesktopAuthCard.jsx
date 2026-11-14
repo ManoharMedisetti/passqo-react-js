@@ -51,41 +51,9 @@ export function DesktopAuthCard({
         </div>
 
         {/* ── RIGHT COLUMN: Form Area (Always Right, Clean Minimal) ── */}
-        <div className="relative flex flex-col justify-center px-8 lg:px-10 py-7 lg:py-8 overflow-y-auto max-h-[90vh] bg-white">
+        <div className="relative flex flex-col justify-center px-8 lg:px-10 py-8 lg:py-10 overflow-y-auto max-h-[90vh] bg-white">
           {/* Close Button top-right */}
           <AuthCloseButton onClick={onClose} className="absolute top-5 right-5" />
-
-          {/* ── MINIMAL CLEAN ROLE SWITCHER TABS ── */}
-          <div className="flex items-center gap-1 p-1 bg-[#F5F0EB] rounded-full w-fit mb-3 select-none">
-            <button
-              type="button"
-              onClick={() => {
-                setError("");
-                setIsOrganizer(false);
-              }}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                !isOrganizer
-                  ? "bg-white text-[#FF4E7A] shadow-2xs"
-                  : "text-[#756C84] hover:text-[#2C2738]"
-              }`}
-            >
-              Attendee
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setError("");
-                setIsOrganizer(true);
-              }}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                isOrganizer
-                  ? "bg-white text-[#0284C7] shadow-2xs"
-                  : "text-[#756C84] hover:text-[#2C2738]"
-              }`}
-            >
-              Organiser
-            </button>
-          </div>
 
           <AnimatePresence mode="wait">
             {mode === "signin" ? (

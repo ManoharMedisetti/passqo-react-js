@@ -96,40 +96,32 @@ export function SignInForm({
       </form>
 
       {/* Footer Switch */}
-      <div className="pt-2 text-center space-y-2.5">
+      <div className="pt-2 text-center">
         <p className="text-xs sm:text-sm text-[#756C84]">
-          No account yet?{" "}
-          <button
-            type="button"
-            onClick={onSwitchToSignUp}
-            className={`font-bold hover:underline cursor-pointer ${
-              isOrganizer ? "text-[#0284C7]" : "text-[#FF4E7A]"
-            }`}
-          >
-            {isOrganizer ? "Register host account" : "Create one free"}
-          </button>
-        </p>
-
-        {/* ── Minimal Clean Switch Button (No sparkle icon, refined UI/UX) ── */}
-        <div className="pt-2 border-t border-[#EDE8E1]">
           {isOrganizer ? (
-            <button
-              type="button"
-              onClick={onSwitchToAttendee}
-              className="w-full h-9.5 rounded-xl border border-[#EDE8E1] hover:border-[#FF4E7A]/40 text-[#756C84] hover:text-[#FF4E7A] bg-[#F5F0EB]/50 hover:bg-[#FFF0F4]/40 font-semibold text-xs sm:text-[13px] transition-all flex items-center justify-center cursor-pointer active:scale-98"
-            >
-              <span>Looking to book events? Attendee Sign In →</span>
-            </button>
+            <>
+              New host?{" "}
+              <button
+                type="button"
+                onClick={onSwitchToSignUp}
+                className="font-bold text-[#0284C7] hover:underline cursor-pointer"
+              >
+                Register host account
+              </button>
+            </>
           ) : (
-            <button
-              type="button"
-              onClick={onBecomeOrganizer}
-              className="w-full h-9.5 rounded-xl border border-[#EDE8E1] hover:border-[#0284C7]/40 text-[#756C84] hover:text-[#0284C7] bg-[#F5F0EB]/50 hover:bg-[#E0F2FE]/40 font-semibold text-xs sm:text-[13px] transition-all flex items-center justify-center cursor-pointer active:scale-98"
-            >
-              <span>Hosting an event? Switch to Organiser Login →</span>
-            </button>
+            <>
+              No account yet?{" "}
+              <button
+                type="button"
+                onClick={onSwitchToSignUp}
+                className="font-bold text-[#FF4E7A] hover:underline cursor-pointer"
+              >
+                Create one free
+              </button>
+            </>
           )}
-        </div>
+        </p>
       </div>
     </motion.div>
   );

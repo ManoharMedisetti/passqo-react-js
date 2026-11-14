@@ -106,6 +106,11 @@ export function AuthModal() {
               role: isOrganizer ? "ORGANIZER" : authData.user.role || "CUSTOMER",
             }
           : null;
+        if (isOrganizer) {
+          localStorage.setItem("passqo_is_organizer", "true");
+        } else {
+          localStorage.removeItem("passqo_is_organizer");
+        }
         if (finalUser) setUser(finalUser);
 
         window.dispatchEvent(
@@ -142,6 +147,11 @@ export function AuthModal() {
               role: isOrganizer ? "ORGANIZER" : regData.user.role || "CUSTOMER",
             }
           : null;
+        if (isOrganizer) {
+          localStorage.setItem("passqo_is_organizer", "true");
+        } else {
+          localStorage.removeItem("passqo_is_organizer");
+        }
         if (finalRegUser) setUser(finalRegUser);
 
         window.dispatchEvent(

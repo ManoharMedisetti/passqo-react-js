@@ -61,38 +61,6 @@ export function MobileAuthCard({
       {/* ── FORM CONTENT (Clean, Minimal, Pure White) ── */}
       <div className="w-full px-5 sm:px-6 py-5 pb-28 bg-white flex-1">
         <div className="max-w-md mx-auto w-full pb-8">
-          {/* ── ROLE SWITCHER TABS (Mobile) ── */}
-          <div className="flex items-center justify-center gap-1 p-1 bg-[#F5F0EB] rounded-full w-fit mb-4 mx-auto select-none">
-            <button
-              type="button"
-              onClick={() => {
-                setError("");
-                setIsOrganizer(false);
-              }}
-              className={`px-3.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                !isOrganizer
-                  ? "bg-white text-[#FF4E7A] shadow-2xs"
-                  : "text-[#756C84] hover:text-[#2C2738]"
-              }`}
-            >
-              Attendee
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setError("");
-                setIsOrganizer(true);
-              }}
-              className={`px-3.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                isOrganizer
-                  ? "bg-white text-[#0284C7] shadow-2xs"
-                  : "text-[#756C84] hover:text-[#2C2738]"
-              }`}
-            >
-              Organiser
-            </button>
-          </div>
-
           <AnimatePresence mode="wait">
             {mode === "signin" ? (
               <SignInForm

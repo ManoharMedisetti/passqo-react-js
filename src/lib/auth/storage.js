@@ -48,5 +48,6 @@ export function clearAuth() {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(USER_ID_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem('passqo_is_organizer');
 }
 

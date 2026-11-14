@@ -100,10 +100,12 @@ export function ProfileSidebarMenu({ isOpen, onClose, user }) {
     </div>
   );
 
+  const isOrganizerUser = user?.role === "ORGANIZER" || localStorage.getItem("passqo_is_organizer") === "true";
+
   {/* Card 2: Main Navigation Actions Card (Matching Reference Frame 118) */}
   const mainActionsCard = (
     <div className="bg-white rounded-2xl sm:rounded-3xl border border-black/6 shadow-2xs divide-y divide-black/5 overflow-hidden">
-      {/* 1. Become an organizer */}
+      {/* 1. Become an organizer / Organiser Dashboard */}
       <button
         type="button"
         onClick={() => handleItemClick("/organizer")}
@@ -112,21 +114,21 @@ export function ProfileSidebarMenu({ isOpen, onClose, user }) {
         <div className="flex items-center gap-3.5 min-w-0">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-              <rect x="7" y="4" width="10" height="7" rx="2" fill="#FF4E7A" />
-              <path d="M4 11h16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4z" stroke="#1B1B23" strokeWidth="1.8" />
-              <path d="M6 17v4M18 17v4" stroke="#1B1B23" strokeWidth="1.8" strokeLinecap="round" />
+              <rect x="7" y="4" width="10" height="7" rx="2" fill={isOrganizerUser ? "#0284C7" : "#FF4E7A"} />
+              <path d="M4 11h16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4z" stroke="#2C2738" strokeWidth="1.8" />
+              <path d="M6 17v4M18 17v4" stroke="#2C2738" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
           </div>
           <div className="min-w-0">
-            <p className="font-display font-bold text-xs sm:text-sm text-[#1B1B23] truncate group-hover:text-[#FF4E7A] transition-colors">
-              Become an organizer
+            <p className="font-display font-bold text-xs sm:text-sm text-[#2C2738] truncate group-hover:text-[#FF4E7A] transition-colors">
+              {isOrganizerUser ? "Organiser Dashboard" : "Become an organizer"}
             </p>
-            <p className="text-[11px] text-[#8C8C9E] font-medium truncate mt-0.5">
-              Host your events
+            <p className="text-[11px] text-[#756C84] font-medium truncate mt-0.5">
+              {isOrganizerUser ? "Manage your events & sales" : "Host your events"}
             </p>
           </div>
         </div>
-        <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-[#1B1B23] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+        <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-[#2C2738] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
       </button>
 
       {/* 2. My Tickets */}

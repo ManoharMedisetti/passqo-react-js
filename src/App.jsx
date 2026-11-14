@@ -11,7 +11,19 @@ import { RateExperiencePage } from "@/pages/RateExperiencePage";
 import { SettingsPage } from "@/pages/SettingsPage";
 import { RewardsPage } from "@/pages/RewardsPage";
 import { ReferEarnPage } from "@/pages/ReferEarnPage";
-import { OrganizerDashboardPage } from "@/pages/OrganizerDashboardPage";
+import { OrganizerDashboardPage } from "@/organizer/pages/OrganizerDashboardPage";
+import { OrganizerOverviewPage } from "@/organizer/pages/OrganizerOverviewPage";
+import { OrganizerEventsPage } from "@/organizer/pages/OrganizerEventsPage";
+import { OrganizerCreateEventPage } from "@/organizer/pages/OrganizerCreateEventPage";
+import { OrganizerAnalyticsPage } from "@/organizer/pages/OrganizerAnalyticsPage";
+import { OrganizerTicketsPage } from "@/organizer/pages/OrganizerTicketsPage";
+import { OrganizerPeoplePage } from "@/organizer/pages/OrganizerPeoplePage";
+import { OrganizerApprovalsPage } from "@/organizer/pages/OrganizerApprovalsPage";
+import { OrganizerRefundsPage } from "@/organizer/pages/OrganizerRefundsPage";
+import { OrganizerCouponsPage } from "@/organizer/pages/OrganizerCouponsPage";
+import { OrganizerScannerPage } from "@/organizer/pages/OrganizerScannerPage";
+import { OrganizerProfilePage } from "@/organizer/pages/OrganizerProfilePage";
+import { OrganizerSettingsPage } from "@/organizer/pages/OrganizerSettingsPage";
 import { SearchProvider } from "@/context/SearchContext";
 import { SearchModal } from "@/components/search/SearchModal";
 import { AuthProvider } from "@/context/AuthContext";
@@ -40,6 +52,18 @@ export function App() {
           <Route path="/refer-and-earn" element={<ReferEarnPage />} />
           <Route path="/organizer" element={<OrganizerDashboardPage />} />
           <Route path="/organizer/dashboard" element={<OrganizerDashboardPage />} />
+          <Route path="/organizer/overview" element={<OrganizerOverviewPage />} />
+          <Route path="/organizer/events" element={<OrganizerEventsPage />} />
+          <Route path="/organizer/create-event" element={<OrganizerCreateEventPage />} />
+          <Route path="/organizer/analytics" element={<OrganizerAnalyticsPage />} />
+          <Route path="/organizer/tickets" element={<OrganizerTicketsPage />} />
+          <Route path="/organizer/people" element={<OrganizerPeoplePage />} />
+          <Route path="/organizer/approvals" element={<OrganizerApprovalsPage />} />
+          <Route path="/organizer/refunds" element={<OrganizerRefundsPage />} />
+          <Route path="/organizer/coupons" element={<OrganizerCouponsPage />} />
+          <Route path="/organizer/scanner" element={<OrganizerScannerPage />} />
+          <Route path="/organizer/profile" element={<OrganizerProfilePage />} />
+          <Route path="/organizer/settings" element={<OrganizerSettingsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/:section" element={<SettingsPage />} />
           {/* Fallback route */}
