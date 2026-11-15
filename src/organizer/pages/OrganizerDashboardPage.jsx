@@ -8,11 +8,8 @@ import { YourActivityChart } from "../components/YourActivityChart";
 import { KeyMetricsGrid } from "../components/KeyMetricsGrid";
 import { SalesAnalyticsCard } from "../components/SalesAnalyticsCard";
 import { ConversionAndTopEvents } from "../components/ConversionAndTopEvents";
-import { RecentActivityCard } from "../components/RecentActivityCard";
-import { UpcomingEventsCard } from "../components/UpcomingEventsCard";
-import { QuickActionsCard } from "../components/QuickActionsCard";
 import { RecentOrdersCard } from "../components/RecentOrdersCard";
-import { PerformanceInsightsCard } from "../components/PerformanceInsightsCard";
+import { UpcomingEventsCard } from "../components/UpcomingEventsCard";
 import { CreateEventModal } from "../components/CreateEventModal";
 
 export function OrganizerDashboardPage() {
@@ -90,40 +87,15 @@ export function OrganizerDashboardPage() {
           </div>
         </div>
 
-        {/* ── ROW 4: Recent Activity (1/3) + Upcoming Events (2/3) ── */}
+        {/* ── ROW 4: Recent Orders (1/3) + Upcoming Events (2/3) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
           <div className="lg:col-span-1 h-full flex flex-col">
-            <RecentActivityCard onViewAll={() => navigate("/organizer/analytics")} />
+            <RecentOrdersCard onViewAll={() => navigate("/organizer/tickets")} />
           </div>
           <div className="lg:col-span-2 h-full flex flex-col">
             <UpcomingEventsCard onViewCalendar={() => navigate("/organizer/events")} />
           </div>
         </div>
-
-        {/* ── ROW 5: Quick Actions (1/3) + Recent Orders (2/3) ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-          <div className="lg:col-span-1 h-full flex flex-col">
-            <QuickActionsCard
-              onCreateEvent={() => setIsCreateModalOpen(true)}
-              onAddTeam={() => navigate("/organizer/people")}
-              onGenerateReport={() => navigate("/organizer/analytics")}
-              onOpenSettings={() => navigate("/organizer/settings")}
-            />
-          </div>
-          <div className="lg:col-span-2 h-full flex flex-col">
-            <RecentOrdersCard onViewAll={() => navigate("/organizer/tickets")} />
-          </div>
-        </div>
-
-        {/* ── ROW 6: Performance Insights (Bottom Row of 3) ── */}
-        <PerformanceInsightsCard
-          avgOrderValue="$65.50"
-          avgOrderGrowth="+5.2% from last month"
-          retention="68%"
-          retentionGrowth="+2.1% from last month"
-          successRate="89%"
-          successRateGrowth="-1.3% from last month"
-        />
       </main>
 
       {/* Create Event Modal */}

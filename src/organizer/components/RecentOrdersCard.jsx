@@ -53,6 +53,18 @@ export function RecentOrdersCard({ onViewAll }) {
       status: "Refunded",
       statusColor: "text-rose-700 bg-rose-50 border-rose-200",
     },
+    {
+      id: "ord-12341",
+      orderNo: "Order #12341",
+      buyer: "Jessica Taylor",
+      eventName: "Electronic Beat 2026",
+      eventImage: "/images/figma-sample/goa/stage-a.png",
+      tickets: "2x General Passes",
+      time: "4 hours ago",
+      price: "$98.00",
+      status: "Paid",
+      statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
+    },
   ];
 
   const handleViewAllClick = () => {
@@ -86,15 +98,15 @@ export function RecentOrdersCard({ onViewAll }) {
       </div>
 
       {/* Orders List with Person Name, Event Name, and Event Cover Photo */}
-      <div className="space-y-3.5 pt-4 flex-1">
+      <div className="pt-3 flex-1 flex flex-col justify-between gap-1.5">
         {orders.map((ord) => (
           <div
             key={ord.id}
-            className="flex items-center justify-between gap-3.5 p-2.5 hover:bg-slate-50/80 rounded-xl transition-all border border-transparent hover:border-[#e2e8f0]/80"
+            className="flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-slate-50/80 transition-all border border-transparent hover:border-[#e2e8f0]/80"
           >
-            <div className="flex items-center gap-3.5 min-w-0">
-              {/* Event Cover Photo (Ticket symbol removed per user request) */}
-              <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-[#e2e8f0] shadow-2xs flex-shrink-0">
+            <div className="flex items-center gap-3 min-w-0">
+              {/* Event Cover Photo */}
+              <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 border border-[#e2e8f0] shadow-2xs flex-shrink-0">
                 <img
                   src={ord.eventImage}
                   alt={ord.eventName}
@@ -108,17 +120,17 @@ export function RecentOrdersCard({ onViewAll }) {
               {/* Person Name & Event Name Details */}
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-xs sm:text-sm font-bold text-[#0f172a] truncate">
+                  <h4 className="text-xs font-bold text-[#0f172a] truncate">
                     {ord.buyer}
                   </h4>
                   <span className="text-[10px] text-[#94a3b8] font-mono hidden sm:inline">
                     {ord.orderNo}
                   </span>
                 </div>
-                <p className="text-xs font-semibold text-blue-600 truncate mt-0.5">
+                <p className="text-[11px] font-semibold text-blue-600 truncate mt-0.5">
                   {ord.eventName}
                 </p>
-                <p className="text-[11px] text-[#64748b] font-medium truncate mt-0.5">
+                <p className="text-[10px] text-[#64748b] font-medium truncate mt-0.5">
                   {ord.tickets} • {ord.time}
                 </p>
               </div>
@@ -126,7 +138,7 @@ export function RecentOrdersCard({ onViewAll }) {
 
             {/* Price & Status Pill */}
             <div className="text-right flex-shrink-0">
-              <p className="text-xs sm:text-sm font-bold text-[#0f172a]">
+              <p className="text-xs font-bold text-[#0f172a]">
                 {ord.price}
               </p>
               <span
