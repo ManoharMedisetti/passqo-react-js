@@ -327,7 +327,10 @@ export function OrganizerEventsPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredEvents.map((evt) => {
-              const percent = Math.round((evt.sold / evt.total) * 100);
+              const totalCap = evt.total ?? 0;
+              const soldCap = evt.sold ?? 0;
+              const percent =
+                totalCap > 0 ? Math.round((soldCap / totalCap) * 100) : 0;
 
               return (
                 <article
@@ -337,8 +340,8 @@ export function OrganizerEventsPage() {
                   {/* Event Cover Photo with Status Badge and Price Overlay */}
                   <div className="relative h-44 w-full overflow-hidden bg-slate-900">
                     <img
-                      src={evt.image}
-                      alt={evt.title}
+                      src={evt.image || "/images/figma-sample/goa/goa-hero.png"}
+                      alt={evt.title || "Event Cover"}
                       className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                       onError={(e) => {
                         e.currentTarget.src =
@@ -350,16 +353,19 @@ export function OrganizerEventsPage() {
                     {/* Top Left: Status Badge */}
                     <div className="absolute top-3 left-3 z-10">
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-xs tracking-wide uppercase ${evt.badgeClass}`}
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-xs tracking-wide uppercase ${
+                          evt.badgeClass ||
+                          "bg-emerald-500/90 text-white backdrop-blur-md"
+                        }`}
                       >
-                        {evt.statusLabel}
+                        {evt.statusLabel || "Live"}
                       </span>
                     </div>
 
                     {/* Top Right: Ticket Price */}
                     <div className="absolute top-3 right-3 z-10">
                       <span className="px-2.5 py-0.5 rounded-md bg-black/65 backdrop-blur-md text-white text-xs font-bold border border-white/20 shadow-xs">
-                        {evt.price}
+                        {evt.price || "Free"}
                       </span>
                     </div>
                   </div>
@@ -368,17 +374,17 @@ export function OrganizerEventsPage() {
                   <div className="p-4 sm:p-5 space-y-3.5 flex-1 flex flex-col justify-between">
                     <div>
                       <h3 className="font-bold text-base text-[#0f172a] group-hover:text-blue-600 transition-colors line-clamp-1 tracking-tight">
-                        {evt.title}
+                        {evt.title || "Untitled Event"}
                       </h3>
 
                       <div className="space-y-1.5 mt-2.5 text-xs text-[#64748b]">
                         <p className="flex items-center gap-2">
                           <Calendar className="w-3.5 h-3.5 text-[#94a3b8] flex-shrink-0" />
-                          <span className="truncate">{evt.date}</span>
+                          <span className="truncate">{evt.date || "Date TBA"}</span>
                         </p>
                         <p className="flex items-center gap-2">
                           <MapPin className="w-3.5 h-3.5 text-[#94a3b8] flex-shrink-0" />
-                          <span className="truncate">{evt.venue}</span>
+                          <span className="truncate">{evt.venue || "Location TBA"}</span>
                         </p>
                       </div>
                     </div>
@@ -387,8 +393,8 @@ export function OrganizerEventsPage() {
                     <div className="pt-3 border-t border-[#f1f5f9] space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-[#64748b] font-medium">
-                          {evt.sold.toLocaleString()} /{" "}
-                          {evt.total.toLocaleString()} sold
+                          {soldCap.toLocaleString()} /{" "}
+                          {totalCap.toLocaleString()} sold
                         </span>
                         <span className="font-bold text-[#0f172a]">
                           {percent}%
@@ -396,8 +402,12 @@ export function OrganizerEventsPage() {
                       </div>
                       <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-300 ${evt.progressColor}`}
-                          style={{ width: `${percent}%` }}
+                          className={`h-full rounded-full transition-all duration-300 ${
+                            evt.progressColor || "bg-emerald-500"
+                          }`}
+                          style={{
+                            width: `${Math.min(100, Math.max(0, percent))}%`,
+                          }}
                         />
                       </div>
                     </div>

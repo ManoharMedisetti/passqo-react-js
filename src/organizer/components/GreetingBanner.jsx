@@ -11,6 +11,12 @@ export function GreetingBanner({
 }) {
   const displayName = user?.name || "manoharprasadmedisetti";
   const avatarSrc = user?.avatar || "/images/avatar-manohar.png";
+  const activeCount = activeEventsCount ?? 0;
+  const upcomingCount = upcomingEventsCount ?? 0;
+  const salesDisplay = todaySales || "$0.00";
+  const salesGrowthDisplay = todaySalesGrowth || "+0%";
+  const ticketsDisplay = ticketsToday ?? 0;
+  const ticketsGrowthDisplay = ticketsGrowth || "+0%";
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-r from-white via-[#F0F8FE] to-[#DDF1FD] rounded-2xl sm:rounded-3xl border border-[#E2E8F0] p-6 sm:p-7 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6 h-full">
@@ -41,8 +47,8 @@ export function GreetingBanner({
               <span className="inline-block select-none text-xl">👋</span>
             </h2>
             <p className="text-xs sm:text-[13px] text-[#64748B] mt-0.5 font-normal whitespace-nowrap">
-              You have <span className="font-bold text-[#FF3B70]">{activeEventsCount}</span> active events and{" "}
-              <span className="font-bold text-[#FF3B70]">{upcomingEventsCount}</span> upcoming this month.
+              You have <span className="font-bold text-[#FF3B70]">{activeCount}</span> active events and{" "}
+              <span className="font-bold text-[#FF3B70]">{upcomingCount}</span> upcoming this month.
             </p>
           </div>
         </div>
@@ -73,11 +79,11 @@ export function GreetingBanner({
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
-                  {todaySales}
+                  {salesDisplay}
                 </span>
                 <span className="text-[11px] font-bold text-[#16A34A] bg-[#E8FAF0] border border-[#D1F7E2] px-2 py-0.5 rounded-full inline-flex items-center gap-0.5">
                   <ArrowUpRight className="w-3 h-3 stroke-[2.5]" />
-                  {todaySalesGrowth}
+                  {salesGrowthDisplay}
                 </span>
               </div>
               <p className="text-xs text-[#64748B] font-medium mt-0.5 whitespace-nowrap">
@@ -94,11 +100,11 @@ export function GreetingBanner({
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
-                  {ticketsToday}
+                  {ticketsDisplay}
                 </span>
                 <span className="text-[11px] font-bold text-[#16A34A] bg-[#E8FAF0] border border-[#D1F7E2] px-2 py-0.5 rounded-full inline-flex items-center gap-0.5">
                   <ArrowUpRight className="w-3 h-3 stroke-[2.5]" />
-                  {ticketsGrowth}
+                  {ticketsGrowthDisplay}
                 </span>
               </div>
               <p className="text-xs text-[#64748B] font-medium mt-0.5 whitespace-nowrap">

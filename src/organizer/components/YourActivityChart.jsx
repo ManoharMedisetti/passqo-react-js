@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from "recharts";
 
-const data = [
+const DEFAULT_DATA = [
   { day: "Mon", value: 15 },
   { day: "Tue", value: 20 },
   { day: "Wed", value: 12 },
@@ -15,6 +15,16 @@ const data = [
   { day: "Fri", value: 21 },
   { day: "Sat", value: 18 },
   { day: "Sun", value: 25 },
+];
+
+const EMPTY_DATA = [
+  { day: "Mon", value: 0 },
+  { day: "Tue", value: 0 },
+  { day: "Wed", value: 0 },
+  { day: "Thu", value: 0 },
+  { day: "Fri", value: 0 },
+  { day: "Sat", value: 0 },
+  { day: "Sun", value: 0 },
 ];
 
 function CustomTooltip({ active, payload, label }) {
@@ -29,11 +39,19 @@ function CustomTooltip({ active, payload, label }) {
   return null;
 }
 
-export function YourActivityChart() {
-  const totalThisWeek = data.reduce((acc, curr) => acc + curr.value, 0);
+export function YourActivityChart({ data: propData }) {
+  const chartData =
+    propData && propData.length > 0
+      ? propData
+      : propData !== undefined
+      ? EMPTY_DATA
+      : DEFAULT_DATA;
+
+  const totalThisWeek = chartData.reduce((acc, curr) => acc + (curr.value || 0), 0);
+  const maxVal = Math.max(...chartData.map((d) => d.value || 0), 20);
 
   return (
-    <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 shadow-xs flex flex-col justify-between h-full">
+    <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 shadow-xs flex flex-col justify-between h-full min-h-[220px]">
       {/* Header: Clean & Concise */}
       <div className="flex items-center justify-between mb-2">
         <div>
@@ -50,11 +68,11 @@ export function YourActivityChart() {
       {/* Chart: Expands to match GreetingBanner height */}
       <div className="w-full flex-1 min-h-[170px] pt-1">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
             <defs>
               <linearGradient id="venueActivityGlow" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+                <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.25} />
+                <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.0} />
               </linearGradient>
             </defs>
             <XAxis
@@ -65,8 +83,7 @@ export function YourActivityChart() {
               dy={5}
             />
             <YAxis
-              domain={[0, 25]}
-              ticks={[0, 5, 10, 15, 20, 25]}
+              domain={[0, maxVal]}
               tickLine={false}
               axisLine={false}
               tick={{ fill: "#94A3B8", fontSize: 10, fontWeight: 500 }}

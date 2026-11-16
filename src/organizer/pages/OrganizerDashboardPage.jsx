@@ -8,8 +8,9 @@ import { YourActivityChart } from "../components/YourActivityChart";
 import { KeyMetricsGrid } from "../components/KeyMetricsGrid";
 import { SalesAnalyticsCard } from "../components/SalesAnalyticsCard";
 import { ConversionAndTopEvents } from "../components/ConversionAndTopEvents";
-import { RecentOrdersCard } from "../components/RecentOrdersCard";
+import { RecentEventsCard } from "../components/RecentEventsCard";
 import { UpcomingEventsCard } from "../components/UpcomingEventsCard";
+import { RecentOrdersCard } from "../components/RecentOrdersCard";
 import { CreateEventModal } from "../components/CreateEventModal";
 
 export function OrganizerDashboardPage() {
@@ -87,13 +88,21 @@ export function OrganizerDashboardPage() {
           </div>
         </div>
 
-        {/* ── ROW 4: Recent Orders (1/3) + Upcoming Events (2/3) ── */}
+        {/* ── ROW 4: 3 Cards Horizontally Side-by-Side (Recent Events, Upcoming Events, Recent Orders) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-          <div className="lg:col-span-1 h-full flex flex-col">
-            <RecentOrdersCard onViewAll={() => navigate("/organizer/tickets")} />
+          {/* 1. Recent Events */}
+          <div className="h-full flex flex-col">
+            <RecentEventsCard onViewAll={() => navigate("/organizer/events")} />
           </div>
-          <div className="lg:col-span-2 h-full flex flex-col">
+
+          {/* 2. Upcoming Events */}
+          <div className="h-full flex flex-col">
             <UpcomingEventsCard onViewCalendar={() => navigate("/organizer/events")} />
+          </div>
+
+          {/* 3. Recent Orders */}
+          <div className="h-full flex flex-col">
+            <RecentOrdersCard onViewAll={() => navigate("/organizer/tickets")} />
           </div>
         </div>
       </main>

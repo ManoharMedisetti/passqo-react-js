@@ -48,17 +48,18 @@ import { OrganizerHeader } from "../components/OrganizerHeader";
 
 // ── Circular SVG Ring Component for Top Metric Cards ──
 function CircularProgressRing({
-  percent,
+  percent = 0,
   color,
   textColor,
   bgTrack = "#f1f5f9",
   size = 46,
 }) {
+  const safePercent = Math.min(100, Math.max(0, Number(percent) || 0));
   const strokeWidth = 3.5;
   const center = size / 2;
   const radius = center - strokeWidth - 0.5;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (percent / 100) * circumference;
+  const strokeDashoffset = circumference - (safePercent / 100) * circumference;
 
   return (
     <div
@@ -95,7 +96,7 @@ function CircularProgressRing({
           className="text-[12px] font-bold leading-none select-none"
           style={{ color: textColor || color }}
         >
-          {percent}%
+          {safePercent}%
         </span>
       </div>
     </div>

@@ -56,10 +56,17 @@ function AnalyticsTooltip({ active, payload, label }) {
   return null;
 }
 
-export function SalesAnalyticsCard() {
+export function SalesAnalyticsCard({ data: propData }) {
   const [timeRange, setTimeRange] = useState("Last 30 Days");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const chartData = DATASETS[timeRange] || DATASETS["Last 30 Days"];
+  const chartData =
+    propData && propData.length > 0
+      ? propData
+      : DATASETS[timeRange] || DATASETS["Last 30 Days"];
+
+  const maxRev = Math.max(...chartData.map((d) => d.revenue || 0), 1000);
+  const maxTix = Math.max(...chartData.map((d) => d.tickets || 0), 20);
+  const totalRevenue = chartData.reduce((sum, d) => sum + (d.revenue || 0), 0);
 
   const handleRefresh = () => {
     setTimeRange((prev) => (prev === "Last 30 Days" ? "Last 7 Days" : "Last 30 Days"));
@@ -159,9 +166,10 @@ export function SalesAnalyticsCard() {
             {/* Left Y Axis (Revenue) */}
             <YAxis
               yAxisId="left"
-              domain={[2200, 3600]}
-              ticks={[2200, 2400, 2600, 2800, 3000, 3200, 3400, 3600]}
-              tickFormatter={(val) => `$${(val / 1000).toFixed(1)}K`}
+              domain={[0, Math.ceil(maxRev * 1.1)]}
+              tickFormatter={(val) =>
+                val >= 1000 ? `$${(val / 1000).toFixed(1)}K` : `$${val}`
+              }
               tickLine={false}
               axisLine={false}
               tick={{ fill: "#94A3B8", fontSize: 9.5, fontWeight: 500 }}
@@ -171,8 +179,8 @@ export function SalesAnalyticsCard() {
             <YAxis
               yAxisId="right"
               orientation="right"
-              domain={[35, 60]}
-              ticks={[35, 40, 45, 50, 55, 60]}
+              domain={[0, Math.ceil(maxTix * 1.2)]}
+              tickFormatter={(val) => `${val}`}
               tickLine={false}
               axisLine={false}
               tick={{ fill: "#94A3B8", fontSize: 9.5, fontWeight: 500 }}

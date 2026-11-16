@@ -196,6 +196,26 @@ html.a11y-reduced-motion *::after {
   .scrollbar-thin-pink::-webkit-scrollbar-thumb:hover {
     background: #E03A64;
   }
+
+  /* Minimal sleek slate scrollbar for dashboard cards */
+  .scrollbar-minimal {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+  .scrollbar-minimal::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .scrollbar-minimal::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-minimal::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+  }
+  .scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
 }
 
 /* ── Fluid / Liquid Modal & Sheet Animations ── */
