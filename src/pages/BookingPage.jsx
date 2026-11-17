@@ -862,7 +862,7 @@ export function BookingPage() {
                           className="w-full text-xs font-semibold text-[#1B1B23] bg-transparent focus:outline-none cursor-pointer"
                         >
                           <option value="IE">Ireland 🇮🇪</option>
-                          <option value="GB">United Kingdom 🇬🇧</option>
+                          <option value="GB">United Kingdom </option>
                           <option value="US">United States 🇺🇸</option>
                           <option value="EU">European Union 🇪🇺</option>
                           <option value="IN">India 🇮🇳</option>
