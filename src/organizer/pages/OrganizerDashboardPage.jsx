@@ -8,9 +8,8 @@ import { YourActivityChart } from "../components/YourActivityChart";
 import { KeyMetricsGrid } from "../components/KeyMetricsGrid";
 import { SalesAnalyticsCard } from "../components/SalesAnalyticsCard";
 import { ConversionAndTopEvents } from "../components/ConversionAndTopEvents";
-import { RecentEventsCard } from "../components/RecentEventsCard";
-import { UpcomingEventsCard } from "../components/UpcomingEventsCard";
 import { RecentOrdersCard } from "../components/RecentOrdersCard";
+import { EventsCombinedCard } from "../components/EventsCombinedCard";
 import { CreateEventModal } from "../components/CreateEventModal";
 
 export function OrganizerDashboardPage() {
@@ -88,21 +87,16 @@ export function OrganizerDashboardPage() {
           </div>
         </div>
 
-        {/* ── ROW 4: 3 Cards Horizontally Side-by-Side (Recent Events, Upcoming Events, Recent Orders) ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-          {/* 1. Recent Events */}
-          <div className="h-full flex flex-col">
-            <RecentEventsCard onViewAll={() => navigate("/organizer/events")} />
-          </div>
-
-          {/* 2. Upcoming Events */}
-          <div className="h-full flex flex-col">
-            <UpcomingEventsCard onViewCalendar={() => navigate("/organizer/events")} />
-          </div>
-
-          {/* 3. Recent Orders */}
+        {/* ── ROW 4: Recent Orders (Left) + Combined Events Card (Right: Recent & Upcoming Separated) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          {/* Left: Recent Orders */}
           <div className="h-full flex flex-col">
             <RecentOrdersCard onViewAll={() => navigate("/organizer/tickets")} />
+          </div>
+
+          {/* Right: Single Card with separated Recent Events & Upcoming Events */}
+          <div className="h-full flex flex-col">
+            <EventsCombinedCard onViewAllEvents={() => navigate("/organizer/events")} />
           </div>
         </div>
       </main>
