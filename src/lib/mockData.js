@@ -305,6 +305,10 @@ export const MOCK_EVENTS = [
       dateLabel: "Sat, 5 Dec – Sun, 6 Dec 2026",
       doors: "Registration & Breakfast from 8:00 AM",
       aboutExtra: "Accredited CPD certification provided upon completion. Group bookings eligible for 20% team discount.",
+      heroImages: [
+        "/images/figma-sample/goa/performance.png",
+        "/images/figma-sample/goa/stage-a.png",
+      ],
       features: {
         agendaBuilder: true,
         speakerProfiles: true,
@@ -620,7 +624,7 @@ export const MOCK_EVENTS = [
     lat: 53.2591,
     lng: -9.0769,
     minPrice: 25,
-    image: "/images/figma-sample/goa/gallery-3.png",
+    image: "",
     isFeatured: false,
     isBlockchain: false,
     isSponsored: false,

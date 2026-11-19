@@ -296,7 +296,7 @@ export function EventFeatureTabs({ event, details }) {
       {/* ── STICKY FEATURES NAVBAR: STOPS & FIXES RIGHT BELOW TOP NAVBAR (56px = top-14) ── */}
       <div
         ref={stickyBarRef}
-        className="sticky top-14 z-30 py-1.5 sm:py-2 px-1 sm:px-2 flex justify-center transition-all duration-200 bg-[#F8F5F0]/90 backdrop-blur-md rounded-2xl"
+        className="sticky top-14 z-30 py-1.5 sm:py-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-2 flex justify-center transition-all duration-200 bg-[#F8F5F0]/90 backdrop-blur-md rounded-none"
       >
         {/* ── ULTRA-PREMIUM APPLE LIQUID GLASS CAPSULE (Compact & Responsive) ── */}
         <div className="relative max-w-full inline-flex items-center rounded-full bg-white/90 backdrop-blur-2xl backdrop-saturate-180 border border-white/90 shadow-[0_4px_20px_rgba(0,0,0,0.06),inset_0_1.5px_2px_rgba(255,255,255,1),inset_0_-1px_1.5px_rgba(255,255,255,0.4)] p-0.5 sm:p-1">
