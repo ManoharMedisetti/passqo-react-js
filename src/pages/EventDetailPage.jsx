@@ -1240,16 +1240,6 @@ function EventDetailPageInner() {
                   <span className="hidden sm:inline">Share</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleInvite}
-                  className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
-                  title="Invite friends"
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Invite</span>
-                </button>
-
                 <a
                   href={calendarUrl}
                   target="_blank"
@@ -1508,16 +1498,6 @@ function EventDetailPageInner() {
                 >
                   <Share2 className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Share</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleInvite}
-                  className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
-                  title="Invite friends"
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Invite</span>
                 </button>
 
                 <a
