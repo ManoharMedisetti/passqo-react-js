@@ -461,6 +461,7 @@ function EventDetailPageInner() {
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   const [activeMobileHeroIndex, setActiveMobileHeroIndex] = useState(0);
   const [isHeroScrolled, setIsHeroScrolled] = useState(false);
+  const [heroImageError, setHeroImageError] = useState(false);
 
   /* ── GALLERY & LIGHTBOX CONTROLS (UNCONDITIONAL TOP-LEVEL HOOKS) ── */
   const activeThumbnailRef = useRef(null);
@@ -655,6 +656,7 @@ function EventDetailPageInner() {
         }
         if (cancelled) return;
         setEvent(data);
+        setHeroImageError(false);
         setInterested(getWishlist().includes(data.id));
         const realId = data.id;
 
@@ -892,42 +894,52 @@ function EventDetailPageInner() {
   const isPastEvent = new Date(event.endDate ?? event.date) < new Date();
   const isInviteActionable =
     !!invite && invite.status === "PENDING" && !isPastEvent && !event.isCancelled;
-  const heroSide = (details.heroImages ?? []).slice(0, 2);
-  const galleryFirst = details.gallery?.items?.[0]?.url;
-  const sideTop = heroSide[0] ?? event.artist?.image;
-  const sideBottom = heroSide[1] ?? galleryFirst;
-
-  const galleryImages = (() => {
+  const explicitExtraImages = (() => {
     const list = [];
-    if (event?.image) list.push(event.image);
-    if (sideTop && !list.includes(sideTop)) list.push(sideTop);
-    if (sideBottom && !list.includes(sideBottom)) list.push(sideBottom);
+    const mainImg = typeof event?.image === "string" ? event.image.trim() : "";
+
     if (Array.isArray(details?.heroImages)) {
       details.heroImages.forEach((img) => {
-        if (img && !list.includes(img)) list.push(img);
+        const u = typeof img === "string" ? img.trim() : img?.url?.trim?.();
+        if (u && !list.includes(u) && u !== mainImg) list.push(u);
+      });
+    }
+    if (Array.isArray(event?.heroImages)) {
+      event.heroImages.forEach((img) => {
+        const u = typeof img === "string" ? img.trim() : img?.url?.trim?.();
+        if (u && !list.includes(u) && u !== mainImg) list.push(u);
       });
     }
     if (Array.isArray(details?.gallery?.items)) {
       details.gallery.items.forEach((item) => {
-        const u = typeof item === "string" ? item : item?.url;
-        if (u && !list.includes(u)) list.push(u);
+        const u = typeof item === "string" ? item.trim() : item?.url?.trim?.();
+        if (u && !list.includes(u) && u !== mainImg) list.push(u);
       });
     }
     if (Array.isArray(event?.gallery)) {
-      event.gallery.forEach((u) => {
-        if (u && !list.includes(u)) list.push(u);
+      event.gallery.forEach((item) => {
+        const u = typeof item === "string" ? item.trim() : item?.url?.trim?.();
+        if (u && !list.includes(u) && u !== mainImg) list.push(u);
       });
     }
-    const fallbacks = [
-      "/images/figma-sample/goa/gallery-1.png",
-      "/images/figma-sample/goa/gallery-2.png",
-      "/images/figma-sample/goa/gallery-3.png",
-      "/images/figma-sample/goa/headliner.png",
-      "/images/figma-sample/goa/support-1.png",
-      "/images/figma-sample/goa/support-2.png",
-    ];
-    fallbacks.forEach((fb) => {
-      if (list.length < 6 && !list.includes(fb)) list.push(fb);
+    return list;
+  })();
+
+  const hasMultipleImages = explicitExtraImages.length > 0;
+  const primaryImage =
+    (typeof event?.image === "string" && event.image.trim()) ||
+    (explicitExtraImages[0] ?? null);
+
+  const heroSide = (details?.heroImages ?? []).slice(0, 2);
+  const galleryFirst = details?.gallery?.items?.[0]?.url;
+  const sideTop = explicitExtraImages[0] ?? heroSide[0] ?? event?.artist?.image ?? "/images/figma-sample/goa/headliner.png";
+  const sideBottom = explicitExtraImages[1] ?? heroSide[1] ?? galleryFirst ?? explicitExtraImages[0] ?? "/images/figma-sample/goa/gallery-1.png";
+
+  const galleryImages = (() => {
+    const list = [];
+    if (primaryImage) list.push(primaryImage);
+    explicitExtraImages.forEach((u) => {
+      if (u && !list.includes(u)) list.push(u);
     });
     return list;
   })();
@@ -1172,161 +1184,163 @@ function EventDetailPageInner() {
           </div>
         </div>
 
-        {/* ── HERO ARTWORK SECTION: MAIN BANNER + MEDIA BESIDE ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-4 items-stretch">
-          {/* Main Artwork Banner: Clean natural scroll on mobile/tablet with touch swipe */}
-          <div
-            onTouchStart={onHeroTouchStart}
-            onTouchMove={onHeroTouchMove}
-            onTouchEnd={onHeroTouchEnd}
-            className="lg:col-span-8 relative min-h-[340px] h-[380px] sm:h-[440px] md:h-[480px] lg:h-[400px] xl:h-[430px] rounded-t-none rounded-b-3xl sm:rounded-b-[32px] lg:rounded-3xl overflow-hidden bg-[#121218] shadow-sm group touch-pan-y"
-          >
-            {/* Ambient Blurred Background Glow */}
-            <img
-              src={galleryImages[activeMobileHeroIndex] || event.image || "/images/figma-sample/goa/goa-hero.png"}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover filter blur-2xl opacity-40 scale-125 select-none pointer-events-none transition-all duration-300"
-            />
-            <div className="absolute inset-0 bg-black/25 pointer-events-none" />
+        {/* ── HERO ARTWORK SECTION: CONDITIONAL (MULTIPLE IMAGES vs SINGLE FULL-WIDTH IMAGE) ── */}
+        {hasMultipleImages ? (
+          /* ── MULTIPLE IMAGES: DEFAULT (8 COLS MAIN BANNER + 4 COLS MEDIA BESIDE) ── */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-4 items-stretch">
+            {/* Main Artwork Banner: Clean natural scroll on mobile/tablet with touch swipe */}
+            <div
+              onTouchStart={onHeroTouchStart}
+              onTouchMove={onHeroTouchMove}
+              onTouchEnd={onHeroTouchEnd}
+              className="lg:col-span-8 relative min-h-[340px] h-[380px] sm:h-[440px] md:h-[480px] lg:h-[400px] xl:h-[430px] rounded-t-none rounded-b-3xl sm:rounded-b-[32px] lg:rounded-3xl overflow-hidden bg-[#121218] shadow-sm group touch-pan-y"
+            >
+              {/* Ambient Blurred Background Glow */}
+              <img
+                src={galleryImages[activeMobileHeroIndex] || primaryImage || "/images/figma-sample/goa/goa-hero.png"}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-cover filter blur-2xl opacity-40 scale-125 select-none pointer-events-none transition-all duration-300"
+              />
+              <div className="absolute inset-0 bg-black/25 pointer-events-none" />
 
-            {/* Centered Crisp Event Poster Artwork */}
-            <img
-              key={activeMobileHeroIndex}
-              src={galleryImages[activeMobileHeroIndex] || event.image || "/images/figma-sample/goa/goa-hero.png"}
-              alt={event.name}
-              className="relative w-full h-full object-cover mx-auto select-none pointer-events-none animate-in fade-in duration-200"
-              draggable={false}
-            />
+              {/* Centered Crisp Event Poster Artwork */}
+              <img
+                key={activeMobileHeroIndex}
+                src={galleryImages[activeMobileHeroIndex] || primaryImage || "/images/figma-sample/goa/goa-hero.png"}
+                alt={event.name}
+                className="relative w-full h-full object-cover mx-auto select-none pointer-events-none animate-in fade-in duration-200"
+                draggable={false}
+              />
 
-            {/* ── DESKTOP TOP RIGHT PILLS (>= lg only) ── */}
-            <div className="hidden lg:flex absolute top-3.5 right-3.5 sm:top-4 sm:right-4 items-center gap-1.5 sm:gap-2 z-20">
-              <button
-                type="button"
-                onClick={handleInterested}
-                className={`
-                  text-xs font-semibold py-1.5 px-3 rounded-full border transition-all flex items-center gap-1.5 backdrop-blur-xl cursor-pointer shadow-sm active:scale-95
-                  ${interested
-                    ? "bg-[#FF4E7A] border-[#FF4E7A] text-white shadow-[#FF4E7A]/30 shadow-md"
-                    : "bg-black/45 hover:bg-black/65 border-white/25 text-white"
-                  }
-                `}
-              >
-                <Heart className={`w-3.5 h-3.5 ${interested ? "fill-white text-white" : "text-white"}`} />
-                <span className="hidden sm:inline">Interested</span>
-              </button>
+              {/* ── DESKTOP TOP RIGHT PILLS (>= lg only) ── */}
+              <div className="hidden lg:flex absolute top-3.5 right-3.5 sm:top-4 sm:right-4 items-center gap-1.5 sm:gap-2 z-20">
+                <button
+                  type="button"
+                  onClick={handleInterested}
+                  className={`
+                    text-xs font-semibold py-1.5 px-3 rounded-full border transition-all flex items-center gap-1.5 backdrop-blur-xl cursor-pointer shadow-sm active:scale-95
+                    ${interested
+                      ? "bg-[#FF4E7A] border-[#FF4E7A] text-white shadow-[#FF4E7A]/30 shadow-md"
+                      : "bg-black/45 hover:bg-black/65 border-white/25 text-white"
+                    }
+                  `}
+                >
+                  <Heart className={`w-3.5 h-3.5 ${interested ? "fill-white text-white" : "text-white"}`} />
+                  <span className="hidden sm:inline">Interested</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={handleShare}
-                className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
-                title="Share event"
-              >
-                <Share2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Share</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
+                  title="Share event"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Share</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={handleInvite}
-                className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
-                title="Invite friends"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Invite</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={handleInvite}
+                  className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
+                  title="Invite friends"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Invite</span>
+                </button>
 
-              <a
-                href={calendarUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
-                title="Add to calendar"
-              >
-                <CalendarPlus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Calendar</span>
-              </a>
+                <a
+                  href={calendarUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
+                  title="Add to calendar"
+                >
+                  <CalendarPlus className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Calendar</span>
+                </a>
 
-              {copied && (
-                <span className="text-[11px] font-semibold text-white bg-emerald-600/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm animate-fade-in border border-emerald-400/40">
-                  {copied}
-                </span>
-              )}
-            </div>
-
-            {/* Mobile / Tablet Overlay: Event Date, Title & Badges ON TOP of Hero Image */}
-            <div className="lg:hidden absolute bottom-0 inset-x-0 p-4 sm:p-6 bg-gradient-to-t from-black/95 via-black/65 to-transparent z-10 pt-16 flex flex-col justify-end">
-              <p className="text-xs sm:text-sm font-semibold text-[#FF7597] tracking-wide mb-1 drop-shadow-sm">
-                {dateLabel}
-              </p>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-snug drop-shadow-md mb-2.5">
-                {event.name}
-              </h1>
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/20">
-                    {categoryLabel(event.category).toUpperCase()}
+                {copied && (
+                  <span className="text-[11px] font-semibold text-white bg-emerald-600/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm animate-fade-in border border-emerald-400/40">
+                    {copied}
                   </span>
-                  {event.format === "VIRTUAL" && (
-                    <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-blue-500/80 backdrop-blur-md px-2.5 py-0.5 rounded-full">
-                      ONLINE
-                    </span>
-                  )}
-                  {FEATURES.blockchain && event.isBlockchain && (
-                    <span className="text-[10px] font-semibold text-[#00C896] bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/15">
-                      ⛓ On-Chain
-                    </span>
-                  )}
-                  {event.isSellingFast && !event.isSoldOut && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-medium tracking-wide shadow-sm select-none">
-                      <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF4E7A] fill-[#FF4E7A] animate-pulse" />
-                      <span>Selling Fast</span>
-                    </span>
-                  )}
-                  {event.isSoldOut && (
-                    <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-neutral-700/90 px-2.5 py-0.5 rounded-full">
-                      SOLD OUT
-                    </span>
-                  )}
-                </div>
+                )}
+              </div>
 
-                {/* Mobile View Gallery Pill & Dots Indicator */}
-                <div className="flex items-center gap-2">
-                  {galleryImages.length > 1 && (
-                    <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/15">
-                      {galleryImages.slice(0, 5).map((_, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveMobileHeroIndex(idx);
-                          }}
-                          className={`h-1.5 rounded-full transition-all duration-200 cursor-pointer ${
-                            idx === (activeMobileHeroIndex % Math.min(5, galleryImages.length))
-                              ? "w-3.5 bg-[#FF4E7A]"
-                              : "w-1.5 bg-white/45 hover:bg-white/70"
-                          }`}
-                          aria-label={`Go to slide ${idx + 1}`}
-                        />
-                      ))}
-                    </div>
-                  )}
+              {/* Mobile / Tablet Overlay: Event Date, Title & Badges ON TOP of Hero Image */}
+              <div className="lg:hidden absolute bottom-0 inset-x-0 p-4 sm:p-6 bg-gradient-to-t from-black/95 via-black/65 to-transparent z-10 pt-16 flex flex-col justify-end">
+                <p className="text-xs sm:text-sm font-semibold text-[#FF7597] tracking-wide mb-1 drop-shadow-sm">
+                  {dateLabel}
+                </p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-snug drop-shadow-md mb-2.5">
+                  {event.name}
+                </h1>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/20">
+                      {categoryLabel(event.category).toUpperCase()}
+                    </span>
+                    {event.format === "VIRTUAL" && (
+                      <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-blue-500/80 backdrop-blur-md px-2.5 py-0.5 rounded-full">
+                        ONLINE
+                      </span>
+                    )}
+                    {FEATURES.blockchain && event.isBlockchain && (
+                      <span className="text-[10px] font-semibold text-[#00C896] bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/15">
+                        ⛓ On-Chain
+                      </span>
+                    )}
+                    {event.isSellingFast && !event.isSoldOut && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-medium tracking-wide shadow-sm select-none">
+                        <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF4E7A] fill-[#FF4E7A] animate-pulse" />
+                        <span>Selling Fast</span>
+                      </span>
+                    )}
+                    {event.isSoldOut && (
+                      <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-neutral-700/90 px-2.5 py-0.5 rounded-full">
+                        SOLD OUT
+                      </span>
+                    )}
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveGalleryIndex(activeMobileHeroIndex);
-                      setIsGalleryOpen(true);
-                    }}
-                    className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/25 text-white text-xs font-semibold py-1 px-3 rounded-full flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95 transition-all"
-                  >
-                    <span>Gallery ({activeMobileHeroIndex + 1}/{galleryImages.length})</span>
-                    <span className="text-[11px]">↗</span>
-                  </button>
+                  {/* Mobile View Gallery Pill & Dots Indicator */}
+                  <div className="flex items-center gap-2">
+                    {galleryImages.length > 1 && (
+                      <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/15">
+                        {galleryImages.slice(0, 5).map((_, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveMobileHeroIndex(idx);
+                            }}
+                            className={`h-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+                              idx === (activeMobileHeroIndex % Math.min(5, galleryImages.length))
+                                ? "w-3.5 bg-[#FF4E7A]"
+                                : "w-1.5 bg-white/45 hover:bg-white/70"
+                            }`}
+                            aria-label={`Go to slide ${idx + 1}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveGalleryIndex(activeMobileHeroIndex);
+                        setIsGalleryOpen(true);
+                      }}
+                      className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/25 text-white text-xs font-semibold py-1 px-3 rounded-full flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95 transition-all"
+                    >
+                      <span>Gallery ({activeMobileHeroIndex + 1}/{galleryImages.length})</span>
+                      <span className="text-[11px]">↗</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
               {/* Badges Overlaid on Bottom Left of Image (Desktop only >= lg) */}
               <div className="hidden lg:flex absolute bottom-3 left-3 items-center gap-2 z-10">
@@ -1347,43 +1361,241 @@ function EventDetailPageInner() {
               </div>
             </div>
 
-          {/* Right Side Media Cards (Desktop >= lg, matching Image 1) */}
-          <div className="hidden lg:flex lg:col-span-4 lg:h-[400px] xl:h-[430px] flex-col gap-3.5">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveGalleryIndex(1);
-                setIsGalleryOpen(true);
-              }}
-              className="relative flex-1 min-h-0 rounded-2xl overflow-hidden bg-neutral-200 shadow-2xs group cursor-pointer w-full text-left"
-            >
-              <img
-                src={sideTop || "/images/figma-sample/goa/headliner.png"}
-                alt="Event media"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </button>
+            {/* Right Side Media Cards (Desktop >= lg, matching Image 1) */}
+            <div className="hidden lg:flex lg:col-span-4 lg:h-[400px] xl:h-[430px] flex-col gap-3.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveGalleryIndex(1);
+                  setIsGalleryOpen(true);
+                }}
+                className="relative flex-1 min-h-0 rounded-2xl overflow-hidden bg-neutral-200 shadow-2xs group cursor-pointer w-full text-left"
+              >
+                <img
+                  src={sideTop}
+                  alt="Event media"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setActiveGalleryIndex(0);
-                setIsGalleryOpen(true);
-              }}
-              className="relative flex-1 min-h-0 rounded-2xl overflow-hidden bg-neutral-900 shadow-2xs flex items-center justify-center group cursor-pointer w-full"
-            >
-              <img
-                src={sideBottom || "/images/figma-sample/goa/gallery-1.png"}
-                alt="View gallery"
-                className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-45 transition-opacity duration-300 group-hover:scale-105"
-              />
-              <span className="relative text-white font-semibold text-base flex items-center gap-1.5 z-10 drop-shadow-md">
-                <span>View gallery</span>
-                <span className="text-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200">↗</span>
-              </span>
-            </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveGalleryIndex(0);
+                  setIsGalleryOpen(true);
+                }}
+                className="relative flex-1 min-h-0 rounded-2xl overflow-hidden bg-neutral-900 shadow-2xs flex items-center justify-center group cursor-pointer w-full"
+              >
+                <img
+                  src={sideBottom}
+                  alt="View gallery"
+                  className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-45 transition-opacity duration-300 group-hover:scale-105"
+                />
+                <span className="relative text-white font-semibold text-base flex items-center gap-1.5 z-10 drop-shadow-md">
+                  <span>View gallery</span>
+                  <span className="text-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200">↗</span>
+                </span>
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          /* ── SINGLE IMAGE: NATURAL WIDTH CENTERED + FULL BLURRED BACKGROUND (BOTTOM FEATHERED, NO SHADOWS) ── */
+          <div className="w-full">
+            <div
+              className="w-full relative min-h-[340px] h-[380px] sm:h-[440px] md:h-[480px] lg:h-[420px] xl:h-[460px] rounded-t-none rounded-b-3xl sm:rounded-b-[32px] lg:rounded-3xl overflow-hidden bg-transparent select-none"
+            >
+              {primaryImage && !heroImageError ? (
+                <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                  {/* 1. Full-Width Vibrant Ambient Blur Background (Normal top, left & right; smooth bottom alpha feather) */}
+                  <div
+                    className="absolute inset-0 pointer-events-none overflow-hidden"
+                    style={{
+                      WebkitMaskImage: "linear-gradient(to bottom, #000 65%, rgba(0, 0, 0, 0.85) 78%, rgba(0, 0, 0, 0.4) 90%, transparent 100%)",
+                      maskImage: "linear-gradient(to bottom, #000 65%, rgba(0, 0, 0, 0.85) 78%, rgba(0, 0, 0, 0.4) 90%, transparent 100%)",
+                    }}
+                  >
+                    <img
+                      src={primaryImage}
+                      alt=""
+                      aria-hidden="true"
+                      className="absolute inset-0 w-full h-full object-cover object-center scale-125 select-none pointer-events-none transition-all duration-300"
+                      style={{ filter: "blur(50px) saturate(1.4)" }}
+                    />
+                    {/* Subtle soft tint so badges and controls remain readable without turning blur dark */}
+                    <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+                  </div>
+
+                  {/* Multi-stop smooth bottom feather gradient seamlessly blending into the #F8F5F0 page */}
+                  <div
+                    className="absolute inset-x-0 bottom-0 h-28 sm:h-36 pointer-events-none z-[5]"
+                    style={{
+                      background: "linear-gradient(to top, #F8F5F0 0%, rgba(248, 245, 240, 0.85) 30%, rgba(248, 245, 240, 0.4) 65%, transparent 100%)",
+                    }}
+                  />
+
+                  {/* 2. Centered Poster Artwork Preserving Natural Width & Aspect Ratio (Single image: non-clickable, no shadows) */}
+                  <div className="relative z-10 max-h-[88%] max-w-[94%] sm:max-w-[85%] md:max-w-[80%] lg:max-w-[65%] xl:max-w-[60%] h-full flex items-center justify-center p-2 sm:p-3 pointer-events-none">
+                    <img
+                      src={primaryImage}
+                      alt={event.name}
+                      onError={() => setHeroImageError(true)}
+                      className="max-h-full w-auto max-w-full object-contain rounded-xl sm:rounded-2xl lg:rounded-3xl border border-white/20 select-none animate-in zoom-in-95 duration-300"
+                      draggable={false}
+                    />
+                  </div>
+                </div>
+              ) : (
+                /* ── ELEGANT BRANDED NO-IMAGE FALLBACK BANNER ── */
+                <div className="absolute inset-0 bg-gradient-to-br from-[#121218] via-[#1A1828] to-[#0D0D14] flex items-center justify-center p-6 text-center overflow-hidden">
+                  {/* Ambient Glowing Orbs */}
+                  <div className="absolute -top-24 -left-24 w-80 h-80 bg-[#FF4E7A]/15 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+
+                  {/* Branded Center Plaque */}
+                  <div className="relative z-10 max-w-lg mx-auto flex flex-col items-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-[#FF4E7A]/25 via-white/10 to-indigo-500/25 border border-white/20 flex items-center justify-center text-[#FF4E7A] shadow-xl backdrop-blur-xl mb-4 group-hover:scale-105 transition-transform duration-300">
+                      <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 stroke-[1.8]" />
+                    </div>
+
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white/90 text-xs font-semibold backdrop-blur-md mb-2 shadow-xs">
+                      <span>{categoryLabel(event.category).toUpperCase()}</span>
+                      <span>•</span>
+                      <span>{event.format === "VIRTUAL" ? "Online Event" : "In-Person Event"}</span>
+                    </div>
+
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight leading-snug drop-shadow-md line-clamp-2 px-4">
+                      {event.name}
+                    </h2>
+
+                    <p className="text-xs sm:text-sm text-white/70 font-medium mt-1.5 flex items-center gap-1.5 flex-wrap justify-center">
+                      <Calendar className="w-3.5 h-3.5 text-[#FF7597]" />
+                      <span>{dateLabel}</span>
+                      {event.venue && (
+                        <>
+                          <span>•</span>
+                          <MapPin className="w-3.5 h-3.5 text-[#FF7597]" />
+                          <span className="truncate max-w-[220px]">{event.venue}</span>
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* ── DESKTOP TOP RIGHT PILLS (>= lg only) ── */}
+              <div className="hidden lg:flex absolute top-3.5 right-3.5 sm:top-4 sm:right-4 items-center gap-1.5 sm:gap-2 z-20">
+                <button
+                  type="button"
+                  onClick={handleInterested}
+                  className={`
+                    text-xs font-semibold py-1.5 px-3 rounded-full border transition-all flex items-center gap-1.5 backdrop-blur-xl cursor-pointer shadow-sm active:scale-95
+                    ${interested
+                      ? "bg-[#FF4E7A] border-[#FF4E7A] text-white shadow-[#FF4E7A]/30 shadow-md"
+                      : "bg-black/45 hover:bg-black/65 border-white/25 text-white"
+                    }
+                  `}
+                >
+                  <Heart className={`w-3.5 h-3.5 ${interested ? "fill-white text-white" : "text-white"}`} />
+                  <span className="hidden sm:inline">Interested</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
+                  title="Share event"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Share</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleInvite}
+                  className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
+                  title="Invite friends"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Invite</span>
+                </button>
+
+                <a
+                  href={calendarUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-black/45 hover:bg-black/65 border border-white/25 text-white text-xs font-semibold py-1.5 px-3 rounded-full transition-all flex items-center gap-1.5 backdrop-blur-xl shadow-sm cursor-pointer active:scale-95"
+                  title="Add to calendar"
+                >
+                  <CalendarPlus className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Calendar</span>
+                </a>
+
+                {copied && (
+                  <span className="text-[11px] font-semibold text-white bg-emerald-600/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm animate-fade-in border border-emerald-400/40">
+                    {copied}
+                  </span>
+                )}
+              </div>
+
+              {/* Mobile / Tablet Overlay: Event Date, Title & Badges ON TOP of Hero Image */}
+              <div className="lg:hidden absolute bottom-0 inset-x-0 p-4 sm:p-6 bg-gradient-to-t from-black/95 via-black/65 to-transparent z-10 pt-16 flex flex-col justify-end">
+                <p className="text-xs sm:text-sm font-semibold text-[#FF7597] tracking-wide mb-1 drop-shadow-sm">
+                  {dateLabel}
+                </p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-snug drop-shadow-md mb-2.5">
+                  {event.name}
+                </h1>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/20">
+                      {categoryLabel(event.category).toUpperCase()}
+                    </span>
+                    {event.format === "VIRTUAL" && (
+                      <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-blue-500/80 backdrop-blur-md px-2.5 py-0.5 rounded-full">
+                        ONLINE
+                      </span>
+                    )}
+                    {FEATURES.blockchain && event.isBlockchain && (
+                      <span className="text-[10px] font-semibold text-[#00C896] bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/15">
+                        ⛓ On-Chain
+                      </span>
+                    )}
+                    {event.isSellingFast && !event.isSoldOut && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-medium tracking-wide shadow-sm select-none">
+                        <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF4E7A] fill-[#FF4E7A] animate-pulse" />
+                        <span>Selling Fast</span>
+                      </span>
+                    )}
+                    {event.isSoldOut && (
+                      <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-neutral-700/90 px-2.5 py-0.5 rounded-full">
+                        SOLD OUT
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Badges Overlaid on Bottom Left of Image (Desktop only >= lg) */}
+              <div className="hidden lg:flex absolute bottom-3 left-3 items-center gap-2 z-10">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-white bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/15">
+                  {categoryLabel(event.category).toUpperCase()}
+                </span>
+                {FEATURES.blockchain && event.isBlockchain && (
+                  <span className="text-[10px] font-semibold text-[#00C896] bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/15">
+                    ⛓ On-Chain
+                  </span>
+                )}
+                {event.isSellingFast && !event.isSoldOut && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-medium tracking-wide shadow-sm select-none">
+                    <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF4E7A] fill-[#FF4E7A] animate-pulse" />
+                    <span>Selling Fast</span>
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── TWO-COLUMN FIRST-FOLD LAYOUT (VISIBLE ON LOAD WITHOUT SCROLLING) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start mt-4 sm:mt-5 lg:mt-4 px-4 sm:px-6 lg:px-0">
@@ -1553,7 +1765,7 @@ function EventDetailPageInner() {
                   <button
                     type="button"
                     onClick={() => navigate(`/events/${event.id}/book`)}
-                    className="bg-[#1B1B23] hover:bg-black text-white font-extrabold text-sm sm:text-base px-7 sm:px-8 py-3.5 h-12 rounded-2xl transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                    className="bg-[#FF4E7A] hover:bg-[#E03A64] text-white font-extrabold text-sm sm:text-base px-7 sm:px-8 py-3.5 h-12 rounded-2xl transition-all shadow-md shadow-[#FF4E7A]/25 active:scale-95 cursor-pointer flex items-center justify-center gap-2 select-none"
                   >
                     <span>Book tickets</span>
                     <span>→</span>
@@ -1692,7 +1904,7 @@ function EventDetailPageInner() {
             <button
               type="button"
               onClick={() => navigate(`/events/${event.id}/book`)}
-              className="bg-[#1B1B23] hover:bg-black text-white font-extrabold text-sm sm:text-base px-8 sm:px-10 py-3.5 sm:py-4 h-12 sm:h-13 min-w-[170px] sm:min-w-[200px] rounded-2xl transition-all shadow-lg active:scale-95 cursor-pointer flex items-center justify-center gap-2 select-none"
+              className="bg-[#FF4E7A] hover:bg-[#E03A64] text-white font-extrabold text-sm sm:text-base px-8 sm:px-10 py-3.5 sm:py-4 h-12 sm:h-13 min-w-[170px] sm:min-w-[200px] rounded-2xl transition-all shadow-lg shadow-[#FF4E7A]/25 active:scale-95 cursor-pointer flex items-center justify-center gap-2 select-none"
             >
               <span>Book tickets</span>
               <span>→</span>
@@ -2143,7 +2355,9 @@ function EventDetailPageInner() {
                 {event.name}
               </h3>
               <p className="text-xs text-neutral-400 font-mono mt-0.5">
-                {(activeGalleryIndex % (galleryImages.length || 1)) + 1} of {galleryImages.length}
+                {galleryImages.length > 1
+                  ? `${(activeGalleryIndex % (galleryImages.length || 1)) + 1} of ${galleryImages.length}`
+                  : "Photo"}
               </p>
             </div>
 
@@ -2159,80 +2373,86 @@ function EventDetailPageInner() {
 
           {/* Main Stage: Center Image + Chevrons with Touch & Drag Swipe */}
           <div
-            onTouchStart={onGalleryTouchStart}
-            onTouchMove={onGalleryTouchMove}
-            onTouchEnd={onGalleryTouchEnd}
-            onMouseDown={onGalleryTouchStart}
-            onMouseMove={onGalleryTouchMove}
-            onMouseUp={onGalleryTouchEnd}
+            onTouchStart={galleryImages.length > 1 ? onGalleryTouchStart : undefined}
+            onTouchMove={galleryImages.length > 1 ? onGalleryTouchMove : undefined}
+            onTouchEnd={galleryImages.length > 1 ? onGalleryTouchEnd : undefined}
+            onMouseDown={galleryImages.length > 1 ? onGalleryTouchStart : undefined}
+            onMouseMove={galleryImages.length > 1 ? onGalleryTouchMove : undefined}
+            onMouseUp={galleryImages.length > 1 ? onGalleryTouchEnd : undefined}
             className="relative flex-1 flex items-center justify-center my-3 max-w-6xl w-full mx-auto overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing select-none"
           >
-            {/* Previous Chevron Button */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveGalleryIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
-              }}
-              className="absolute left-2 sm:left-4 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-90"
-              aria-label="Previous photo"
-            >
-              <ChevronLeft className="w-6 h-6 -translate-x-0.5" />
-            </button>
+            {/* Previous Chevron Button (Multiple images only) */}
+            {galleryImages.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveGalleryIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
+                }}
+                className="absolute left-2 sm:left-4 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-90"
+                aria-label="Previous photo"
+              >
+                <ChevronLeft className="w-6 h-6 -translate-x-0.5" />
+              </button>
+            )}
 
             {/* Main Stage Image */}
             <div className="relative max-h-[62vh] sm:max-h-[68vh] max-w-full flex items-center justify-center pointer-events-none">
               <img
                 key={activeGalleryIndex}
-                src={galleryImages[activeGalleryIndex % (galleryImages.length || 1)] || galleryImages[0]}
+                src={galleryImages[activeGalleryIndex % (galleryImages.length || 1)] || galleryImages[0] || primaryImage}
                 alt={`Gallery photo ${(activeGalleryIndex % (galleryImages.length || 1)) + 1}`}
                 className="max-h-[62vh] sm:max-h-[68vh] w-auto max-w-full object-contain rounded-2xl sm:rounded-3xl shadow-2xl animate-in zoom-in-95 duration-150 select-none pointer-events-none"
                 draggable={false}
               />
             </div>
 
-            {/* Next Chevron Button */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveGalleryIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
-              }}
-              className="absolute right-2 sm:right-4 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-90"
-              aria-label="Next photo"
-            >
-              <ChevronRight className="w-6 h-6 translate-x-0.5" />
-            </button>
+            {/* Next Chevron Button (Multiple images only) */}
+            {galleryImages.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveGalleryIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
+                }}
+                className="absolute right-2 sm:right-4 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-90"
+                aria-label="Next photo"
+              >
+                <ChevronRight className="w-6 h-6 translate-x-0.5" />
+              </button>
+            )}
           </div>
 
-          {/* Bottom 1:1 Square Thumbnail Strip */}
-          <div className="max-w-4xl w-full mx-auto z-10 pt-1">
-            <div className="flex items-center justify-center gap-2.5 sm:gap-3 overflow-x-auto scrollbar-none py-2 px-1">
-              {galleryImages.map((img, idx) => {
-                const isActive = idx === activeGalleryIndex;
-                return (
-                  <button
-                    key={idx}
-                    ref={isActive ? activeThumbnailRef : null}
-                    type="button"
-                    onClick={() => setActiveGalleryIndex(idx)}
-                    className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer transition-all duration-200 ${
-                      isActive
-                        ? "ring-2 ring-[#FF4E7A] ring-offset-2 ring-offset-black scale-105 opacity-100"
-                        : "opacity-45 hover:opacity-85 border border-white/10"
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={`Thumbnail ${idx + 1}`}
-                      className="w-full h-full object-cover select-none pointer-events-none"
-                      draggable={false}
-                    />
-                  </button>
-                );
-              })}
+          {/* Bottom 1:1 Square Thumbnail Strip (Multiple images only) */}
+          {galleryImages.length > 1 && (
+            <div className="max-w-4xl w-full mx-auto z-10 pt-1">
+              <div className="flex items-center justify-center gap-2.5 sm:gap-3 overflow-x-auto scrollbar-none py-2 px-1">
+                {galleryImages.map((img, idx) => {
+                  const isActive = idx === activeGalleryIndex;
+                  return (
+                    <button
+                      key={idx}
+                      ref={isActive ? activeThumbnailRef : null}
+                      type="button"
+                      onClick={() => setActiveGalleryIndex(idx)}
+                      className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer transition-all duration-200 ${
+                        isActive
+                          ? "ring-2 ring-[#FF4E7A] ring-offset-2 ring-offset-black scale-105 opacity-100"
+                          : "opacity-45 hover:opacity-85 border border-white/10"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`Thumbnail ${idx + 1}`}
+                        className="w-full h-full object-cover select-none pointer-events-none"
+                        draggable={false}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
