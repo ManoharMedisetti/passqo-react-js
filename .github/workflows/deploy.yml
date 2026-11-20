@@ -26,8 +26,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install clean Linux dependencies
+        run: |
+          rm -rf node_modules
+          npm install
+          chmod -R +x node_modules/.bin || true
 
       - name: Build with base path
         run: npx vite build --base=/passqo-react-js/
