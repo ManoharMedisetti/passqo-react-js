@@ -24,13 +24,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Install clean Linux dependencies
+      - name: Install dependencies
         run: |
           rm -rf node_modules
           npm install
           chmod -R +x node_modules/.bin || true
+
+      - name: Switch to HashRouter and fix image paths
+        run: |
+          # 1. Switch to HashRouter so reloads work on all pages
+          sed -i 's/BrowserRouter/HashRouter/g' src/main.jsx
+          
+          # 2. Prefix image and icon paths with /passqo-react-js/ so images load
+          find src -type f \( -name "*.jsx" -o -name "*.js" \) -exec sed -i 's|"/images/|"/passqo-react-js/images/|g; s|"/icons/|"/passqo-react-js/icons/|g' {} +
 
       - name: Build with base path
         run: npx vite build --base=/passqo-react-js/
