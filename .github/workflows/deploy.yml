@@ -37,6 +37,7 @@ jobs:
           # 1. Switch to HashRouter so reloads work on all pages
           sed -i 's/BrowserRouter/HashRouter/g' src/main.jsx
           
+<<<<<<< HEAD
           # 2. Reset any previous prefixes
           find src -type f \( -name "*.jsx" -o -name "*.js" \) -exec sed -i 's|/passqo-react-js/||g' {} +
           
@@ -45,6 +46,11 @@ jobs:
           
           # 4. Clean up the double-prefix on category icons (/images/categories/icons/)
           find src -type f \( -name "*.jsx" -o -name "*.js" \) -exec sed -i 's|/passqo-react-js/images/categories/passqo-react-js/icons/|/passqo-react-js/images/categories/icons/|g' {} +
+=======
+          # 2. Prefix all image, icon, and category paths (including template literals) with /passqo-react-js/
+          find src -type f \( -name "*.jsx" -o -name "*.js" \) -exec sed -i 's|/passqo-react-js/images/|/images/|g; s|/passqo-react-js/icons/|/icons/|g' {} +
+          find src -type f \( -name "*.jsx" -o -name "*.js" \) -exec sed -i 's|/images/|/passqo-react-js/images/|g; s|/icons/|/passqo-react-js/icons/|g' {} +
+>>>>>>> a4c644687a3e8076e010c6f595dae8f1d8b59f72
 
       - name: Build with base path
         run: npx vite build --base=/passqo-react-js/
