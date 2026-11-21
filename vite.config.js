@@ -1,9 +1,22 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import fs from "fs";
 
 export default defineConfig({
-  plugins: [react()],
+  base: "/passqo-react-js/",
+  plugins: [
+    react(),
+    {
+      name: "copy-404-for-gh-pages",
+      closeBundle() {
+        const distDir = path.resolve(__dirname, "./dist");
+        if (fs.existsSync(path.join(distDir, "index.html"))) {
+          fs.copyFileSync(path.join(distDir, "index.html"), path.join(distDir, "404.html"));
+        }
+      },
+    },
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
